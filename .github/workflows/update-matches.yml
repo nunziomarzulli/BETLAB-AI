@@ -1,4 +1,4 @@
-name: Aggiorna partite Serie A
+name: Aggiorna partite BETLAB
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Scarica prossime partite Serie A
+      - name: Scarica partite disponibili
         env:
           FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
         run: |
@@ -25,17 +25,31 @@ jobs:
 
           curl --fail --silent --show-error \
             -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
-            "https://api.football-data.org/v4/competitions/SA/matches?status=SCHEDULED" \
+            "https://api.football-data.org/v4/matches" \
             -o data/matches.json
 
           echo "Partite ricevute:"
+
           python3 - <<'PY'
           import json
 
           with open("data/matches.json", encoding="utf-8") as f:
               data = json.load(f)
 
-          print(len(data.get("matches", [])))
+          matches = data.get("matches", [])
+
+          print("Totale partite:", len(matches))
+
+          competitions = {}
+
+          for match in matches:
+              competition = match.get("competition", {})
+              name = competition.get("name", "Sconosciuto")
+              competitions[name] = competitions.get(name, 0) + 1
+
+          print("\nCompetizioni:")
+          for name, count in sorted(competitions.items()):
+              print(f"- {name}: {count}")
           PY
 
       - name: Salva aggiornamento
@@ -48,6 +62,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna partite Serie A"
+            git commit -m "Aggiorna partite BETLAB"
             git push
           fi
