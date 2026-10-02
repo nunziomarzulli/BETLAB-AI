@@ -9,13 +9,13 @@
 <style>
 :root{
   --green:#16a05d;
-  --green-dark:#0d7c46;
+  --green-dark:#087742;
   --green-light:#eaf7f0;
   --text:#171717;
   --muted:#777;
-  --border:#e5e5e5;
-  --soft:#f6f7f8;
-  --white:#fff;
+  --border:#e2e2e2;
+  --background:#f5f6f7;
+  --white:#ffffff;
 }
 
 *{
@@ -26,7 +26,7 @@
 
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  background:#f4f5f6;
+  background:var(--background);
   color:var(--text);
 }
 
@@ -51,7 +51,6 @@ header{
 .logo{
   font-size:23px;
   font-weight:800;
-  letter-spacing:-.5px;
 }
 
 .logo span{
@@ -59,8 +58,9 @@ header{
 }
 
 .engine{
-  font-size:12px;
+  font-size:11px;
   color:#888;
+  text-transform:uppercase;
 }
 
 main{
@@ -69,72 +69,89 @@ main{
   padding:0 15px;
 }
 
-.toolbar{
+/* CALENDARIO */
+
+.calendar{
   background:#fff;
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:9px;
   overflow:hidden;
   margin-bottom:12px;
 }
 
 .days{
   display:flex;
-  align-items:center;
   overflow-x:auto;
+  scrollbar-width:thin;
   border-bottom:1px solid var(--border);
 }
 
 .day{
-  min-width:120px;
-  padding:13px 15px;
+  flex:0 0 105px;
+  padding:10px 5px 9px;
   text-align:center;
   cursor:pointer;
   border-right:1px solid var(--border);
-  color:#666;
-  font-size:12px;
   background:#fff;
+  color:#777;
+  font-size:10px;
 }
 
 .day:hover{
   background:#fafafa;
 }
 
-.day strong{
+.day .label{
+  font-weight:600;
+}
+
+.day .date{
   display:block;
-  color:#222;
-  font-size:13px;
   margin-top:3px;
+  font-size:13px;
+  font-weight:700;
+  color:#222;
+}
+
+.day .games{
+  display:block;
+  margin-top:3px;
+  font-size:9px;
+  color:#999;
 }
 
 .day.active{
-  color:var(--green-dark);
   background:var(--green-light);
+  color:var(--green-dark);
   border-bottom:3px solid var(--green);
 }
 
-.day.active strong{
+.day.active .date{
   color:var(--green-dark);
 }
 
+/* SEARCH */
+
 .tools{
   display:flex;
-  gap:10px;
-  padding:12px;
   align-items:center;
+  gap:12px;
+  padding:10px;
 }
 
 .search{
-  flex:1;
   position:relative;
+  flex:1;
 }
 
 .search input{
   width:100%;
+  height:38px;
   border:1px solid #ddd;
-  border-radius:7px;
-  padding:10px 12px 10px 36px;
-  font-size:14px;
+  border-radius:6px;
+  padding:0 12px 0 36px;
   outline:none;
+  font-size:13px;
 }
 
 .search input:focus{
@@ -148,89 +165,96 @@ main{
   color:#999;
 }
 
-.counter{
-  font-size:12px;
+.total{
+  min-width:75px;
+  text-align:right;
   color:#777;
-  white-space:nowrap;
+  font-size:11px;
 }
 
-.info-bar{
+/* DATA SELEZIONATA */
+
+.day-title{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin:14px 2px 10px;
-  font-size:13px;
-  color:#777;
+  margin:13px 2px 9px;
+  font-size:12px;
 }
 
-.info-bar strong{
-  color:#222;
+.day-title strong{
+  font-size:13px;
 }
+
+.version{
+  color:#999;
+  font-size:10px;
+}
+
+/* NAZIONE */
 
 .country{
-  margin-bottom:14px;
+  margin-bottom:15px;
 }
 
 .country-title{
-  padding:8px 11px;
-  font-size:12px;
+  padding:7px 9px;
+  font-size:11px;
   font-weight:700;
   color:#666;
   text-transform:uppercase;
-  letter-spacing:.4px;
 }
+
+/* CAMPIONATO */
 
 .competition{
   background:#fff;
   border:1px solid var(--border);
-  border-radius:9px;
+  border-radius:8px;
   overflow:hidden;
   margin-bottom:8px;
 }
 
 .competition-header{
-  height:43px;
-  padding:0 12px;
+  height:42px;
+  padding:0 11px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   background:#fafafa;
   border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
   cursor:pointer;
 }
 
-.competition-name{
+.competition-left{
   display:flex;
   align-items:center;
-  gap:9px;
-  font-size:13px;
+  gap:8px;
+  font-size:12px;
   font-weight:700;
 }
 
 .competition-logo{
-  width:22px;
-  height:22px;
+  width:21px;
+  height:21px;
   object-fit:contain;
 }
 
 .arrow{
   color:#999;
-  font-size:12px;
+  font-size:10px;
 }
 
-.matches{
-  display:block;
-}
+/* PARTITA */
 
 .match{
-  min-height:54px;
+  min-height:55px;
   display:grid;
-  grid-template-columns:65px 1fr 110px;
+  grid-template-columns:60px 1fr 85px;
   align-items:center;
+  padding:5px 10px;
   border-bottom:1px solid #eee;
-  padding:5px 12px;
   cursor:pointer;
-  transition:.1s;
 }
 
 .match:last-child{
@@ -242,14 +266,14 @@ main{
 }
 
 .time{
-  font-size:12px;
-  font-weight:600;
   color:#666;
+  font-size:11px;
+  font-weight:600;
 }
 
 .teams{
-  display:grid;
-  grid-template-columns:1fr;
+  display:flex;
+  flex-direction:column;
   gap:4px;
 }
 
@@ -257,25 +281,25 @@ main{
   display:flex;
   align-items:center;
   gap:7px;
-  font-size:13px;
+  font-size:12px;
   font-weight:500;
 }
 
 .crest{
-  width:19px;
-  height:19px;
+  width:18px;
+  height:18px;
   object-fit:contain;
 }
 
 .analysis{
   justify-self:end;
   border:1px solid #d6d6d6;
-  border-radius:6px;
-  padding:6px 9px;
+  border-radius:5px;
+  padding:6px 8px;
   background:#fff;
   color:#555;
-  font-size:11px;
-  font-weight:600;
+  font-size:10px;
+  font-weight:700;
 }
 
 .match:hover .analysis{
@@ -283,53 +307,51 @@ main{
   color:var(--green-dark);
 }
 
-.empty{
+/* EMPTY */
+
+.empty,
+.loading,
+.error{
   background:#fff;
   border:1px solid var(--border);
-  border-radius:9px;
-  padding:50px 20px;
+  border-radius:8px;
+  padding:45px 20px;
   text-align:center;
   color:#777;
+  font-size:13px;
 }
 
 .empty strong{
   display:block;
   color:#333;
-  margin-bottom:6px;
-}
-
-.loading{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:9px;
-  padding:40px;
-  text-align:center;
-  color:#777;
+  font-size:15px;
+  margin-bottom:7px;
 }
 
 .error{
-  background:#fff;
-  border:1px solid #e3b6b6;
-  border-radius:9px;
-  padding:25px;
-  color:#a23a3a;
+  color:#a33;
+  border-color:#e5bbbb;
 }
+
+/* FOOTER */
 
 footer{
   max-width:1100px;
   margin:30px auto;
-  padding:20px 15px;
+  padding:20px;
   border-top:1px solid #ddd;
-  color:#999;
-  font-size:11px;
   text-align:center;
+  color:#999;
+  font-size:10px;
   line-height:1.8;
 }
+
+/* MOBILE */
 
 @media(max-width:650px){
 
   .header-inner{
-    height:57px;
+    height:56px;
   }
 
   .engine{
@@ -337,8 +359,12 @@ footer{
   }
 
   main{
-    padding:0 8px;
     margin-top:8px;
+    padding:0 7px;
+  }
+
+  .day{
+    flex-basis:88px;
   }
 
   .tools{
@@ -346,22 +372,18 @@ footer{
     align-items:stretch;
   }
 
-  .counter{
+  .total{
     text-align:right;
   }
 
   .match{
-    grid-template-columns:48px 1fr 70px;
-    padding:6px 8px;
+    grid-template-columns:48px 1fr 68px;
+    padding:5px 7px;
   }
 
   .analysis{
     padding:5px;
-    font-size:10px;
-  }
-
-  .day{
-    min-width:95px;
+    font-size:9px;
   }
 }
 </style>
@@ -370,69 +392,107 @@ footer{
 <body>
 
 <header>
+
   <div class="header-inner">
-    <div class="logo">BETLAB <span>AI</span></div>
-    <div class="engine">DATA ENGINE · MULTI LEAGUE</div>
+
+    <div class="logo">
+      BETLAB <span>AI</span>
+    </div>
+
+    <div class="engine">
+      Data Engine · Multi League
+    </div>
+
   </div>
+
 </header>
+
 
 <main>
 
-<div class="toolbar">
+  <div class="calendar">
 
-  <div class="days" id="days"></div>
-
-  <div class="tools">
-
-    <div class="search">
-      <span class="search-icon">⌕</span>
-      <input
-        id="search"
-        type="text"
-        placeholder="Cerca squadra o campionato..."
-      >
+    <div
+      class="days"
+      id="days">
     </div>
 
-    <div class="counter">
-      <span id="matchCount">0</span> partite
+    <div class="tools">
+
+      <div class="search">
+
+        <span class="search-icon">
+          ⌕
+        </span>
+
+        <input
+          id="search"
+          type="text"
+          placeholder="Cerca squadra o campionato..."
+        >
+
+      </div>
+
+      <div class="total">
+        <span id="matchCount">0</span>
+        partite
+      </div>
+
     </div>
 
   </div>
 
-</div>
 
-<div class="info-bar">
-  <div>
-    <strong id="selectedDate">Partite</strong>
+  <div class="day-title">
+
+    <strong id="selectedDate">
+      Partite
+    </strong>
+
+    <span class="version">
+      BETLAB V0.4
+    </span>
+
   </div>
 
-  <div>
-    BETLAB V0.3
-  </div>
-</div>
 
-<div id="content">
-  <div class="loading">Caricamento partite...</div>
-</div>
+  <div id="content">
+
+    <div class="loading">
+      Caricamento partite...
+    </div>
+
+  </div>
 
 </main>
 
+
 <footer>
-  BETLAB AI · Analisi statistica sperimentale · Nessuna vincita è garantita
+
+  BETLAB AI · Analisi statistica sperimentale ·
+  Nessuna vincita è garantita
+
   <br>
+
   Data provided by football-data.org
+
 </footer>
 
 
 <script>
 
+/* =========================================
+   BETLAB AI V0.4
+========================================= */
+
 let allMatches = [];
+
 let selectedDay = null;
 
 
-/* -------------------------
-   DATA
-------------------------- */
+/* =========================================
+   CARICAMENTO DATI
+========================================= */
 
 async function loadData(){
 
@@ -442,17 +502,28 @@ async function loadData(){
       "data/matches.json?v=" + Date.now()
     );
 
+
     if(!response.ok){
-      throw new Error("Errore caricamento dati");
+
+      throw new Error(
+        "Impossibile caricare matches.json"
+      );
+
     }
+
 
     const data = await response.json();
 
+
     allMatches = data.matches || [];
 
+
     allMatches.sort(
-      (a,b) => new Date(a.utcDate) - new Date(b.utcDate)
+      (a,b) =>
+        new Date(a.utcDate) -
+        new Date(b.utcDate)
     );
+
 
     createDayNavigation();
 
@@ -462,116 +533,281 @@ async function loadData(){
 
     console.error(error);
 
-    document.getElementById("content").innerHTML = `
-      <div class="error">
-        Impossibile caricare i dati delle partite.
-      </div>
-    `;
+
+    document
+      .getElementById("content")
+      .innerHTML = `
+
+        <div class="error">
+
+          Errore nel caricamento
+          delle partite.
+
+        </div>
+
+      `;
 
   }
 
 }
 
 
-/* -------------------------
-   DATE
-------------------------- */
+/* =========================================
+   DATA LOCALE ITALIANA
+========================================= */
 
 function localDateKey(date){
 
-  return new Intl.DateTimeFormat(
-    "en-CA",
-    {
-      timeZone:"Europe/Rome",
-      year:"numeric",
-      month:"2-digit",
-      day:"2-digit"
-    }
-  ).format(date);
+  const parts =
+    new Intl.DateTimeFormat(
+      "it-IT",
+      {
+        timeZone:"Europe/Rome",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit"
+      }
+    )
+    .formatToParts(date);
+
+
+  const year =
+    parts.find(
+      part => part.type === "year"
+    ).value;
+
+
+  const month =
+    parts.find(
+      part => part.type === "month"
+    ).value;
+
+
+  const day =
+    parts.find(
+      part => part.type === "day"
+    ).value;
+
+
+  return `${year}-${month}-${day}`;
 
 }
 
 
+/* =========================================
+   CALENDARIO CONTINUO
+========================================= */
+
 function createDayNavigation(){
 
-  const dates = [...new Set(
-    allMatches.map(
-      match => localDateKey(new Date(match.utcDate))
-    )
-  )];
+  const container =
+    document.getElementById("days");
 
-  const container = document.getElementById("days");
 
   container.innerHTML = "";
 
-  if(dates.length === 0){
-    renderMatches();
-    return;
-  }
-
 
   /*
-    Se oggi esiste nei dati viene selezionato.
-    Altrimenti viene scelta la prima giornata disponibile.
+    Creiamo:
+    ieri
+    oggi
+    + 9 giorni
+
+    Nessun giorno viene saltato.
   */
 
-  const today = localDateKey(new Date());
+  const today = new Date();
+
+  today.setHours(
+    12,
+    0,
+    0,
+    0
+  );
+
 
   selectedDay =
-    dates.includes(today)
-      ? today
-      : dates[0];
+    localDateKey(today);
 
 
-  dates.forEach(dateKey => {
+  for(
+    let offset = -1;
+    offset <= 9;
+    offset++
+  ){
 
-    const date = new Date(dateKey + "T12:00:00");
+    const date =
+      new Date(today);
 
-    const weekday =
-      new Intl.DateTimeFormat(
-        "it-IT",
-        {weekday:"short"}
-      ).format(date);
 
-    const formatted =
+    date.setDate(
+      today.getDate() + offset
+    );
+
+
+    const dateKey =
+      localDateKey(date);
+
+
+    /*
+      Nome giorno
+    */
+
+    let label;
+
+
+    if(offset === -1){
+
+      label = "IERI";
+
+    }
+
+    else if(offset === 0){
+
+      label = "OGGI";
+
+    }
+
+    else if(offset === 1){
+
+      label = "DOMANI";
+
+    }
+
+    else{
+
+      label =
+        new Intl.DateTimeFormat(
+          "it-IT",
+          {
+            weekday:"short"
+          }
+        )
+        .format(date)
+        .replace(".","")
+        .toUpperCase();
+
+    }
+
+
+    /*
+      Data DD/MM
+    */
+
+    const formattedDate =
       new Intl.DateTimeFormat(
         "it-IT",
         {
           day:"2-digit",
           month:"2-digit"
         }
-      ).format(date);
+      )
+      .format(date);
 
 
-    const item = document.createElement("div");
+    /*
+      Numero partite presenti
+      nel nostro feed
+    */
 
-    item.className =
+    const count =
+      allMatches.filter(
+        match =>
+          localDateKey(
+            new Date(match.utcDate)
+          ) === dateKey
+      ).length;
+
+
+    const element =
+      document.createElement("div");
+
+
+    element.className =
       "day" +
-      (dateKey === selectedDay ? " active" : "");
+      (
+        dateKey === selectedDay
+          ? " active"
+          : ""
+      );
 
-    item.innerHTML = `
-      ${weekday}
-      <strong>${formatted}</strong>
+
+    element.innerHTML = `
+
+      <span class="label">
+        ${label}
+      </span>
+
+      <span class="date">
+        ${formattedDate}
+      </span>
+
+      <span class="games">
+        ${count} ${count === 1 ? "partita" : "partite"}
+      </span>
+
     `;
 
 
-    item.onclick = () => {
+    element.onclick = () => {
 
-      selectedDay = dateKey;
+      selectedDay =
+        dateKey;
 
-      document.querySelectorAll(".day")
-        .forEach(x => x.classList.remove("active"));
 
-      item.classList.add("active");
+      document
+        .querySelectorAll(".day")
+        .forEach(
+          item =>
+            item.classList.remove(
+              "active"
+            )
+        );
+
+
+      element
+        .classList
+        .add("active");
+
 
       renderMatches();
 
     };
 
 
-    container.appendChild(item);
+    container.appendChild(
+      element
+    );
 
-  });
+  }
+
+
+  /*
+    Centra OGGI
+  */
+
+  setTimeout(
+    () => {
+
+      const active =
+        container.querySelector(
+          ".active"
+        );
+
+
+      if(active){
+
+        active.scrollIntoView({
+          behavior:"smooth",
+          block:"nearest",
+          inline:"center"
+        });
+
+      }
+
+    },
+    100
+  );
 
 
   renderMatches();
@@ -579,9 +815,9 @@ function createDayNavigation(){
 }
 
 
-/* -------------------------
-   RENDER
-------------------------- */
+/* =========================================
+   PARTITE
+========================================= */
 
 function renderMatches(){
 
@@ -593,78 +829,116 @@ function renderMatches(){
       .toLowerCase();
 
 
-  let matches =
-    allMatches.filter(match => {
-
-      const date =
-        localDateKey(new Date(match.utcDate));
-
-      if(date !== selectedDay){
-        return false;
-      }
+  const matches =
+    allMatches.filter(
+      match => {
 
 
-      const home =
-        (
-          match.homeTeam?.name ||
-          match.homeTeam?.shortName ||
-          ""
-        ).toLowerCase();
+        /*
+          FILTRO DATA
+        */
+
+        const matchDate =
+          localDateKey(
+            new Date(match.utcDate)
+          );
 
 
-      const away =
-        (
-          match.awayTeam?.name ||
-          match.awayTeam?.shortName ||
-          ""
-        ).toLowerCase();
+        if(
+          matchDate !== selectedDay
+        ){
+
+          return false;
+
+        }
 
 
-      const competition =
-        (
-          match.competition?.name ||
-          ""
-        ).toLowerCase();
+        /*
+          FILTRO RICERCA
+        */
+
+        if(!search){
+
+          return true;
+
+        }
 
 
-      const country =
-        (
-          match.area?.name ||
-          ""
-        ).toLowerCase();
+        const home =
+          (
+            match.homeTeam?.name ||
+            match.homeTeam?.shortName ||
+            ""
+          ).toLowerCase();
 
 
-      if(search){
+        const away =
+          (
+            match.awayTeam?.name ||
+            match.awayTeam?.shortName ||
+            ""
+          ).toLowerCase();
+
+
+        const competition =
+          (
+            match.competition?.name ||
+            ""
+          ).toLowerCase();
+
+
+        const country =
+          (
+            match.area?.name ||
+            ""
+          ).toLowerCase();
+
 
         return (
+
           home.includes(search) ||
+
           away.includes(search) ||
+
           competition.includes(search) ||
+
           country.includes(search)
+
         );
 
       }
-
-      return true;
-
-    });
+    );
 
 
-  document.getElementById("matchCount")
-    .textContent = matches.length;
+  document
+    .getElementById("matchCount")
+    .textContent =
+      matches.length;
 
 
-  updateDateTitle();
+  updateSelectedDate();
 
 
-  if(matches.length === 0){
+  if(
+    matches.length === 0
+  ){
 
-    document.getElementById("content").innerHTML = `
-      <div class="empty">
-        <strong>Nessuna partita</strong>
-        Nessun incontro disponibile per questa selezione.
-      </div>
-    `;
+    document
+      .getElementById("content")
+      .innerHTML = `
+
+        <div class="empty">
+
+          <strong>
+            Nessuna partita disponibile
+          </strong>
+
+          Il feed BETLAB non contiene
+          incontri per questa giornata.
+
+        </div>
+
+      `;
 
     return;
 
@@ -672,151 +946,204 @@ function renderMatches(){
 
 
   /*
-     COUNTRY -> COMPETITION -> MATCHES
+    Raggruppamento:
+    NAZIONE -> CAMPIONATO
   */
 
-  const countries = {};
+  const groups = {};
 
 
-  matches.forEach(match => {
-
-    const country =
-      match.area?.name ||
-      "Internazionale";
+  matches.forEach(
+    match => {
 
 
-    const competition =
-      match.competition?.name ||
-      "Competizione";
+      const country =
+        match.area?.name ||
+        "Internazionale";
 
 
-    if(!countries[country]){
-      countries[country] = {};
+      const competition =
+        match.competition?.name ||
+        "Competizione";
+
+
+      if(!groups[country]){
+
+        groups[country] = {};
+
+      }
+
+
+      if(
+        !groups[country][competition]
+      ){
+
+        groups[country][competition] =
+          [];
+
+      }
+
+
+      groups[country][competition]
+        .push(match);
+
     }
-
-
-    if(!countries[country][competition]){
-      countries[country][competition] = [];
-    }
-
-
-    countries[country][competition].push(match);
-
-  });
+  );
 
 
   let html = "";
 
 
-  Object.keys(countries)
+  Object
+    .keys(groups)
     .sort()
-    .forEach(country => {
-
-      html += `
-        <div class="country">
-
-          <div class="country-title">
-            ${escapeHtml(country)}
-          </div>
-      `;
+    .forEach(
+      country => {
 
 
-      Object.keys(countries[country])
-        .sort()
-        .forEach(competition => {
+        html += `
 
-          const games =
-            countries[country][competition];
+          <section class="country">
 
-
-          const competitionData =
-            games[0]?.competition || {};
-
-
-          const emblem =
-            competitionData.emblem
-              ? `
-                <img
-                  class="competition-logo"
-                  src="${competitionData.emblem}"
-                  alt=""
-                >
-              `
-              : "";
-
-
-          const competitionId =
-            "competition-" +
-            Math.random()
-              .toString(36)
-              .substring(2);
-
-
-          html += `
-
-            <div class="competition">
-
-              <div
-                class="competition-header"
-                onclick="toggleCompetition('${competitionId}',this)"
-              >
-
-                <div class="competition-name">
-
-                  ${emblem}
-
-                  ${escapeHtml(competition)}
-
-                </div>
-
-                <div class="arrow">
-                  ▼
-                </div>
-
-              </div>
-
-
-              <div
-                class="matches"
-                id="${competitionId}"
-              >
-
-          `;
-
-
-          games.forEach(match => {
-
-            html += createMatchRow(match);
-
-          });
-
-
-          html += `
-              </div>
+            <div class="country-title">
+              ${escapeHtml(country)}
             </div>
-          `;
 
-        });
-
-
-      html += `</div>`;
-
-    });
+        `;
 
 
-  document.getElementById("content").innerHTML = html;
+        Object
+          .keys(groups[country])
+          .sort()
+          .forEach(
+            competition => {
+
+
+              const games =
+                groups[country][competition];
+
+
+              const competitionData =
+                games[0]?.competition ||
+                {};
+
+
+              const logo =
+                competitionData.emblem
+                  ? `
+
+                    <img
+                      class="competition-logo"
+                      src="${competitionData.emblem}"
+                      alt=""
+                    >
+
+                  `
+                  : "";
+
+
+              const id =
+                "league-" +
+                Math.random()
+                  .toString(36)
+                  .substring(2);
+
+
+              html += `
+
+                <div class="competition">
+
+
+                  <div
+                    class="competition-header"
+                    onclick="
+                      toggleCompetition(
+                        '${id}',
+                        this
+                      )
+                    "
+                  >
+
+
+                    <div class="competition-left">
+
+                      ${logo}
+
+                      <span>
+                        ${escapeHtml(competition)}
+                      </span>
+
+                    </div>
+
+
+                    <span class="arrow">
+                      ▼
+                    </span>
+
+
+                  </div>
+
+
+                  <div
+                    class="competition-matches"
+                    id="${id}"
+                  >
+
+              `;
+
+
+              games.forEach(
+                match => {
+
+                  html +=
+                    createMatchRow(
+                      match
+                    );
+
+                }
+              );
+
+
+              html += `
+
+                  </div>
+
+                </div>
+
+              `;
+
+            }
+          );
+
+
+        html += `
+
+          </section>
+
+        `;
+
+      }
+    );
+
+
+  document
+    .getElementById("content")
+    .innerHTML =
+      html;
 
 }
 
 
-/* -------------------------
-   MATCH
-------------------------- */
+/* =========================================
+   RIGA PARTITA
+========================================= */
 
 function createMatchRow(match){
 
   const date =
-    new Date(match.utcDate);
+    new Date(
+      match.utcDate
+    );
 
 
   const time =
@@ -827,7 +1154,8 @@ function createMatchRow(match){
         hour:"2-digit",
         minute:"2-digit"
       }
-    ).format(date);
+    )
+    .format(date);
 
 
   const home =
@@ -842,26 +1170,30 @@ function createMatchRow(match){
     "Trasferta";
 
 
-  const homeCrest =
+  const homeLogo =
     match.homeTeam?.crest
       ? `
+
         <img
           class="crest"
           src="${match.homeTeam.crest}"
           alt=""
         >
+
       `
       : "";
 
 
-  const awayCrest =
+  const awayLogo =
     match.awayTeam?.crest
       ? `
+
         <img
           class="crest"
           src="${match.awayTeam.crest}"
           alt=""
         >
+
       `
       : "";
 
@@ -873,6 +1205,7 @@ function createMatchRow(match){
       data-match-id="${match.id || ""}"
     >
 
+
       <div class="time">
         ${time}
       </div>
@@ -880,15 +1213,28 @@ function createMatchRow(match){
 
       <div class="teams">
 
-        <div class="team">
-          ${homeCrest}
-          ${escapeHtml(home)}
-        </div>
 
         <div class="team">
-          ${awayCrest}
-          ${escapeHtml(away)}
+
+          ${homeLogo}
+
+          <span>
+            ${escapeHtml(home)}
+          </span>
+
         </div>
+
+
+        <div class="team">
+
+          ${awayLogo}
+
+          <span>
+            ${escapeHtml(away)}
+          </span>
+
+        </div>
+
 
       </div>
 
@@ -897,6 +1243,7 @@ function createMatchRow(match){
         ANALISI ›
       </div>
 
+
     </div>
 
   `;
@@ -904,45 +1251,27 @@ function createMatchRow(match){
 }
 
 
-/* -------------------------
-   UI
-------------------------- */
+/* =========================================
+   DATA SELEZIONATA
+========================================= */
 
-function toggleCompetition(id,header){
-
-  const element =
-    document.getElementById(id);
-
-  const arrow =
-    header.querySelector(".arrow");
-
-
-  if(element.style.display === "none"){
-
-    element.style.display = "block";
-    arrow.textContent = "▼";
-
-  }else{
-
-    element.style.display = "none";
-    arrow.textContent = "▶";
-
-  }
-
-}
-
-
-function updateDateTitle(){
+function updateSelectedDate(){
 
   if(!selectedDay){
+
     return;
+
   }
 
+
   const date =
-    new Date(selectedDay + "T12:00:00");
+    new Date(
+      selectedDay +
+      "T12:00:00"
+    );
 
 
-  const text =
+  const formatted =
     new Intl.DateTimeFormat(
       "it-IT",
       {
@@ -951,36 +1280,111 @@ function updateDateTitle(){
         month:"long",
         year:"numeric"
       }
-    ).format(date);
+    )
+    .format(date);
 
 
-  document.getElementById("selectedDate")
+  const text =
+    formatted
+      .charAt(0)
+      .toUpperCase() +
+    formatted.slice(1);
+
+
+  document
+    .getElementById(
+      "selectedDate"
+    )
     .textContent =
-      text.charAt(0).toUpperCase() +
-      text.slice(1);
+      text;
 
 }
 
 
-/* -------------------------
-   SECURITY
-------------------------- */
+/* =========================================
+   APRI / CHIUDI CAMPIONATO
+========================================= */
+
+function toggleCompetition(
+  id,
+  header
+){
+
+  const element =
+    document.getElementById(id);
+
+
+  const arrow =
+    header.querySelector(
+      ".arrow"
+    );
+
+
+  if(
+    element.style.display ===
+    "none"
+  ){
+
+    element.style.display =
+      "block";
+
+    arrow.textContent =
+      "▼";
+
+  }
+
+  else{
+
+    element.style.display =
+      "none";
+
+    arrow.textContent =
+      "▶";
+
+  }
+
+}
+
+
+/* =========================================
+   PROTEZIONE HTML
+========================================= */
 
 function escapeHtml(text){
 
   return String(text)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
 
-/* -------------------------
-   SEARCH
-------------------------- */
+/* =========================================
+   RICERCA
+========================================= */
 
 document
   .getElementById("search")
@@ -989,6 +1393,10 @@ document
     renderMatches
   );
 
+
+/* =========================================
+   START
+========================================= */
 
 loadData();
 
