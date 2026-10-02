@@ -14,66 +14,133 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Scarica campionati BETLAB
+
+      - name: Scarica calendario BETLAB
         env:
           FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+
         run: |
+
           mkdir -p data
+
+          # Finestra dinamica:
+          # ieri -> prossimi 14 giorni
+
+          DATE_FROM=$(date -u -d "-1 day" +%Y-%m-%d)
+          DATE_TO=$(date -u -d "+14 days" +%Y-%m-%d)
+
+          echo "Periodo BETLAB:"
+          echo "$DATE_FROM -> $DATE_TO"
 
           curl --fail --silent --show-error \
             -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
-            "https://api.football-data.org/v4/matches?competitions=CL,PPL,PL,DED,BL1,FL1,SA,PD,ELC,BSA,WC,EC&dateFrom=2026-10-02&dateTo=2026-10-12" \
+            "https://api.football-data.org/v4/matches?competitions=CL,PPL,PL,DED,BL1,FL1,SA,PD,ELC,BSA,WC,EC&dateFrom=$DATE_FROM&dateTo=$DATE_TO" \
             -o data/matches.json
 
+
+          echo ""
           echo "================================="
           echo "BETLAB - DATI RICEVUTI"
           echo "================================="
 
-          python3 - <<'PY'
-          import json
 
-          with open("data/matches.json", encoding="utf-8") as f:
+          python3 - <<'PY'
+
+          import json
+          from collections import defaultdict
+
+
+          with open(
+              "data/matches.json",
+              encoding="utf-8"
+          ) as f:
+
               data = json.load(f)
 
+
           matches = data.get("matches", [])
+
 
           print("Totale partite:", len(matches))
           print()
 
-          competitions = {}
+
+          competitions = defaultdict(int)
+
 
           for match in matches:
-              competition = match.get("competition", {})
-              area = match.get("area", {})
 
-              name = competition.get("name", "Sconosciuto")
-              country = area.get("name", "Internazionale")
+              competition = match.get(
+                  "competition",
+                  {}
+              )
 
-              key = f"{country} | {name}"
-              competitions[key] = competitions.get(key, 0) + 1
+              area = match.get(
+                  "area",
+                  {}
+              )
+
+
+              competition_name = competition.get(
+                  "name",
+                  "Sconosciuto"
+              )
+
+              country = area.get(
+                  "name",
+                  "Internazionale"
+              )
+
+
+              competitions[
+                  f"{country} | {competition_name}"
+              ] += 1
+
 
           print("Competizioni trovate:")
 
-          for name, count in sorted(competitions.items()):
-              print(f"- {name}: {count}")
+
+          for name in sorted(competitions):
+
+              print(
+                  f"- {name}: "
+                  f"{competitions[name]}"
+              )
+
 
           print()
-          print("Periodo analizzato: 02/10/2026 - 12/10/2026")
+          print("BETLAB Data Engine OK")
+
           PY
 
+
       - name: Salva aggiornamento
+
         run: |
+
           git config user.name "BETLAB AI Bot"
-          git config user.email "actions@github.com"
+
+          git config user.email \
+            "actions@github.com"
+
 
           git add data/matches.json
 
-          if git diff --cached --quiet; then
+
+          if git diff --cached --quiet
+          then
+
             echo "Nessun aggiornamento."
+
           else
-            git commit -m "Aggiorna calendario multi-campionato BETLAB"
+
+            git commit \
+              -m "Aggiorna calendario BETLAB"
+
             git push
+
           fi
