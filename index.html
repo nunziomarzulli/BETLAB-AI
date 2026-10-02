@@ -1,342 +1,548 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BETLAB AI</title>
+<title>BETLAB AI</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #07110d;
-      color: #f4f7f5;
-    }
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#07110d;
+  color:#f4f7f5;
+}
 
-    header {
-      background: #0b1812;
-      border-bottom: 1px solid #1d3528;
-      padding: 18px 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+header{
+  background:#0b1812;
+  border-bottom:1px solid #1d3528;
+  padding:18px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .logo {
-      font-size: 25px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
+.logo{
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:1px;
+}
 
-    .logo span {
-      color: #28e17c;
-    }
+.logo span{color:#28e17c}
 
-    .status {
-      color: #8ba397;
-      font-size: 13px;
-    }
+.status{
+  color:#8ba397;
+  font-size:13px;
+}
 
-    main {
-      width: 92%;
-      max-width: 1250px;
-      margin: 35px auto;
-    }
+main{
+  width:92%;
+  max-width:1250px;
+  margin:35px auto;
+}
 
-    .hero {
-      margin-bottom: 30px;
-    }
+.hero{margin-bottom:30px}
 
-    .hero h1 {
-      font-size: 38px;
-      margin-bottom: 8px;
-    }
+.hero h1{
+  font-size:38px;
+  margin-bottom:8px;
+}
 
-    .hero p {
-      color: #8fa399;
-      line-height: 1.5;
-    }
+.hero p{
+  color:#8fa399;
+  line-height:1.5;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 30px;
-    }
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:30px;
+}
 
-    .stat {
-      background: #0d1b15;
-      border: 1px solid #193326;
-      border-radius: 12px;
-      padding: 20px;
-    }
+.stat{
+  background:#0d1b15;
+  border:1px solid #193326;
+  border-radius:12px;
+  padding:20px;
+}
 
-    .stat small {
-      color: #81968b;
-    }
+.stat small{color:#81968b}
 
-    .stat strong {
-      display: block;
-      margin-top: 8px;
-      font-size: 24px;
-    }
+.stat strong{
+  display:block;
+  margin-top:8px;
+  font-size:24px;
+}
 
-    .green {
-      color: #28e17c;
-    }
+h2{
+  margin:30px 0 15px;
+  font-size:21px;
+}
 
-    h2 {
-      margin: 30px 0 15px;
-      font-size: 21px;
-    }
+.section-info{
+  color:#81968b;
+  font-size:13px;
+  margin-top:-8px;
+  margin-bottom:15px;
+}
 
-    .match {
-      background: #0d1b15;
-      border: 1px solid #193326;
-      border-radius: 14px;
-      margin-bottom: 15px;
-      padding: 20px;
-    }
+.match{
+  background:#0d1b15;
+  border:1px solid #193326;
+  border-radius:14px;
+  margin-bottom:12px;
+  padding:18px 20px;
+}
 
-    .match-top {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
+.match-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
 
-    .teams {
-      font-size: 18px;
-      font-weight: bold;
-    }
+.teams{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:17px;
+  font-weight:bold;
+}
 
-    .time {
-      color: #84978e;
-    }
+.team{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
 
-    .markets {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
+.crest{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+}
 
-    .market {
-      background: #13251c;
-      border-radius: 9px;
-      padding: 12px;
-      text-align: center;
-    }
+.vs{
+  color:#61746a;
+  font-size:12px;
+  font-weight:normal;
+}
 
-    .market small {
-      color: #81968b;
-      display: block;
-      margin-bottom: 5px;
-    }
+.datetime{
+  text-align:right;
+  color:#94a59d;
+  font-size:13px;
+  min-width:150px;
+}
 
-    .market strong {
-      font-size: 17px;
-    }
+.datetime strong{
+  display:block;
+  color:#f4f7f5;
+  margin-bottom:4px;
+}
 
-    .value {
-      border: 1px solid #28e17c;
-    }
+.analysis-wait{
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid #193326;
+  color:#70857a;
+  font-size:12px;
+}
 
-    .value strong {
-      color: #28e17c;
-    }
+.loading{
+  padding:25px;
+  background:#0d1b15;
+  border:1px solid #193326;
+  border-radius:14px;
+  color:#8fa399;
+}
 
-    .bets {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-bottom: 40px;
-    }
+.error{
+  padding:20px;
+  border:1px solid #7c3434;
+  background:#251212;
+  border-radius:12px;
+  color:#ff9c9c;
+}
 
-    .bet {
-      background: #0d1b15;
-      border: 1px solid #193326;
-      border-radius: 14px;
-      padding: 22px;
-    }
+.bets{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-bottom:40px;
+}
 
-    .bet h3 {
-      margin-bottom: 15px;
-    }
+.bet{
+  background:#0d1b15;
+  border:1px solid #193326;
+  border-radius:14px;
+  padding:22px;
+}
 
-    .target {
-      font-size: 28px;
-      font-weight: bold;
-      color: #28e17c;
-      margin-bottom: 15px;
-    }
+.bet h3{margin-bottom:15px}
 
-    .bet p {
-      color: #94a59d;
-      margin: 7px 0;
-      font-size: 14px;
-    }
+.target{
+  font-size:28px;
+  font-weight:bold;
+  color:#28e17c;
+  margin-bottom:15px;
+}
 
-    button {
-      width: 100%;
-      border: 0;
-      margin-top: 18px;
-      padding: 12px;
-      border-radius: 8px;
-      background: #28e17c;
-      color: #041009;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.bet p{
+  color:#94a59d;
+  margin:7px 0;
+  font-size:14px;
+}
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #64776e;
-      font-size: 12px;
-    }
+button{
+  width:100%;
+  border:0;
+  margin-top:18px;
+  padding:12px;
+  border-radius:8px;
+  background:#28e17c;
+  color:#041009;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    @media(max-width: 800px) {
-      .stats,
-      .bets {
-        grid-template-columns: 1fr;
-      }
+button:disabled{
+  background:#193326;
+  color:#6f8378;
+  cursor:not-allowed;
+}
 
-      .markets {
-        grid-template-columns: repeat(2, 1fr);
-      }
+footer{
+  text-align:center;
+  padding:30px;
+  color:#64776e;
+  font-size:12px;
+}
 
-      .hero h1 {
-        font-size: 29px;
-      }
-    }
-  </style>
+@media(max-width:800px){
+
+  .stats,
+  .bets{
+    grid-template-columns:1fr;
+  }
+
+  .hero h1{font-size:29px}
+
+  .match-top{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .datetime{
+    text-align:left;
+  }
+
+  .teams{
+    flex-wrap:wrap;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <header>
   <div class="logo">BETLAB <span>AI</span></div>
-  <div class="status">● Motore analisi V0.1</div>
+  <div class="status">● DATA ENGINE V0.2</div>
 </header>
 
 <main>
 
-  <section class="hero">
-    <h1>Il mercato dice una cosa.<br>L'algoritmo controlla.</h1>
+<section class="hero">
 
-    <p>
-      Analisi probabilistica delle partite, confronto con le quote
-      e ricerca delle opportunità statisticamente interessanti.
-    </p>
-  </section>
+<h1>
+Il mercato dice una cosa.<br>
+L'algoritmo controlla.
+</h1>
 
-  <section class="stats">
+<p>
+Analisi probabilistica delle partite, confronto con le quote
+e ricerca delle opportunità statisticamente interessanti.
+</p>
 
-    <div class="stat">
-      <small>Partite analizzate</small>
-      <strong>0</strong>
-    </div>
+</section>
 
-    <div class="stat">
-      <small>Pronostici verificati</small>
-      <strong>0</strong>
-    </div>
+<section class="stats">
 
-    <div class="stat">
-      <small>Accuracy</small>
-      <strong>—</strong>
-    </div>
+<div class="stat">
+<small>Partite disponibili</small>
+<strong id="matchCount">—</strong>
+</div>
 
-    <div class="stat">
-      <small>ROI simulato</small>
-      <strong>—</strong>
-    </div>
+<div class="stat">
+<small>Pronostici verificati</small>
+<strong>0</strong>
+</div>
 
-  </section>
+<div class="stat">
+<small>Accuracy</small>
+<strong>—</strong>
+</div>
 
-  <h2>Analisi partite</h2>
+<div class="stat">
+<small>ROI simulato</small>
+<strong>—</strong>
+</div>
 
-  <div class="match">
+</section>
 
-    <div class="match-top">
-      <div class="teams">Inter — Roma</div>
-      <div class="time">Demo</div>
-    </div>
 
-    <div class="markets">
+<h2>Prossime partite Serie A</h2>
 
-      <div class="market value">
-        <small>1</small>
-        <strong>56%</strong>
-      </div>
+<div class="section-info">
+Dati aggiornati automaticamente tramite BETLAB Data Engine
+</div>
 
-      <div class="market">
-        <small>X</small>
-        <strong>25%</strong>
-      </div>
+<div id="matches">
 
-      <div class="market">
-        <small>2</small>
-        <strong>19%</strong>
-      </div>
+<div class="loading">
+Caricamento partite reali...
+</div>
 
-      <div class="market">
-        <small>Over 2.5</small>
-        <strong>61%</strong>
-      </div>
+</div>
 
-      <div class="market">
-        <small>Goal</small>
-        <strong>54%</strong>
-      </div>
 
-    </div>
+<h2>Schedine AI</h2>
 
-  </div>
+<section class="bets">
 
-  <h2>Schedine AI</h2>
+<div class="bet">
 
-  <section class="bets">
+<h3>Profilo A</h3>
 
-    <div class="bet">
-      <h3>Profilo A</h3>
-      <div class="target">~ €100</div>
-      <p>Puntata: €2</p>
-      <p>Target quota: ~50</p>
-      <p>Selezioni: da calcolare</p>
-      <button>GENERA SCHEDINA</button>
-    </div>
+<div class="target">~ €100</div>
 
-    <div class="bet">
-      <h3>Profilo B</h3>
-      <div class="target">~ €1.000</div>
-      <p>Puntata: €5</p>
-      <p>Target quota: ~200</p>
-      <p>Selezioni: da calcolare</p>
-      <button>GENERA SCHEDINA</button>
-    </div>
+<p>Puntata: €2</p>
+<p>Target quota: ~50</p>
+<p>Selezioni: in attesa del motore predittivo</p>
 
-    <div class="bet">
-      <h3>Profilo C</h3>
-      <div class="target">~ €10.000</div>
-      <p>Puntata: €10</p>
-      <p>Target quota: ~1.000</p>
-      <p>Selezioni: da calcolare</p>
-      <button>GENERA SCHEDINA</button>
-    </div>
+<button disabled>
+MOTORE IN PREPARAZIONE
+</button>
 
-  </section>
+</div>
+
+
+<div class="bet">
+
+<h3>Profilo B</h3>
+
+<div class="target">~ €1.000</div>
+
+<p>Puntata: €5</p>
+<p>Target quota: ~200</p>
+<p>Selezioni: in attesa del motore predittivo</p>
+
+<button disabled>
+MOTORE IN PREPARAZIONE
+</button>
+
+</div>
+
+
+<div class="bet">
+
+<h3>Profilo C</h3>
+
+<div class="target">~ €10.000</div>
+
+<p>Puntata: €10</p>
+<p>Target quota: ~1.000</p>
+<p>Selezioni: in attesa del motore predittivo</p>
+
+<button disabled>
+MOTORE IN PREPARAZIONE
+</button>
+
+</div>
+
+</section>
 
 </main>
 
+
 <footer>
-  BETLAB AI • Analisi statistica sperimentale • Nessuna vincita è garantita
+BETLAB AI • Analisi statistica sperimentale • Nessuna vincita è garantita
 </footer>
+
+
+<script>
+
+async function loadMatches(){
+
+  const container = document.getElementById("matches");
+  const counter = document.getElementById("matchCount");
+
+  try{
+
+    const response = await fetch(
+      "data/matches.json?time=" + Date.now()
+    );
+
+    if(!response.ok){
+      throw new Error("Impossibile caricare matches.json");
+    }
+
+    const data = await response.json();
+
+    let matches = data.matches || [];
+
+    const now = new Date();
+
+    matches = matches
+      .filter(match => new Date(match.utcDate) > now)
+      .sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate));
+
+    counter.textContent = matches.length;
+
+    /*
+      Per adesso mostriamo le prossime 20.
+      Il JSON completo rimane disponibile al motore.
+    */
+
+    const visibleMatches = matches.slice(0,20);
+
+    if(visibleMatches.length === 0){
+
+      container.innerHTML =
+        '<div class="loading">Nessuna partita programmata disponibile.</div>';
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    visibleMatches.forEach(match => {
+
+      const date = new Date(match.utcDate);
+
+      const dateText =
+        new Intl.DateTimeFormat(
+          "it-IT",
+          {
+            weekday:"short",
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric"
+          }
+        ).format(date);
+
+      const timeText =
+        new Intl.DateTimeFormat(
+          "it-IT",
+          {
+            hour:"2-digit",
+            minute:"2-digit"
+          }
+        ).format(date);
+
+
+      const home =
+        match.homeTeam?.shortName ||
+        match.homeTeam?.name ||
+        "Casa";
+
+      const away =
+        match.awayTeam?.shortName ||
+        match.awayTeam?.name ||
+        "Trasferta";
+
+
+      const homeCrest =
+        match.homeTeam?.crest || "";
+
+      const awayCrest =
+        match.awayTeam?.crest || "";
+
+
+      const homeImg = homeCrest
+        ? `<img class="crest" src="${homeCrest}" alt="">`
+        : "";
+
+      const awayImg = awayCrest
+        ? `<img class="crest" src="${awayCrest}" alt="">`
+        : "";
+
+
+      const element =
+        document.createElement("div");
+
+      element.className = "match";
+
+
+      element.innerHTML = `
+
+        <div class="match-top">
+
+          <div class="teams">
+
+            <span class="team">
+              ${homeImg}
+              ${home}
+            </span>
+
+            <span class="vs">
+              VS
+            </span>
+
+            <span class="team">
+              ${awayImg}
+              ${away}
+            </span>
+
+          </div>
+
+          <div class="datetime">
+
+            <strong>
+              ${dateText}
+            </strong>
+
+            ${timeText}
+
+          </div>
+
+        </div>
+
+        <div class="analysis-wait">
+          Analisi BETLAB: in attesa del modello predittivo
+        </div>
+
+      `;
+
+      container.appendChild(element);
+
+    });
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    counter.textContent = "ERRORE";
+
+    container.innerHTML = `
+      <div class="error">
+        Impossibile caricare i dati delle partite.
+      </div>
+    `;
+
+  }
+
+}
+
+
+loadMatches();
+
+</script>
 
 </body>
 </html>
