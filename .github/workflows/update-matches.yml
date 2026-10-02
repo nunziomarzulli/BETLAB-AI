@@ -1,0 +1,53 @@
+name: Aggiorna partite Serie A
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "15 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-matches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Scarica prossime partite Serie A
+        env:
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+        run: |
+          mkdir -p data
+
+          curl --fail --silent --show-error \
+            -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
+            "https://api.football-data.org/v4/competitions/SA/matches?status=SCHEDULED" \
+            -o data/matches.json
+
+          echo "Partite ricevute:"
+          python3 - <<'PY'
+          import json
+
+          with open("data/matches.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          print(len(data.get("matches", [])))
+          PY
+
+      - name: Salva aggiornamento
+        run: |
+          git config user.name "BETLAB AI Bot"
+          git config user.email "actions@github.com"
+
+          git add data/matches.json
+
+          if git diff --cached --quiet; then
+            echo "Nessun aggiornamento."
+          else
+            git commit -m "Aggiorna partite Serie A"
+            git push
+          fi
