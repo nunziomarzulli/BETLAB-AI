@@ -17,7 +17,7 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Scarica partite disponibili
+      - name: Scarica campionati BETLAB
         env:
           FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
         run: |
@@ -25,10 +25,12 @@ jobs:
 
           curl --fail --silent --show-error \
             -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
-            "https://api.football-data.org/v4/matches" \
+            "https://api.football-data.org/v4/matches?competitions=CL,PPL,PL,DED,BL1,FL1,SA,PD,ELC,BSA,WC,EC&dateFrom=2026-10-02&dateTo=2026-10-12" \
             -o data/matches.json
 
-          echo "Partite ricevute:"
+          echo "================================="
+          echo "BETLAB - DATI RICEVUTI"
+          echo "================================="
 
           python3 - <<'PY'
           import json
@@ -39,17 +41,27 @@ jobs:
           matches = data.get("matches", [])
 
           print("Totale partite:", len(matches))
+          print()
 
           competitions = {}
 
           for match in matches:
               competition = match.get("competition", {})
-              name = competition.get("name", "Sconosciuto")
-              competitions[name] = competitions.get(name, 0) + 1
+              area = match.get("area", {})
 
-          print("\nCompetizioni:")
+              name = competition.get("name", "Sconosciuto")
+              country = area.get("name", "Internazionale")
+
+              key = f"{country} | {name}"
+              competitions[key] = competitions.get(key, 0) + 1
+
+          print("Competizioni trovate:")
+
           for name, count in sorted(competitions.items()):
               print(f"- {name}: {count}")
+
+          print()
+          print("Periodo analizzato: 02/10/2026 - 12/10/2026")
           PY
 
       - name: Salva aggiornamento
@@ -62,6 +74,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna partite BETLAB"
+            git commit -m "Aggiorna calendario multi-campionato BETLAB"
             git push
           fi
