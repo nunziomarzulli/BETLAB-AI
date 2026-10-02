@@ -31,7 +31,7 @@ jobs:
           # ieri -> prossimi 14 giorni
 
           DATE_FROM=$(date -u -d "-1 day" +%Y-%m-%d)
-          DATE_TO=$(date -u -d "+14 days" +%Y-%m-%d)
+          DATE_TO=$(date -u -d "+9 days" +%Y-%m-%d)
 
           echo "Periodo BETLAB:"
           echo "$DATE_FROM -> $DATE_TO"
