@@ -7,240 +7,361 @@
 <title>BETLAB AI</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16a05d;
+  --green-dark:#0d7c46;
+  --green-light:#eaf7f0;
+  --text:#171717;
+  --muted:#777;
+  --border:#e5e5e5;
+  --soft:#f6f7f8;
+  --white:#fff;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
 body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:#07110d;
-  color:#f4f7f5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#f4f5f6;
+  color:var(--text);
 }
 
 header{
-  background:#0b1812;
-  border-bottom:1px solid #1d3528;
-  padding:18px 5%;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+  height:64px;
+  padding:0 18px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 }
 
 .logo{
-  font-size:25px;
+  font-size:23px;
   font-weight:800;
-  letter-spacing:1px;
+  letter-spacing:-.5px;
 }
 
-.logo span{color:#28e17c}
+.logo span{
+  color:var(--green);
+}
 
-.status{
-  color:#8ba397;
-  font-size:13px;
+.engine{
+  font-size:12px;
+  color:#888;
 }
 
 main{
-  width:92%;
-  max-width:1250px;
-  margin:35px auto;
+  max-width:1100px;
+  margin:18px auto 50px;
+  padding:0 15px;
 }
 
-.hero{margin-bottom:30px}
-
-.hero h1{
-  font-size:38px;
-  margin-bottom:8px;
-}
-
-.hero p{
-  color:#8fa399;
-  line-height:1.5;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-  margin-bottom:30px;
-}
-
-.stat{
-  background:#0d1b15;
-  border:1px solid #193326;
-  border-radius:12px;
-  padding:20px;
-}
-
-.stat small{color:#81968b}
-
-.stat strong{
-  display:block;
-  margin-top:8px;
-  font-size:24px;
-}
-
-h2{
-  margin:30px 0 15px;
-  font-size:21px;
-}
-
-.section-info{
-  color:#81968b;
-  font-size:13px;
-  margin-top:-8px;
-  margin-bottom:15px;
-}
-
-.match{
-  background:#0d1b15;
-  border:1px solid #193326;
-  border-radius:14px;
+.toolbar{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
   margin-bottom:12px;
-  padding:18px 20px;
 }
 
-.match-top{
+.days{
+  display:flex;
+  align-items:center;
+  overflow-x:auto;
+  border-bottom:1px solid var(--border);
+}
+
+.day{
+  min-width:120px;
+  padding:13px 15px;
+  text-align:center;
+  cursor:pointer;
+  border-right:1px solid var(--border);
+  color:#666;
+  font-size:12px;
+  background:#fff;
+}
+
+.day:hover{
+  background:#fafafa;
+}
+
+.day strong{
+  display:block;
+  color:#222;
+  font-size:13px;
+  margin-top:3px;
+}
+
+.day.active{
+  color:var(--green-dark);
+  background:var(--green-light);
+  border-bottom:3px solid var(--green);
+}
+
+.day.active strong{
+  color:var(--green-dark);
+}
+
+.tools{
+  display:flex;
+  gap:10px;
+  padding:12px;
+  align-items:center;
+}
+
+.search{
+  flex:1;
+  position:relative;
+}
+
+.search input{
+  width:100%;
+  border:1px solid #ddd;
+  border-radius:7px;
+  padding:10px 12px 10px 36px;
+  font-size:14px;
+  outline:none;
+}
+
+.search input:focus{
+  border-color:#aaa;
+}
+
+.search-icon{
+  position:absolute;
+  left:12px;
+  top:9px;
+  color:#999;
+}
+
+.counter{
+  font-size:12px;
+  color:#777;
+  white-space:nowrap;
+}
+
+.info-bar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:20px;
+  margin:14px 2px 10px;
+  font-size:13px;
+  color:#777;
+}
+
+.info-bar strong{
+  color:#222;
+}
+
+.country{
+  margin-bottom:14px;
+}
+
+.country-title{
+  padding:8px 11px;
+  font-size:12px;
+  font-weight:700;
+  color:#666;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.competition{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:9px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+
+.competition-header{
+  height:43px;
+  padding:0 12px;
+  background:#fafafa;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.competition-name{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.competition-logo{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+}
+
+.arrow{
+  color:#999;
+  font-size:12px;
+}
+
+.matches{
+  display:block;
+}
+
+.match{
+  min-height:54px;
+  display:grid;
+  grid-template-columns:65px 1fr 110px;
+  align-items:center;
+  border-bottom:1px solid #eee;
+  padding:5px 12px;
+  cursor:pointer;
+  transition:.1s;
+}
+
+.match:last-child{
+  border-bottom:0;
+}
+
+.match:hover{
+  background:#fafafa;
+}
+
+.time{
+  font-size:12px;
+  font-weight:600;
+  color:#666;
 }
 
 .teams{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:17px;
-  font-weight:bold;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:4px;
 }
 
 .team{
   display:flex;
   align-items:center;
   gap:7px;
+  font-size:13px;
+  font-weight:500;
 }
 
 .crest{
-  width:28px;
-  height:28px;
+  width:19px;
+  height:19px;
   object-fit:contain;
 }
 
-.vs{
-  color:#61746a;
-  font-size:12px;
-  font-weight:normal;
+.analysis{
+  justify-self:end;
+  border:1px solid #d6d6d6;
+  border-radius:6px;
+  padding:6px 9px;
+  background:#fff;
+  color:#555;
+  font-size:11px;
+  font-weight:600;
 }
 
-.datetime{
-  text-align:right;
-  color:#94a59d;
-  font-size:13px;
-  min-width:150px;
+.match:hover .analysis{
+  border-color:var(--green);
+  color:var(--green-dark);
 }
 
-.datetime strong{
+.empty{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:50px 20px;
+  text-align:center;
+  color:#777;
+}
+
+.empty strong{
   display:block;
-  color:#f4f7f5;
-  margin-bottom:4px;
-}
-
-.analysis-wait{
-  margin-top:14px;
-  padding-top:13px;
-  border-top:1px solid #193326;
-  color:#70857a;
-  font-size:12px;
+  color:#333;
+  margin-bottom:6px;
 }
 
 .loading{
-  padding:25px;
-  background:#0d1b15;
-  border:1px solid #193326;
-  border-radius:14px;
-  color:#8fa399;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:40px;
+  text-align:center;
+  color:#777;
 }
 
 .error{
-  padding:20px;
-  border:1px solid #7c3434;
-  background:#251212;
-  border-radius:12px;
-  color:#ff9c9c;
-}
-
-.bets{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  margin-bottom:40px;
-}
-
-.bet{
-  background:#0d1b15;
-  border:1px solid #193326;
-  border-radius:14px;
-  padding:22px;
-}
-
-.bet h3{margin-bottom:15px}
-
-.target{
-  font-size:28px;
-  font-weight:bold;
-  color:#28e17c;
-  margin-bottom:15px;
-}
-
-.bet p{
-  color:#94a59d;
-  margin:7px 0;
-  font-size:14px;
-}
-
-button{
-  width:100%;
-  border:0;
-  margin-top:18px;
-  padding:12px;
-  border-radius:8px;
-  background:#28e17c;
-  color:#041009;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:disabled{
-  background:#193326;
-  color:#6f8378;
-  cursor:not-allowed;
+  background:#fff;
+  border:1px solid #e3b6b6;
+  border-radius:9px;
+  padding:25px;
+  color:#a23a3a;
 }
 
 footer{
+  max-width:1100px;
+  margin:30px auto;
+  padding:20px 15px;
+  border-top:1px solid #ddd;
+  color:#999;
+  font-size:11px;
   text-align:center;
-  padding:30px;
-  color:#64776e;
-  font-size:12px;
+  line-height:1.8;
 }
 
-@media(max-width:800px){
+@media(max-width:650px){
 
-  .stats,
-  .bets{
-    grid-template-columns:1fr;
+  .header-inner{
+    height:57px;
   }
 
-  .hero h1{font-size:29px}
+  .engine{
+    display:none;
+  }
 
-  .match-top{
+  main{
+    padding:0 8px;
+    margin-top:8px;
+  }
+
+  .tools{
     flex-direction:column;
-    align-items:flex-start;
+    align-items:stretch;
   }
 
-  .datetime{
-    text-align:left;
+  .counter{
+    text-align:right;
   }
 
-  .teams{
-    flex-wrap:wrap;
+  .match{
+    grid-template-columns:48px 1fr 70px;
+    padding:6px 8px;
+  }
+
+  .analysis{
+    padding:5px;
+    font-size:10px;
+  }
+
+  .day{
+    min-width:95px;
   }
 }
 </style>
@@ -249,277 +370,91 @@ footer{
 <body>
 
 <header>
-  <div class="logo">BETLAB <span>AI</span></div>
-  <div class="status">● DATA ENGINE V0.2</div>
+  <div class="header-inner">
+    <div class="logo">BETLAB <span>AI</span></div>
+    <div class="engine">DATA ENGINE · MULTI LEAGUE</div>
+  </div>
 </header>
 
 <main>
 
-<section class="hero">
+<div class="toolbar">
 
-<h1>
-Il mercato dice una cosa.<br>
-L'algoritmo controlla.
-</h1>
+  <div class="days" id="days"></div>
 
-<p>
-Analisi probabilistica delle partite, confronto con le quote
-e ricerca delle opportunità statisticamente interessanti.
-</p>
+  <div class="tools">
 
-</section>
+    <div class="search">
+      <span class="search-icon">⌕</span>
+      <input
+        id="search"
+        type="text"
+        placeholder="Cerca squadra o campionato..."
+      >
+    </div>
 
-<section class="stats">
+    <div class="counter">
+      <span id="matchCount">0</span> partite
+    </div>
 
-<div class="stat">
-<small>Partite disponibili</small>
-<strong id="matchCount">—</strong>
-</div>
-
-<div class="stat">
-<small>Pronostici verificati</small>
-<strong>0</strong>
-</div>
-
-<div class="stat">
-<small>Accuracy</small>
-<strong>—</strong>
-</div>
-
-<div class="stat">
-<small>ROI simulato</small>
-<strong>—</strong>
-</div>
-
-</section>
-
-
-<h2>Prossime partite Serie A</h2>
-
-<div class="section-info">
-Dati aggiornati automaticamente tramite BETLAB Data Engine
-</div>
-
-<div id="matches">
-
-<div class="loading">
-Caricamento partite reali...
-</div>
+  </div>
 
 </div>
 
+<div class="info-bar">
+  <div>
+    <strong id="selectedDate">Partite</strong>
+  </div>
 
-<h2>Schedine AI</h2>
-
-<section class="bets">
-
-<div class="bet">
-
-<h3>Profilo A</h3>
-
-<div class="target">~ €100</div>
-
-<p>Puntata: €2</p>
-<p>Target quota: ~50</p>
-<p>Selezioni: in attesa del motore predittivo</p>
-
-<button disabled>
-MOTORE IN PREPARAZIONE
-</button>
-
+  <div>
+    BETLAB V0.3
+  </div>
 </div>
 
-
-<div class="bet">
-
-<h3>Profilo B</h3>
-
-<div class="target">~ €1.000</div>
-
-<p>Puntata: €5</p>
-<p>Target quota: ~200</p>
-<p>Selezioni: in attesa del motore predittivo</p>
-
-<button disabled>
-MOTORE IN PREPARAZIONE
-</button>
-
+<div id="content">
+  <div class="loading">Caricamento partite...</div>
 </div>
-
-
-<div class="bet">
-
-<h3>Profilo C</h3>
-
-<div class="target">~ €10.000</div>
-
-<p>Puntata: €10</p>
-<p>Target quota: ~1.000</p>
-<p>Selezioni: in attesa del motore predittivo</p>
-
-<button disabled>
-MOTORE IN PREPARAZIONE
-</button>
-
-</div>
-
-</section>
 
 </main>
 
-
 <footer>
-BETLAB AI • Analisi statistica sperimentale • Nessuna vincita è garantita
+  BETLAB AI · Analisi statistica sperimentale · Nessuna vincita è garantita
+  <br>
+  Data provided by football-data.org
 </footer>
 
 
 <script>
 
-async function loadMatches(){
+let allMatches = [];
+let selectedDay = null;
 
-  const container = document.getElementById("matches");
-  const counter = document.getElementById("matchCount");
+
+/* -------------------------
+   DATA
+------------------------- */
+
+async function loadData(){
 
   try{
 
     const response = await fetch(
-      "data/matches.json?time=" + Date.now()
+      "data/matches.json?v=" + Date.now()
     );
 
     if(!response.ok){
-      throw new Error("Impossibile caricare matches.json");
+      throw new Error("Errore caricamento dati");
     }
 
     const data = await response.json();
 
-    let matches = data.matches || [];
+    allMatches = data.matches || [];
 
-    const now = new Date();
+    allMatches.sort(
+      (a,b) => new Date(a.utcDate) - new Date(b.utcDate)
+    );
 
-    matches = matches
-      .filter(match => new Date(match.utcDate) > now)
-      .sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate));
-
-    counter.textContent = matches.length;
-
-    /*
-      Per adesso mostriamo le prossime 20.
-      Il JSON completo rimane disponibile al motore.
-    */
-
-    const visibleMatches = matches.slice(0,20);
-
-    if(visibleMatches.length === 0){
-
-      container.innerHTML =
-        '<div class="loading">Nessuna partita programmata disponibile.</div>';
-
-      return;
-    }
-
-    container.innerHTML = "";
-
-    visibleMatches.forEach(match => {
-
-      const date = new Date(match.utcDate);
-
-      const dateText =
-        new Intl.DateTimeFormat(
-          "it-IT",
-          {
-            weekday:"short",
-            day:"2-digit",
-            month:"2-digit",
-            year:"numeric"
-          }
-        ).format(date);
-
-      const timeText =
-        new Intl.DateTimeFormat(
-          "it-IT",
-          {
-            hour:"2-digit",
-            minute:"2-digit"
-          }
-        ).format(date);
-
-
-      const home =
-        match.homeTeam?.shortName ||
-        match.homeTeam?.name ||
-        "Casa";
-
-      const away =
-        match.awayTeam?.shortName ||
-        match.awayTeam?.name ||
-        "Trasferta";
-
-
-      const homeCrest =
-        match.homeTeam?.crest || "";
-
-      const awayCrest =
-        match.awayTeam?.crest || "";
-
-
-      const homeImg = homeCrest
-        ? `<img class="crest" src="${homeCrest}" alt="">`
-        : "";
-
-      const awayImg = awayCrest
-        ? `<img class="crest" src="${awayCrest}" alt="">`
-        : "";
-
-
-      const element =
-        document.createElement("div");
-
-      element.className = "match";
-
-
-      element.innerHTML = `
-
-        <div class="match-top">
-
-          <div class="teams">
-
-            <span class="team">
-              ${homeImg}
-              ${home}
-            </span>
-
-            <span class="vs">
-              VS
-            </span>
-
-            <span class="team">
-              ${awayImg}
-              ${away}
-            </span>
-
-          </div>
-
-          <div class="datetime">
-
-            <strong>
-              ${dateText}
-            </strong>
-
-            ${timeText}
-
-          </div>
-
-        </div>
-
-        <div class="analysis-wait">
-          Analisi BETLAB: in attesa del modello predittivo
-        </div>
-
-      `;
-
-      container.appendChild(element);
-
-    });
+    createDayNavigation();
 
   }
 
@@ -527,9 +462,7 @@ async function loadMatches(){
 
     console.error(error);
 
-    counter.textContent = "ERRORE";
-
-    container.innerHTML = `
+    document.getElementById("content").innerHTML = `
       <div class="error">
         Impossibile caricare i dati delle partite.
       </div>
@@ -540,7 +473,524 @@ async function loadMatches(){
 }
 
 
-loadMatches();
+/* -------------------------
+   DATE
+------------------------- */
+
+function localDateKey(date){
+
+  return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:"Europe/Rome",
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }
+  ).format(date);
+
+}
+
+
+function createDayNavigation(){
+
+  const dates = [...new Set(
+    allMatches.map(
+      match => localDateKey(new Date(match.utcDate))
+    )
+  )];
+
+  const container = document.getElementById("days");
+
+  container.innerHTML = "";
+
+  if(dates.length === 0){
+    renderMatches();
+    return;
+  }
+
+
+  /*
+    Se oggi esiste nei dati viene selezionato.
+    Altrimenti viene scelta la prima giornata disponibile.
+  */
+
+  const today = localDateKey(new Date());
+
+  selectedDay =
+    dates.includes(today)
+      ? today
+      : dates[0];
+
+
+  dates.forEach(dateKey => {
+
+    const date = new Date(dateKey + "T12:00:00");
+
+    const weekday =
+      new Intl.DateTimeFormat(
+        "it-IT",
+        {weekday:"short"}
+      ).format(date);
+
+    const formatted =
+      new Intl.DateTimeFormat(
+        "it-IT",
+        {
+          day:"2-digit",
+          month:"2-digit"
+        }
+      ).format(date);
+
+
+    const item = document.createElement("div");
+
+    item.className =
+      "day" +
+      (dateKey === selectedDay ? " active" : "");
+
+    item.innerHTML = `
+      ${weekday}
+      <strong>${formatted}</strong>
+    `;
+
+
+    item.onclick = () => {
+
+      selectedDay = dateKey;
+
+      document.querySelectorAll(".day")
+        .forEach(x => x.classList.remove("active"));
+
+      item.classList.add("active");
+
+      renderMatches();
+
+    };
+
+
+    container.appendChild(item);
+
+  });
+
+
+  renderMatches();
+
+}
+
+
+/* -------------------------
+   RENDER
+------------------------- */
+
+function renderMatches(){
+
+  const search =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  let matches =
+    allMatches.filter(match => {
+
+      const date =
+        localDateKey(new Date(match.utcDate));
+
+      if(date !== selectedDay){
+        return false;
+      }
+
+
+      const home =
+        (
+          match.homeTeam?.name ||
+          match.homeTeam?.shortName ||
+          ""
+        ).toLowerCase();
+
+
+      const away =
+        (
+          match.awayTeam?.name ||
+          match.awayTeam?.shortName ||
+          ""
+        ).toLowerCase();
+
+
+      const competition =
+        (
+          match.competition?.name ||
+          ""
+        ).toLowerCase();
+
+
+      const country =
+        (
+          match.area?.name ||
+          ""
+        ).toLowerCase();
+
+
+      if(search){
+
+        return (
+          home.includes(search) ||
+          away.includes(search) ||
+          competition.includes(search) ||
+          country.includes(search)
+        );
+
+      }
+
+      return true;
+
+    });
+
+
+  document.getElementById("matchCount")
+    .textContent = matches.length;
+
+
+  updateDateTitle();
+
+
+  if(matches.length === 0){
+
+    document.getElementById("content").innerHTML = `
+      <div class="empty">
+        <strong>Nessuna partita</strong>
+        Nessun incontro disponibile per questa selezione.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  /*
+     COUNTRY -> COMPETITION -> MATCHES
+  */
+
+  const countries = {};
+
+
+  matches.forEach(match => {
+
+    const country =
+      match.area?.name ||
+      "Internazionale";
+
+
+    const competition =
+      match.competition?.name ||
+      "Competizione";
+
+
+    if(!countries[country]){
+      countries[country] = {};
+    }
+
+
+    if(!countries[country][competition]){
+      countries[country][competition] = [];
+    }
+
+
+    countries[country][competition].push(match);
+
+  });
+
+
+  let html = "";
+
+
+  Object.keys(countries)
+    .sort()
+    .forEach(country => {
+
+      html += `
+        <div class="country">
+
+          <div class="country-title">
+            ${escapeHtml(country)}
+          </div>
+      `;
+
+
+      Object.keys(countries[country])
+        .sort()
+        .forEach(competition => {
+
+          const games =
+            countries[country][competition];
+
+
+          const competitionData =
+            games[0]?.competition || {};
+
+
+          const emblem =
+            competitionData.emblem
+              ? `
+                <img
+                  class="competition-logo"
+                  src="${competitionData.emblem}"
+                  alt=""
+                >
+              `
+              : "";
+
+
+          const competitionId =
+            "competition-" +
+            Math.random()
+              .toString(36)
+              .substring(2);
+
+
+          html += `
+
+            <div class="competition">
+
+              <div
+                class="competition-header"
+                onclick="toggleCompetition('${competitionId}',this)"
+              >
+
+                <div class="competition-name">
+
+                  ${emblem}
+
+                  ${escapeHtml(competition)}
+
+                </div>
+
+                <div class="arrow">
+                  ▼
+                </div>
+
+              </div>
+
+
+              <div
+                class="matches"
+                id="${competitionId}"
+              >
+
+          `;
+
+
+          games.forEach(match => {
+
+            html += createMatchRow(match);
+
+          });
+
+
+          html += `
+              </div>
+            </div>
+          `;
+
+        });
+
+
+      html += `</div>`;
+
+    });
+
+
+  document.getElementById("content").innerHTML = html;
+
+}
+
+
+/* -------------------------
+   MATCH
+------------------------- */
+
+function createMatchRow(match){
+
+  const date =
+    new Date(match.utcDate);
+
+
+  const time =
+    new Intl.DateTimeFormat(
+      "it-IT",
+      {
+        timeZone:"Europe/Rome",
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    ).format(date);
+
+
+  const home =
+    match.homeTeam?.shortName ||
+    match.homeTeam?.name ||
+    "Casa";
+
+
+  const away =
+    match.awayTeam?.shortName ||
+    match.awayTeam?.name ||
+    "Trasferta";
+
+
+  const homeCrest =
+    match.homeTeam?.crest
+      ? `
+        <img
+          class="crest"
+          src="${match.homeTeam.crest}"
+          alt=""
+        >
+      `
+      : "";
+
+
+  const awayCrest =
+    match.awayTeam?.crest
+      ? `
+        <img
+          class="crest"
+          src="${match.awayTeam.crest}"
+          alt=""
+        >
+      `
+      : "";
+
+
+  return `
+
+    <div
+      class="match"
+      data-match-id="${match.id || ""}"
+    >
+
+      <div class="time">
+        ${time}
+      </div>
+
+
+      <div class="teams">
+
+        <div class="team">
+          ${homeCrest}
+          ${escapeHtml(home)}
+        </div>
+
+        <div class="team">
+          ${awayCrest}
+          ${escapeHtml(away)}
+        </div>
+
+      </div>
+
+
+      <div class="analysis">
+        ANALISI ›
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* -------------------------
+   UI
+------------------------- */
+
+function toggleCompetition(id,header){
+
+  const element =
+    document.getElementById(id);
+
+  const arrow =
+    header.querySelector(".arrow");
+
+
+  if(element.style.display === "none"){
+
+    element.style.display = "block";
+    arrow.textContent = "▼";
+
+  }else{
+
+    element.style.display = "none";
+    arrow.textContent = "▶";
+
+  }
+
+}
+
+
+function updateDateTitle(){
+
+  if(!selectedDay){
+    return;
+  }
+
+  const date =
+    new Date(selectedDay + "T12:00:00");
+
+
+  const text =
+    new Intl.DateTimeFormat(
+      "it-IT",
+      {
+        weekday:"long",
+        day:"numeric",
+        month:"long",
+        year:"numeric"
+      }
+    ).format(date);
+
+
+  document.getElementById("selectedDate")
+    .textContent =
+      text.charAt(0).toUpperCase() +
+      text.slice(1);
+
+}
+
+
+/* -------------------------
+   SECURITY
+------------------------- */
+
+function escapeHtml(text){
+
+  return String(text)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* -------------------------
+   SEARCH
+------------------------- */
+
+document
+  .getElementById("search")
+  .addEventListener(
+    "input",
+    renderMatches
+  );
+
+
+loadData();
 
 </script>
 
