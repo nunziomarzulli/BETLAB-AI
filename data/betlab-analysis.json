@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-03T16:57:05.294726+00:00",
-  "engine": "BETLAB ANALYSIS ENGINE V3",
-  "historyMatches": 5474,
+  "generatedAt": "2026-10-03T16:59:21.851832+00:00",
+  "engine": "BETLAB ANALYSIS ENGINE V4",
+  "historyMatches": 5481,
   "matchesAnalyzed": 4,
   "analysis": [
     {
@@ -13,7 +13,7 @@
         "id": 442,
         "name": "Defensa Y Justicia",
         "form": {
-          "teamKey": "defensa y justicia",
+          "canonicalName": "defensa y justicia",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -31,7 +31,7 @@
         "id": 460,
         "name": "San Lorenzo",
         "form": {
-          "teamKey": "san lorenzo",
+          "canonicalName": "san lorenzo",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -55,7 +55,7 @@
         "id": 455,
         "name": "Atletico Tucuman",
         "form": {
-          "teamKey": "atletico tucuman",
+          "canonicalName": "atletico tucuman",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -73,7 +73,7 @@
         "id": 2432,
         "name": "Barracas Central",
         "form": {
-          "teamKey": "barracas central",
+          "canonicalName": "barracas central",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -97,7 +97,7 @@
         "id": 457,
         "name": "Newells Old Boys",
         "form": {
-          "teamKey": "newells old boys",
+          "canonicalName": "newells old boys",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -115,7 +115,7 @@
         "id": 446,
         "name": "Lanus",
         "form": {
-          "teamKey": "lanus",
+          "canonicalName": "lanus",
           "played": 0,
           "wins": 0,
           "draws": 0,
@@ -139,25 +139,71 @@
         "id": 1062,
         "name": "Atletico-MG",
         "form": {
-          "teamKey": "atletico mg",
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "points": 0,
-          "pointsPerGame": null,
-          "avgGoalsFor": null,
-          "avgGoalsAgainst": null,
-          "recent": []
+          "canonicalName": "atletico mineiro",
+          "played": 5,
+          "wins": 2,
+          "draws": 2,
+          "losses": 1,
+          "goalsFor": 6,
+          "goalsAgainst": 5,
+          "points": 8,
+          "pointsPerGame": 1.6,
+          "avgGoalsFor": 1.2,
+          "avgGoalsAgainst": 1.0,
+          "recent": [
+            {
+              "date": "2026-09-19",
+              "opponent": "Chapecoense AF",
+              "venue": "HOME",
+              "goalsFor": 1,
+              "goalsAgainst": 1,
+              "result": "D",
+              "source": "OpenFootball"
+            },
+            {
+              "date": "2026-09-12",
+              "opponent": "Fluminense FC",
+              "venue": "HOME",
+              "goalsFor": 3,
+              "goalsAgainst": 1,
+              "result": "W",
+              "source": "OpenFootball"
+            },
+            {
+              "date": "2026-09-05",
+              "opponent": "São Paulo FC",
+              "venue": "AWAY",
+              "goalsFor": 0,
+              "goalsAgainst": 2,
+              "result": "L",
+              "source": "OpenFootball"
+            },
+            {
+              "date": "2026-08-29",
+              "opponent": "EC Vitória",
+              "venue": "HOME",
+              "goalsFor": 2,
+              "goalsAgainst": 1,
+              "result": "W",
+              "source": "OpenFootball"
+            },
+            {
+              "date": "2026-08-22",
+              "opponent": "SC Internacional",
+              "venue": "AWAY",
+              "goalsFor": 0,
+              "goalsAgainst": 0,
+              "result": "D",
+              "source": "OpenFootball"
+            }
+          ]
         }
       },
       "away": {
         "id": 794,
         "name": "RB Bragantino",
         "form": {
-          "teamKey": "rb bragantino",
+          "canonicalName": "bragantino",
           "played": 5,
           "wins": 1,
           "draws": 1,
