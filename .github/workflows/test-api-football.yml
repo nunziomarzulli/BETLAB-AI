@@ -25,7 +25,7 @@ jobs:
 
         run: |
           mkdir -p data
-          TODAY=$(date -u +%Y-%m-%d)
+          TODAY=$(TZ=Europe/Rome date +%Y-%m-%d)
 
           echo "================================="
           echo "BETLAB DATA ENGINE"
@@ -58,18 +58,7 @@ jobs:
 
           matches = data.get("response", [])
 
-          # ==========================================
-          # CAMPIONATI BETLAB
-          #
-          # 3 = massima priorita'
-          # 2 = alta priorita'
-          # 1 = secondaria
-          #
-          # Le coppe nazionali minori vengono escluse.
-          # ==========================================
-
           priority = {
-
               # TOP 5 EUROPA
               ("Italy", "Serie A"): 3,
               ("England", "Premier League"): 3,
@@ -82,7 +71,7 @@ jobs:
               ("World", "UEFA Europa League"): 3,
               ("World", "UEFA Europa Conference League"): 3,
 
-              # SECONDE DIVISIONI IMPORTANTI
+              # SECONDE DIVISIONI
               ("Italy", "Serie B"): 2,
               ("England", "Championship"): 2,
               ("Spain", "Segunda División"): 2,
@@ -116,7 +105,6 @@ jobs:
           filtered = []
 
           for match in matches:
-
               fixture = match.get("fixture", {})
               league = match.get("league", {})
               teams = match.get("teams", {})
@@ -130,18 +118,16 @@ jobs:
               if level is None:
                   continue
 
-              # Solo partite non iniziate
               if status not in ("NS", "TBD"):
                   continue
 
               home = teams.get("home", {})
               away = teams.get("away", {})
 
-              # Devono esserci entrambe le squadre
               if not home.get("id") or not away.get("id"):
                   continue
 
-              item = {
+              filtered.append({
                   "fixtureId": fixture.get("id"),
                   "date": fixture.get("date"),
                   "timestamp": fixture.get("timestamp"),
@@ -166,9 +152,7 @@ jobs:
                       "name": away.get("name"),
                       "logo": away.get("logo")
                   }
-              }
-
-              filtered.append(item)
+              })
 
           filtered.sort(
               key=lambda x: (
@@ -191,10 +175,6 @@ jobs:
                   ensure_ascii=False,
                   indent=2
               )
-
-          # ==========================================
-          # SHORTLIST
-          # ==========================================
 
           shortlist = filtered[:30]
 
@@ -234,6 +214,332 @@ jobs:
           print("BETLAB SHORTLIST ENGINE OK")
           PY
 
+      - name: Analizza forma recente squadre
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+          import time
+          from datetime import datetime, timezone
+
+          SHORTLIST = "data/betlab-shortlist.json"
+          OUTPUT = "data/betlab-analysis.json"
+
+          API_KEY = os.environ["API_FOOTBALL_KEY"]
+          BASE_URL = "https://v3.football.api-sports.io"
+
+          with open(SHORTLIST, encoding="utf-8") as f:
+              shortlist_data = json.load(f)
+
+          candidates = shortlist_data.get("candidates", [])[:5]
+
+          cache = {}
+
+          def get_last_matches(team_id):
+              if team_id in cache:
+                  return cache[team_id]
+
+              url = f"{BASE_URL}/fixtures?team={team_id}&last=5"
+
+              request = urllib.request.Request(
+                  url,
+                  headers={
+                      "x-apisports-key": API_KEY
+                  }
+              )
+
+              try:
+                  with urllib.request.urlopen(
+                      request,
+                      timeout=30
+                  ) as response:
+                      payload = json.loads(
+                          response.read().decode("utf-8")
+                      )
+
+              except Exception as e:
+                  print(
+                      f"ERRORE API team {team_id}: {e}"
+                  )
+                  cache[team_id] = []
+                  return []
+
+              if payload.get("errors"):
+                  print(
+                      f"ERRORE API team {team_id}: "
+                      f"{payload['errors']}"
+                  )
+                  cache[team_id] = []
+                  return []
+
+              result = payload.get("response", [])
+
+              cache[team_id] = result
+
+              time.sleep(0.25)
+
+              return result
+
+          def calculate_form(fixtures, team_id):
+              played = 0
+              wins = 0
+              draws = 0
+              losses = 0
+              goals_for = 0
+              goals_against = 0
+              points = 0
+
+              recent = []
+
+              for match in fixtures:
+                  fixture = match.get("fixture", {})
+
+                  status = (
+                      fixture
+                      .get("status", {})
+                      .get("short")
+                  )
+
+                  if status not in (
+                      "FT",
+                      "AET",
+                      "PEN"
+                  ):
+                      continue
+
+                  teams = match.get("teams", {})
+                  goals = match.get("goals", {})
+
+                  home = teams.get("home", {})
+                  away = teams.get("away", {})
+
+                  home_id = home.get("id")
+                  away_id = away.get("id")
+
+                  home_goals = goals.get("home")
+                  away_goals = goals.get("away")
+
+                  if (
+                      home_goals is None
+                      or away_goals is None
+                  ):
+                      continue
+
+                  if team_id == home_id:
+                      gf = home_goals
+                      ga = away_goals
+                      opponent = away.get("name")
+                      venue = "HOME"
+
+                  elif team_id == away_id:
+                      gf = away_goals
+                      ga = home_goals
+                      opponent = home.get("name")
+                      venue = "AWAY"
+
+                  else:
+                      continue
+
+                  played += 1
+
+                  goals_for += gf
+                  goals_against += ga
+
+                  if gf > ga:
+                      result = "W"
+                      wins += 1
+                      points += 3
+
+                  elif gf == ga:
+                      result = "D"
+                      draws += 1
+                      points += 1
+
+                  else:
+                      result = "L"
+                      losses += 1
+
+                  recent.append({
+                      "date": fixture.get("date"),
+                      "opponent": opponent,
+                      "venue": venue,
+                      "goalsFor": gf,
+                      "goalsAgainst": ga,
+                      "result": result
+                  })
+
+              if played == 0:
+                  return {
+                      "played": 0,
+                      "wins": 0,
+                      "draws": 0,
+                      "losses": 0,
+                      "goalsFor": 0,
+                      "goalsAgainst": 0,
+                      "points": 0,
+                      "pointsPerGame": None,
+                      "avgGoalsFor": None,
+                      "avgGoalsAgainst": None,
+                      "recent": []
+                  }
+
+              return {
+                  "played": played,
+                  "wins": wins,
+                  "draws": draws,
+                  "losses": losses,
+                  "goalsFor": goals_for,
+                  "goalsAgainst": goals_against,
+                  "points": points,
+
+                  "pointsPerGame":
+                      round(points / played, 2),
+
+                  "avgGoalsFor":
+                      round(goals_for / played, 2),
+
+                  "avgGoalsAgainst":
+                      round(goals_against / played, 2),
+
+                  "recent": recent
+              }
+
+          analysis = []
+
+          print()
+          print("=================================")
+          print("BETLAB FORM ENGINE")
+          print("=================================")
+          print()
+
+          for candidate in candidates:
+              home = candidate["home"]
+              away = candidate["away"]
+
+              print(
+                  f'Analisi: '
+                  f'{home["name"]} - '
+                  f'{away["name"]}'
+              )
+
+              home_fixtures = get_last_matches(
+                  home["id"]
+              )
+
+              away_fixtures = get_last_matches(
+                  away["id"]
+              )
+
+              home_form = calculate_form(
+                  home_fixtures,
+                  home["id"]
+              )
+
+              away_form = calculate_form(
+                  away_fixtures,
+                  away["id"]
+              )
+
+              analysis.append({
+                  "fixtureId":
+                      candidate["fixtureId"],
+
+                  "date":
+                      candidate["date"],
+
+                  "country":
+                      candidate["country"],
+
+                  "league":
+                      candidate["league"],
+
+                  "leagueId":
+                      candidate["leagueId"],
+
+                  "season":
+                      candidate["season"],
+
+                  "home": {
+                      "id": home["id"],
+                      "name": home["name"],
+                      "form": home_form
+                  },
+
+                  "away": {
+                      "id": away["id"],
+                      "name": away["name"],
+                      "form": away_form
+                  }
+              })
+
+              print(
+                  f'  {home["name"]}: '
+                  f'{home_form["wins"]}V '
+                  f'{home_form["draws"]}N '
+                  f'{home_form["losses"]}P | '
+                  f'{home_form["goalsFor"]}-'
+                  f'{home_form["goalsAgainst"]}'
+              )
+
+              print(
+                  f'  {away["name"]}: '
+                  f'{away_form["wins"]}V '
+                  f'{away_form["draws"]}N '
+                  f'{away_form["losses"]}P | '
+                  f'{away_form["goalsFor"]}-'
+                  f'{away_form["goalsAgainst"]}'
+              )
+
+              print()
+
+          output = {
+              "generatedAt":
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
+
+              "source":
+                  "API-Football",
+
+              "matchesAnalyzed":
+                  len(analysis),
+
+              "apiRequestsUsed":
+                  len(cache),
+
+              "analysis":
+                  analysis
+          }
+
+          with open(
+              OUTPUT,
+              "w",
+              encoding="utf-8"
+          ) as f:
+              json.dump(
+                  output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+          print(
+              "Partite analizzate:",
+              len(analysis)
+          )
+
+          print(
+              "Richieste API utilizzate:",
+              len(cache)
+          )
+
+          print("BETLAB FORM ENGINE OK")
+          PY
+
       - name: Salva dati BETLAB
         run: |
           git config user.name "BETLAB AI Bot"
@@ -241,12 +547,13 @@ jobs:
 
           git add data/betlab-matches.json
           git add data/betlab-shortlist.json
+          git add data/betlab-analysis.json
 
           if git diff --cached --quiet
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna shortlist BETLAB"
+            git commit -m "Aggiorna analisi BETLAB"
 
             git pull --rebase origin main
 
