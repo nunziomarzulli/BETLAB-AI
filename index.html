@@ -1,893 +1,1421 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
 
-<title>BETLAB AI</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-<style>
-*{
-    box-sizing:border-box;
-}
+  <title>BETLAB AI</title>
 
-body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-    background:#f4f6f7;
-    color:#111820;
-}
+  <style>
 
-header{
-    height:72px;
-    background:#fff;
-    border-bottom:1px solid #e3e7e9;
-    display:flex;
-    align-items:center;
-}
-
-.header{
-    width:100%;
-    max-width:900px;
-    margin:auto;
-    padding:0 22px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.logo{
-    font-size:24px;
-    font-weight:900;
-    letter-spacing:-1px;
-}
-
-.logo span{
-    color:#13ad68;
-}
-
-.engine{
-    font-size:10px;
-    color:#92999e;
-    letter-spacing:1px;
-}
-
-main{
-    max-width:720px;
-    margin:auto;
-    padding:65px 20px 70px;
-}
-
-.hero{
-    text-align:center;
-    margin-bottom:34px;
-}
-
-.hero h1{
-    margin:0;
-    font-size:48px;
-    letter-spacing:-2.5px;
-    line-height:1.05;
-}
-
-.hero h1 span{
-    color:#13ad68;
-}
-
-.hero p{
-    margin:14px 0 0;
-    color:#7b848a;
-    font-size:15px;
-}
-
-.box{
-    background:#fff;
-    border:1px solid #e0e5e7;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 12px 35px rgba(20,35,45,.06);
-}
-
-.label{
-    display:block;
-    font-size:13px;
-    font-weight:750;
-    margin-bottom:10px;
-}
-
-.money{
-    position:relative;
-    margin-bottom:27px;
-}
-
-.euro{
-    position:absolute;
-    left:18px;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:21px;
-    font-weight:800;
-    color:#606a71;
-}
-
-#amount{
-    width:100%;
-    height:60px;
-    padding:0 18px 0 47px;
-    border:1px solid #d7dde0;
-    border-radius:10px;
-    background:#fafbfb;
-    outline:none;
-    font-size:23px;
-    font-weight:800;
-}
-
-#amount:focus{
-    border-color:#13ad68;
-    background:#fff;
-}
-
-.numbers{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-    margin-bottom:28px;
-}
-
-.number{
-    height:54px;
-    border:1px solid #d7dde0;
-    border-radius:10px;
-    background:#fff;
-    font-size:17px;
-    font-weight:800;
-    cursor:pointer;
-}
-
-.number.active{
-    background:#e8f8f0;
-    color:#087746;
-    border-color:#13ad68;
-}
-
-#create{
-    width:100%;
-    height:61px;
-    border:0;
-    border-radius:10px;
-    background:#13ad68;
-    color:#fff;
-    font-size:15px;
-    font-weight:850;
-    cursor:pointer;
-}
-
-#create:hover{
-    background:#0f995b;
-}
-
-#create:disabled{
-    opacity:.65;
-    cursor:wait;
-}
-
-.status{
-    text-align:center;
-    margin-top:14px;
-    min-height:16px;
-    color:#92999e;
-    font-size:11px;
-}
-
-#result{
-    display:none;
-    margin-top:34px;
-}
-
-.result-title{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    margin-bottom:15px;
-}
-
-.result-title h2{
-    margin:0;
-    font-size:25px;
-    letter-spacing:-.6px;
-}
-
-.result-title span{
-    font-size:11px;
-    color:#92999e;
-}
-
-.ticket{
-    background:#fff;
-    border:1px solid #dfe4e6;
-    border-radius:15px;
-    overflow:hidden;
-}
-
-.pick{
-    padding:19px 21px;
-    border-bottom:1px solid #edf0f1;
-}
-
-.pick:last-child{
-    border-bottom:0;
-}
-
-.pick-top{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    align-items:center;
-}
-
-.pick-info{
-    min-width:0;
-}
-
-.date{
-    font-size:10px;
-    color:#8d969c;
-    text-transform:uppercase;
-    margin-bottom:5px;
-    font-weight:650;
-}
-
-.fixture{
-    font-size:16px;
-    font-weight:800;
-}
-
-.badge{
-    flex-shrink:0;
-    padding:6px 9px;
-    border-radius:20px;
-    font-size:10px;
-    font-weight:800;
-}
-
-.strong{
-    background:#e6f7ef;
-    color:#087746;
-}
-
-.medium{
-    background:#fff4d9;
-    color:#846000;
-}
-
-.limited{
-    background:#f1f2f3;
-    color:#7d858a;
-}
-
-.ticket-bottom{
-    margin-top:13px;
-    background:#111a22;
-    border-radius:13px;
-    padding:19px 21px;
-    color:#fff;
-}
-
-.row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:7px 0;
-    font-size:13px;
-}
-
-.row strong{
-    font-size:16px;
-}
-
-.note{
-    margin-top:15px;
-    text-align:center;
-    color:#92999e;
-    font-size:10px;
-    line-height:1.5;
-}
-
-.error{
-    padding:22px;
-    background:#fff;
-    border:1px solid #e0e4e6;
-    border-radius:13px;
-    text-align:center;
-    font-size:14px;
-    line-height:1.5;
-}
-
-footer{
-    text-align:center;
-    padding:25px 20px;
-    border-top:1px solid #e1e5e7;
-    color:#a0a7ab;
-    font-size:10px;
-}
-
-@media(max-width:600px){
-
-    main{
-        padding-top:45px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    .hero h1{
-        font-size:38px;
+    body {
+      min-height: 100vh;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at top,
+          #16233a 0%,
+          #0b1220 40%,
+          #070b12 100%
+        );
+
+      color: #ffffff;
     }
 
-    .box{
-        padding:22px;
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    header {
+      width: 100%;
+      padding: 22px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(7,11,18,0.80);
+      backdrop-filter: blur(12px);
     }
 
-    .engine{
-        display:none;
+    .header-inner {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .numbers{
-        grid-template-columns:repeat(2,1fr);
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
     }
 
-    .pick-top{
-        align-items:flex-start;
+    .brand span {
+      color: #4ade80;
     }
-}
-</style>
+
+    .engine-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 12px rgba(74,222,128,0.8);
+    }
+
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    main {
+      width: 100%;
+      max-width: 760px;
+
+      margin: 0 auto;
+      padding: 70px 20px 80px;
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 7vw, 58px);
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: #4ade80;
+    }
+
+    .hero p {
+      margin-top: 14px;
+      color: #9ca3af;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       CONTROL PANEL
+       ========================================================= */
+
+    .panel {
+      background: rgba(17,24,39,0.88);
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      border-radius: 22px;
+
+      padding: 26px;
+
+      box-shadow:
+        0 30px 70px rgba(0,0,0,0.35);
+    }
+
+    .field {
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      display: block;
+
+      margin-bottom: 10px;
+
+      color: #d1d5db;
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+
+    /* =========================================================
+       IMPORTO
+       ========================================================= */
+
+    .amount-box {
+      position: relative;
+    }
+
+    .currency {
+      position: absolute;
+
+      left: 18px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      font-size: 22px;
+      font-weight: 800;
+
+      color: #4ade80;
+    }
+
+    #amount {
+      width: 100%;
+
+      padding: 17px 18px 17px 48px;
+
+      border-radius: 14px;
+
+      border: 1px solid rgba(255,255,255,0.10);
+
+      outline: none;
+
+      background: #0b1220;
+
+      color: white;
+
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    #amount:focus {
+      border-color: #4ade80;
+    }
+
+
+    /* =========================================================
+       NUMERO PARTITE
+       ========================================================= */
+
+    .match-count {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .count-button {
+      padding: 14px 10px;
+
+      border: 1px solid rgba(255,255,255,0.10);
+
+      border-radius: 12px;
+
+      background: #0b1220;
+
+      color: #d1d5db;
+
+      font-size: 16px;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      transition: 0.2s ease;
+    }
+
+    .count-button:hover {
+      border-color: rgba(74,222,128,0.55);
+    }
+
+    .count-button.active {
+      background: #4ade80;
+      color: #07100a;
+      border-color: #4ade80;
+    }
+
+
+    /* =========================================================
+       CREA GIOCATA
+       ========================================================= */
+
+    #createBet {
+      width: 100%;
+
+      border: 0;
+
+      border-radius: 14px;
+
+      padding: 18px;
+
+      background: #4ade80;
+
+      color: #07100a;
+
+      font-size: 15px;
+      font-weight: 900;
+
+      cursor: pointer;
+
+      transition: 0.2s ease;
+    }
+
+    #createBet:hover {
+      transform: translateY(-1px);
+      background: #5bea8d;
+    }
+
+    #createBet:disabled {
+      cursor: wait;
+      opacity: 0.65;
+      transform: none;
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    #status {
+      margin-top: 14px;
+
+      min-height: 20px;
+
+      text-align: center;
+
+      color: #9ca3af;
+
+      font-size: 12px;
+    }
+
+
+    /* =========================================================
+       RESULT
+       ========================================================= */
+
+    #result {
+      display: none;
+      margin-top: 32px;
+    }
+
+    #result.visible {
+      display: block;
+    }
+
+    .result-title {
+      margin-bottom: 16px;
+
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+
+    /* =========================================================
+       MATCH CARD
+       ========================================================= */
+
+    .match-card {
+      margin-bottom: 13px;
+
+      padding: 18px;
+
+      border-radius: 17px;
+
+      background: rgba(17,24,39,0.92);
+
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .match-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+
+      margin-bottom: 14px;
+    }
+
+    .match-info {
+      min-width: 0;
+    }
+
+    .match-league {
+      margin-bottom: 6px;
+
+      color: #6b7280;
+
+      font-size: 11px;
+      font-weight: 700;
+
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .match-name {
+      font-size: 17px;
+      font-weight: 850;
+      line-height: 1.3;
+    }
+
+    .match-date {
+      flex-shrink: 0;
+
+      color: #9ca3af;
+
+      font-size: 11px;
+      text-align: right;
+    }
+
+
+    /* =========================================================
+       PRONOSTICO
+       ========================================================= */
+
+    .prediction-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+
+      padding: 15px;
+
+      border-radius: 13px;
+
+      background: #0b1220;
+
+      border: 1px solid rgba(74,222,128,0.18);
+    }
+
+    .prediction-left {
+      min-width: 0;
+    }
+
+    .prediction-label {
+      margin-bottom: 4px;
+
+      color: #6b7280;
+
+      font-size: 10px;
+      font-weight: 800;
+
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .prediction-value {
+      color: #4ade80;
+
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .prediction-market {
+      margin-top: 3px;
+
+      color: #9ca3af;
+
+      font-size: 11px;
+    }
+
+
+    /* =========================================================
+       INDICE
+       ========================================================= */
+
+    .confidence {
+      flex-shrink: 0;
+
+      text-align: center;
+
+      min-width: 68px;
+
+      padding: 9px 10px;
+
+      border-radius: 11px;
+
+      background: rgba(74,222,128,0.10);
+    }
+
+    .confidence-number {
+      display: block;
+
+      color: #4ade80;
+
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .confidence-label {
+      display: block;
+
+      margin-top: 2px;
+
+      color: #6b7280;
+
+      font-size: 9px;
+      font-weight: 700;
+
+      text-transform: uppercase;
+    }
+
+
+    /* =========================================================
+       SUMMARY
+       ========================================================= */
+
+    .summary {
+      margin-top: 18px;
+
+      padding: 20px;
+
+      border-radius: 17px;
+
+      background: rgba(17,24,39,0.92);
+
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+
+      padding: 8px 0;
+
+      color: #9ca3af;
+
+      font-size: 13px;
+    }
+
+    .summary-row strong {
+      color: white;
+    }
+
+
+    /* =========================================================
+       ERROR
+       ========================================================= */
+
+    .message {
+      padding: 20px;
+
+      border-radius: 16px;
+
+      background: rgba(17,24,39,0.92);
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      color: #d1d5db;
+
+      line-height: 1.5;
+
+      text-align: center;
+    }
+
+    .message strong {
+      color: white;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+      padding: 30px 20px;
+
+      text-align: center;
+
+      color: #4b5563;
+
+      font-size: 11px;
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      main {
+        padding-top: 45px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .match-top {
+        display: block;
+      }
+
+      .match-date {
+        margin-top: 7px;
+        text-align: left;
+      }
+
+      .prediction-value {
+        font-size: 19px;
+      }
+
+    }
+
+  </style>
 </head>
+
 
 <body>
 
-<header>
-<div class="header">
+  <header>
 
-    <div class="logo">
+    <div class="header-inner">
+
+      <div class="brand">
         BETLAB <span>AI</span>
+      </div>
+
+      <div class="engine-status">
+
+        <span class="status-dot"></span>
+
+        <span id="engineText">
+          BETLAB pronto
+        </span>
+
+      </div>
+
     </div>
 
-    <div class="engine">
-        PREDICTION ENGINE
-    </div>
-
-</div>
-</header>
+  </header>
 
 
-<main>
+  <main>
 
-<section class="hero">
+    <section class="hero">
 
-    <h1>
-        Cosa giochiamo<span>?</span>
-    </h1>
+      <h1>
+        Cosa <span>giochiamo?</span>
+      </h1>
 
-    <p>
-        Scegli importo e numero di partite.
-        Al resto pensa BETLAB.
-    </p>
+      <p>
+        Scegli l'importo e quante partite vuoi.
+        BETLAB analizza i dati e seleziona un solo
+        pronostico per ogni partita.
+      </p>
 
-</section>
+    </section>
 
 
-<section class="box">
+    <section class="panel">
 
-    <label class="label">
-        Quanto vuoi giocare?
-    </label>
+      <div class="field">
 
-    <div class="money">
+        <label
+          class="field-label"
+          for="amount"
+        >
+          Quanto vuoi giocare?
+        </label>
 
-        <span class="euro">€</span>
+        <div class="amount-box">
 
-        <input
+          <span class="currency">
+            €
+          </span>
+
+          <input
             id="amount"
             type="number"
             min="1"
             step="1"
             value="5"
-        >
+          >
 
-    </div>
+        </div>
+
+      </div>
 
 
-    <label class="label">
-        Quante partite?
-    </label>
+      <div class="field">
 
-    <div class="numbers">
+        <span class="field-label">
+          Quante partite?
+        </span>
 
-        <button class="number active" data-number="2">
+        <div class="match-count">
+
+          <button
+            class="count-button active"
+            data-count="2"
+            type="button"
+          >
             2
-        </button>
+          </button>
 
-        <button class="number" data-number="3">
+          <button
+            class="count-button"
+            data-count="3"
+            type="button"
+          >
             3
-        </button>
+          </button>
 
-        <button class="number" data-number="4">
+          <button
+            class="count-button"
+            data-count="4"
+            type="button"
+          >
             4
-        </button>
+          </button>
 
-        <button class="number" data-number="5">
+          <button
+            class="count-button"
+            data-count="5"
+            type="button"
+          >
             5
-        </button>
+          </button>
 
-    </div>
+        </div>
+
+      </div>
 
 
-    <button id="create">
+      <button
+        id="createBet"
+        type="button"
+      >
         CREA LA GIOCATA
-    </button>
+      </button>
 
 
-    <div id="status" class="status">
-        BETLAB sta caricando le partite disponibili...
-    </div>
+      <div id="status">
+        BETLAB pronto
+      </div>
 
-</section>
-
-
-<section id="result">
-
-    <div class="result-title">
-
-        <h2>
-            La tua giocata
-        </h2>
-
-        <span id="generatedDate"></span>
-
-    </div>
+    </section>
 
 
-    <div id="ticket" class="ticket"></div>
+    <section id="result"></section>
+
+  </main>
 
 
-    <div class="ticket-bottom">
-
-        <div class="row">
-            <span>Partite</span>
-            <strong id="totalMatches">0</strong>
-        </div>
-
-        <div class="row">
-            <span>Importo</span>
-            <strong id="totalAmount">€ 0,00</strong>
-        </div>
-
-    </div>
+  <footer>
+    BETLAB AI · Analisi statistica automatizzata
+  </footer>
 
 
-    <div class="note">
-        BETLAB seleziona le partite in base ai dati disponibili.
-        L'analisi è probabilistica e non garantisce risultati o vincite.
-    </div>
+  <script>
 
-</section>
+    /* =========================================================
+       STATO
+       ========================================================= */
 
-</main>
+    let selectedCount = 2;
 
-
-<footer>
-    BETLAB AI · Statistical Prediction Engine
-</footer>
+    let betlabData = null;
 
 
-<script>
-
-let selectedNumber = 2;
-let data = null;
-
-
-/* ==========================================
-   NUMERO PARTITE
-========================================== */
-
-document
-.querySelectorAll(".number")
-.forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        document
-        .querySelectorAll(".number")
-        .forEach(b => b.classList.remove("active"));
-
-        button.classList.add("active");
-
-        selectedNumber =
-            Number(button.dataset.number);
-
-    });
-
-});
+    const amountInput =
+      document.getElementById(
+        "amount"
+      );
 
 
-/* ==========================================
-   CARICAMENTO DATI
-========================================== */
+    const createButton =
+      document.getElementById(
+        "createBet"
+      );
 
-async function loadData(){
 
-    const status =
-        document.getElementById("status");
+    const statusElement =
+      document.getElementById(
+        "status"
+      );
 
-    try{
+
+    const resultElement =
+      document.getElementById(
+        "result"
+      );
+
+
+    const engineText =
+      document.getElementById(
+        "engineText"
+      );
+
+
+    /* =========================================================
+       SELETTORE NUMERO PARTITE
+       ========================================================= */
+
+    document
+      .querySelectorAll(
+        ".count-button"
+      )
+      .forEach(
+        button => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              document
+                .querySelectorAll(
+                  ".count-button"
+                )
+                .forEach(
+                  item => {
+                    item.classList.remove(
+                      "active"
+                    );
+                  }
+                );
+
+
+              button.classList.add(
+                "active"
+              );
+
+
+              selectedCount =
+                Number(
+                  button.dataset.count
+                );
+
+            }
+          );
+
+        }
+      );
+
+
+    /* =========================================================
+       CARICA DATI
+       ========================================================= */
+
+    async function loadData() {
+
+      statusElement.textContent =
+        "Caricamento analisi BETLAB...";
+
+
+      engineText.textContent =
+        "Analisi dati";
+
+
+      try {
 
         const response =
-            await fetch(
-                "data/betlab-analysis.json?v=" +
-                Date.now()
-            );
+          await fetch(
+            "data/betlab-analysis.json?v="
+            +
+            Date.now(),
+            {
+              cache: "no-store"
+            }
+          );
 
-        if(!response.ok){
-            throw new Error("Feed non disponibile");
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Impossibile caricare i dati BETLAB."
+          );
+
         }
 
-        data =
-            await response.json();
 
-        const count =
-            Array.isArray(data.analysis)
-            ? data.analysis.length
-            : 0;
-
-        status.textContent =
-            count > 0
-            ? "BETLAB pronto"
-            : "Nessuna partita disponibile";
-
-    }
-    catch(error){
-
-        console.error(error);
-
-        data = null;
-
-        status.textContent =
-            "Dati momentaneamente non disponibili";
-
-    }
-
-}
+        betlabData =
+          await response.json();
 
 
-/* ==========================================
-   QUALITÀ DATI
-========================================== */
+        const matches =
+          getAnalysisArray(
+            betlabData
+          );
 
-function quality(match){
 
-    const home =
-        Number(
-            match?.home?.form?.played || 0
+        const available =
+          matches.filter(
+            match => {
+              return (
+                match.prediction
+                &&
+                match.prediction.available
+                === true
+              );
+            }
+          );
+
+
+        statusElement.textContent =
+          available.length
+          +
+          " pronostici disponibili";
+
+
+        engineText.textContent =
+          "BETLAB pronto";
+
+
+      } catch (error) {
+
+        console.error(
+          error
         );
 
-    const away =
-        Number(
-            match?.away?.form?.played || 0
-        );
 
-    const total = home + away;
+        statusElement.textContent =
+          "Errore caricamento dati";
 
 
-    if(home >= 4 && away >= 4){
+        engineText.textContent =
+          "Dati non disponibili";
 
-        return {
-            score:300 + total,
-            label:"DATI FORTI",
-            css:"strong"
-        };
+      }
 
     }
 
 
-    if(home > 0 && away > 0){
+    /* =========================================================
+       TROVA ARRAY ANALISI
+       ========================================================= */
 
-        return {
-            score:200 + total,
-            label:"DATI BUONI",
-            css:"medium"
-        };
+    function getAnalysisArray(data) {
+
+      if (
+        data
+        &&
+        Array.isArray(
+          data.analysis
+        )
+      ) {
+
+        return data.analysis;
+
+      }
+
+
+      if (
+        data
+        &&
+        Array.isArray(
+          data.matches
+        )
+      ) {
+
+        return data.matches;
+
+      }
+
+
+      if (
+        Array.isArray(
+          data
+        )
+      ) {
+
+        return data;
+
+      }
+
+
+      return [];
 
     }
 
 
-    if(home > 0 || away > 0){
+    /* =========================================================
+       FORMATTA DATA
+       ========================================================= */
 
-        return {
-            score:100 + total,
-            label:"DATI PARZIALI",
-            css:"medium"
-        };
+    function formatDate(
+      dateString
+    ) {
 
-    }
-
-
-    return {
-        score:0,
-        label:"DATI LIMITATI",
-        css:"limited"
-    };
-
-}
-
-
-/* ==========================================
-   DATA PARTITA
-========================================== */
-
-function matchDate(value){
-
-    if(!value){
+      if (!dateString) {
         return "";
-    }
+      }
 
-    const date =
-        new Date(value);
 
-    return date.toLocaleDateString(
+      const date =
+        new Date(
+          dateString
+        );
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return dateString;
+
+      }
+
+
+      return new Intl.DateTimeFormat(
         "it-IT",
         {
-            weekday:"short",
-            day:"2-digit",
-            month:"2-digit"
+          weekday: "short",
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
         }
-    );
+      ).format(
+        date
+      );
 
-}
+    }
 
 
-/* ==========================================
-   CREA GIOCATA
-========================================== */
+    /* =========================================================
+       ESCAPE HTML
+       ========================================================= */
 
-function createTicket(){
+    function escapeHtml(
+      value
+    ) {
 
-    const amount =
+      return String(
+        value ?? ""
+      )
+        .replaceAll(
+          "&",
+          "&amp;"
+        )
+        .replaceAll(
+          "<",
+          "&lt;"
+        )
+        .replaceAll(
+          ">",
+          "&gt;"
+        )
+        .replaceAll(
+          '"',
+          "&quot;"
+        )
+        .replaceAll(
+          "'",
+          "&#039;"
+        );
+
+    }
+
+
+    /* =========================================================
+       CREA CARD
+       ========================================================= */
+
+    function createMatchCard(
+      match
+    ) {
+
+      const homeName =
+        match.home?.name
+        ??
+        "Casa";
+
+
+      const awayName =
+        match.away?.name
+        ??
+        "Trasferta";
+
+
+      const league =
+        match.league
+        ??
+        "";
+
+
+      const country =
+        match.country
+        ??
+        "";
+
+
+      const prediction =
+        match.prediction
+        ??
+        {};
+
+
+      const selection =
+        prediction.prediction
+        ??
+        "-";
+
+
+      const market =
+        prediction.market
+        ??
+        "Mercato";
+
+
+      const confidence =
         Number(
-            document
-            .getElementById("amount")
-            .value
+          prediction.confidence
+          ??
+          0
         );
 
 
-    if(
+      return `
+        <article class="match-card">
+
+          <div class="match-top">
+
+            <div class="match-info">
+
+              <div class="match-league">
+                ${escapeHtml(country)}
+                ${country && league ? " · " : ""}
+                ${escapeHtml(league)}
+              </div>
+
+              <div class="match-name">
+                ${escapeHtml(homeName)}
+                –
+                ${escapeHtml(awayName)}
+              </div>
+
+            </div>
+
+            <div class="match-date">
+              ${escapeHtml(
+                formatDate(
+                  match.date
+                )
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="prediction-box">
+
+            <div class="prediction-left">
+
+              <div class="prediction-label">
+                Pronostico BETLAB
+              </div>
+
+              <div class="prediction-value">
+                ${escapeHtml(selection)}
+              </div>
+
+              <div class="prediction-market">
+                ${escapeHtml(market)}
+              </div>
+
+            </div>
+
+
+            <div class="confidence">
+
+              <span class="confidence-number">
+                ${confidence.toFixed(0)}%
+              </span>
+
+              <span class="confidence-label">
+                indice
+              </span>
+
+            </div>
+
+          </div>
+
+        </article>
+      `;
+
+    }
+
+
+    /* =========================================================
+       CREA GIOCATA
+       ========================================================= */
+
+    function createBet() {
+
+      const amount =
+        Number(
+          amountInput.value
+        );
+
+
+      if (
         !Number.isFinite(amount)
         ||
         amount <= 0
-    ){
+      ) {
 
-        alert(
-            "Inserisci un importo valido."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        !data
-        ||
-        !Array.isArray(data.analysis)
-    ){
-
-        alert(
-            "BETLAB non ha ancora caricato i dati."
-        );
+        statusElement.textContent =
+          "Inserisci un importo valido.";
 
         return;
 
-    }
+      }
 
 
-    const button =
-        document.getElementById("create");
+      if (!betlabData) {
+
+        statusElement.textContent =
+          "I dati BETLAB non sono ancora disponibili.";
+
+        return;
+
+      }
 
 
-    button.disabled = true;
-
-    button.textContent =
-        "ANALISI IN CORSO...";
-
-
-    /*
-       NON eliminiamo le partite senza storico.
-
-       Le ordiniamo per qualità dati.
-
-       Così:
-       - se l'utente chiede 2, riceve 2;
-       - se chiede 5, riceve 5;
-       - le migliori vengono sempre prima.
-    */
-
-    const candidates =
-        [...data.analysis];
-
-
-    candidates.sort((a,b) => {
-
-        const qa = quality(a);
-        const qb = quality(b);
-
-
-        if(qb.score !== qa.score){
-            return qb.score - qa.score;
-        }
-
-
-        const priorityA =
-            Number(a.priority || 0);
-
-        const priorityB =
-            Number(b.priority || 0);
-
-
-        if(priorityB !== priorityA){
-            return priorityB - priorityA;
-        }
-
-
-        return (
-            Number(a.timestamp || 0)
-            -
-            Number(b.timestamp || 0)
-        );
-
-    });
-
-
-    const selected =
-        candidates.slice(
-            0,
-            selectedNumber
+      const allMatches =
+        getAnalysisArray(
+          betlabData
         );
 
 
-    const ticket =
-        document.getElementById("ticket");
+      /*
+       * Qui entrano SOLO partite
+       * per cui il Prediction Engine
+       * ha prodotto una selezione.
+       */
+
+      const predictedMatches =
+        allMatches.filter(
+          match => {
+
+            return (
+              match.prediction
+              &&
+              match.prediction.available
+              === true
+              &&
+              match.prediction.prediction
+            );
+
+          }
+        );
 
 
-    ticket.innerHTML = "";
+      /*
+       * Il workflow le ha già ordinate
+       * secondo qualità dei dati e indice.
+       */
+
+      const selectedMatches =
+        predictedMatches.slice(
+          0,
+          selectedCount
+        );
 
 
-    if(selected.length === 0){
+      if (
+        selectedMatches.length === 0
+      ) {
 
-        ticket.innerHTML = `
-            <div class="error">
-                Nessuna partita disponibile
-                in questo momento.
-            </div>
+        resultElement.innerHTML = `
+          <div class="message">
+
+            <strong>
+              Nessun pronostico disponibile.
+            </strong>
+
+            <br><br>
+
+            BETLAB non ha trovato partite
+            con dati sufficienti per produrre
+            una selezione.
+
+          </div>
         `;
 
-    }
-    else{
 
-        selected.forEach(match => {
-
-            const q =
-                quality(match);
-
-
-            const item =
-                document.createElement("div");
-
-
-            item.className =
-                "pick";
-
-
-            item.innerHTML = `
-
-                <div class="pick-top">
-
-                    <div class="pick-info">
-
-                        <div class="date">
-                            ${matchDate(match.date)}
-                            ·
-                            ${match.league || ""}
-                        </div>
-
-                        <div class="fixture">
-                            ${match.home.name}
-                            –
-                            ${match.away.name}
-                        </div>
-
-                    </div>
-
-
-                    <div class="badge ${q.css}">
-                        ${q.label}
-                    </div>
-
-                </div>
-
-            `;
-
-
-            ticket.appendChild(item);
-
-        });
-
-    }
-
-
-    document
-    .getElementById("totalMatches")
-    .textContent =
-        selected.length;
-
-
-    document
-    .getElementById("totalAmount")
-    .textContent =
-        amount.toLocaleString(
-            "it-IT",
-            {
-                style:"currency",
-                currency:"EUR"
-            }
+        resultElement.classList.add(
+          "visible"
         );
 
 
-    document
-    .getElementById("generatedDate")
-    .textContent =
-        new Date()
-        .toLocaleDateString(
-            "it-IT"
-        );
+        statusElement.textContent =
+          "Nessuna giocata disponibile.";
+
+        return;
+
+      }
 
 
-    const result =
-        document.getElementById("result");
+      let html = `
+        <div class="result-title">
+          La tua giocata
+        </div>
+      `;
 
 
-    result.style.display =
-        "block";
+      selectedMatches.forEach(
+        match => {
+
+          html +=
+            createMatchCard(
+              match
+            );
+
+        }
+      );
 
 
-    result.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-    });
+      html += `
+        <div class="summary">
+
+          <div class="summary-row">
+
+            <span>
+              Partite
+            </span>
+
+            <strong>
+              ${selectedMatches.length}
+            </strong>
+
+          </div>
 
 
-    button.disabled = false;
+          <div class="summary-row">
 
-    button.textContent =
-        "CREA LA GIOCATA";
+            <span>
+              Importo
+            </span>
 
-}
+            <strong>
+              ${amount.toLocaleString(
+                "it-IT",
+                {
+                  style: "currency",
+                  currency: "EUR"
+                }
+              )}
+            </strong>
+
+          </div>
+
+        </div>
+      `;
 
 
-/* ==========================================
-   CLICK
-========================================== */
+      /*
+       * Se l'utente ne chiede più di quelle
+       * realmente analizzabili, NON inventiamo
+       * pronostici.
+       */
 
-document
-.getElementById("create")
-.addEventListener(
-    "click",
-    createTicket
-);
+      if (
+        selectedMatches.length
+        <
+        selectedCount
+      ) {
+
+        html += `
+          <div
+            class="message"
+            style="margin-top:13px"
+          >
+
+            Hai richiesto
+            <strong>
+              ${selectedCount}
+            </strong>
+            partite.
+
+            <br><br>
+
+            Al momento BETLAB ne considera
+            utilizzabili
+            <strong>
+              ${selectedMatches.length}
+            </strong>.
+
+          </div>
+        `;
+
+      }
 
 
-/* ==========================================
-   START
-========================================== */
+      resultElement.innerHTML =
+        html;
 
-loadData();
 
-</script>
+      resultElement.classList.add(
+        "visible"
+      );
+
+
+      statusElement.textContent =
+        selectedMatches.length
+        +
+        " pronostico"
+        +
+        (
+          selectedMatches.length === 1
+          ? ""
+          : "i"
+        )
+        +
+        " selezionato"
+        +
+        (
+          selectedMatches.length === 1
+          ? ""
+          : "i"
+        )
+        +
+        ".";
+
+
+      resultElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
+
+
+    /* =========================================================
+       CLICK
+       ========================================================= */
+
+    createButton.addEventListener(
+      "click",
+      createBet
+    );
+
+
+    /* =========================================================
+       AVVIO
+       ========================================================= */
+
+    loadData();
+
+  </script>
 
 </body>
 </html>
