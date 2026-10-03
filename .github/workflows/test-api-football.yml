@@ -2556,7 +2556,7 @@ jobs:
           exact_scores_with_odds = 0
 
 
-          # massimo 30 partite analizzate
+          # analizza tutte le partite candidate disponibili
           for match in candidate_matches:
 
               home_games = match[
