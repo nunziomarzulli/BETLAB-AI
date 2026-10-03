@@ -1,0 +1,68 @@
+name: Test API Football
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test collegamento API-Football
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+
+          echo "================================="
+          echo "BETLAB AI - TEST API FOOTBALL"
+          echo "================================="
+          echo "Data: $TODAY"
+          echo ""
+
+          curl --fail --silent --show-error \
+            --request GET \
+            --url "https://v3.football.api-sports.io/fixtures?date=$TODAY" \
+            --header "x-apisports-key: $API_FOOTBALL_KEY" \
+            -o response.json
+
+          python3 - <<'PY'
+          import json
+
+          with open("response.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          errors = data.get("errors")
+
+          if errors:
+              print("ERRORE API:")
+              print(errors)
+              raise SystemExit(1)
+
+          matches = data.get("response", [])
+
+          print("Partite trovate:", len(matches))
+          print()
+
+          leagues = {}
+
+          for match in matches:
+              league = match.get("league", {})
+              country = league.get("country", "Internazionale")
+              name = league.get("name", "Sconosciuto")
+
+              key = f"{country} | {name}"
+              leagues[key] = leagues.get(key, 0) + 1
+
+          print("Campionati trovati:")
+          print()
+
+          for league, count in sorted(leagues.items()):
+              print(f"- {league}: {count}")
+
+          print()
+          print("=================================")
+          print("BETLAB API-FOOTBALL OK")
+          print("=================================")
+          PY
