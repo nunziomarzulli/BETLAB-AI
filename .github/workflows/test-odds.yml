@@ -1110,12 +1110,11 @@ jobs:
                   continue
 
 
-              best,
-              all_matches = find_odds(
-                  response,
-                  betlab_market,
-                  betlab_pick
-              )
+                best, all_matches = find_odds(
+                response,
+                betlab_market,
+                betlab_pick
+                )
 
 
               if best is None:
