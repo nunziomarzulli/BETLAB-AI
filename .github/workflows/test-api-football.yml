@@ -16,17 +16,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # =========================================================
-      # 1. REPOSITORY
-      # =========================================================
-
       - name: Scarica repository
         uses: actions/checkout@v4
 
-
       # =========================================================
-      # 2. PARTITE DI OGGI
+      # 1. SCARICA TUTTE LE PARTITE DEL GIORNO
+      # Una sola richiesta API
       # =========================================================
 
       - name: Scarica partite API-Football
@@ -35,7 +30,6 @@ jobs:
 
         run: |
           mkdir -p data
-
           TODAY=$(TZ=Europe/Rome date +%Y-%m-%d)
 
           echo "================================="
@@ -49,35 +43,29 @@ jobs:
             --header "x-apisports-key: $API_FOOTBALL_KEY" \
             -o data/api-football-raw.json
 
-
       # =========================================================
-      # 3. SHORTLIST
+      # 2. AGGIORNA ARCHIVIO + CREA SHORTLIST + ANALISI
       # =========================================================
 
-      - name: Costruisci shortlist BETLAB
+      - name: Costruisci database BETLAB
         run: |
           python3 - <<'PY'
-
           import json
+          import os
           from datetime import datetime, timezone
 
-          INPUT = "data/api-football-raw.json"
-          OUTPUT = "data/betlab-matches.json"
+          RAW = "data/api-football-raw.json"
+          HISTORY = "data/betlab-history.json"
+          MATCHES = "data/betlab-matches.json"
           SHORTLIST = "data/betlab-shortlist.json"
+          ANALYSIS = "data/betlab-analysis.json"
 
-          with open(INPUT, encoding="utf-8") as f:
-              data = json.load(f)
-
-          if data.get("errors"):
-              print("ERRORE API:")
-              print(data["errors"])
-              raise SystemExit(1)
-
-          matches = data.get("response", [])
+          # -----------------------------------------------------
+          # CAMPIONATI BETLAB
+          # -----------------------------------------------------
 
           priority = {
-
-              # TOP 5 EUROPA
+              # TOP 5
               ("Italy", "Serie A"): 3,
               ("England", "Premier League"): 3,
               ("Spain", "La Liga"): 3,
@@ -103,15 +91,13 @@ jobs:
               ("Turkey", "Süper Lig"): 2,
               ("Scotland", "Premiership"): 2,
 
-              # SUD AMERICA
+              # AMERICHE
               ("Brazil", "Serie A"): 2,
               ("Argentina", "Liga Profesional Argentina"): 2,
-
-              # NORD AMERICA
               ("USA", "Major League Soccer"): 2,
               ("Mexico", "Liga MX"): 2,
 
-              # ALTRI CAMPIONATI
+              # ALTRI
               ("Greece", "Super League 1"): 1,
               ("Austria", "Bundesliga"): 1,
               ("Switzerland", "Super League"): 1,
@@ -120,17 +106,172 @@ jobs:
               ("Sweden", "Allsvenskan"): 1
           }
 
-          filtered = []
+          # -----------------------------------------------------
+          # CARICA RISPOSTA API
+          # -----------------------------------------------------
 
-          for match in matches:
+          with open(RAW, encoding="utf-8") as f:
+              api_data = json.load(f)
 
+          if api_data.get("errors"):
+              print("ERRORE API:")
+              print(api_data["errors"])
+              raise SystemExit(1)
+
+          api_matches = api_data.get("response", [])
+
+          print("Partite ricevute API:", len(api_matches))
+
+          # -----------------------------------------------------
+          # CARICA STORICO ESISTENTE
+          # -----------------------------------------------------
+
+          if os.path.exists(HISTORY):
+              try:
+                  with open(HISTORY, encoding="utf-8") as f:
+                      history_data = json.load(f)
+
+                  history = history_data.get("matches", [])
+
+              except Exception:
+                  history = []
+          else:
+              history = []
+
+          print("Partite già presenti nello storico:", len(history))
+
+          # Indicizzazione per fixture ID
+          history_by_id = {
+              str(x["fixtureId"]): x
+              for x in history
+              if x.get("fixtureId") is not None
+          }
+
+          # -----------------------------------------------------
+          # AGGIORNA STORICO
+          # -----------------------------------------------------
+
+          completed_statuses = {
+              "FT",
+              "AET",
+              "PEN"
+          }
+
+          new_completed = 0
+
+          for match in api_matches:
+              fixture = match.get("fixture", {})
+              league = match.get("league", {})
+              teams = match.get("teams", {})
+              goals = match.get("goals", {})
+
+              fixture_id = fixture.get("id")
+
+              if fixture_id is None:
+                  continue
+
+              status = (
+                  fixture
+                  .get("status", {})
+                  .get("short")
+              )
+
+              # Nello storico salviamo solo partite terminate
+              if status not in completed_statuses:
+                  continue
+
+              home = teams.get("home", {})
+              away = teams.get("away", {})
+
+              if not home.get("id") or not away.get("id"):
+                  continue
+
+              if goals.get("home") is None:
+                  continue
+
+              if goals.get("away") is None:
+                  continue
+
+              item = {
+                  "fixtureId": fixture_id,
+                  "date": fixture.get("date"),
+                  "timestamp": fixture.get("timestamp"),
+                  "status": status,
+
+                  "country": league.get("country"),
+                  "league": league.get("name"),
+                  "leagueId": league.get("id"),
+                  "season": league.get("season"),
+                  "round": league.get("round"),
+
+                  "home": {
+                      "id": home.get("id"),
+                      "name": home.get("name")
+                  },
+
+                  "away": {
+                      "id": away.get("id"),
+                      "name": away.get("name")
+                  },
+
+                  "goals": {
+                      "home": goals.get("home"),
+                      "away": goals.get("away")
+                  }
+              }
+
+              key = str(fixture_id)
+
+              if key not in history_by_id:
+                  new_completed += 1
+
+              history_by_id[key] = item
+
+          history = list(history_by_id.values())
+
+          history.sort(
+              key=lambda x: x.get("timestamp") or 0
+          )
+
+          history_output = {
+              "updatedAt":
+                  datetime.now(timezone.utc).isoformat(),
+
+              "total":
+                  len(history),
+
+              "matches":
+                  history
+          }
+
+          with open(
+              HISTORY,
+              "w",
+              encoding="utf-8"
+          ) as f:
+              json.dump(
+                  history_output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+          print("Nuovi risultati aggiunti:", new_completed)
+          print("Totale storico BETLAB:", len(history))
+
+          # -----------------------------------------------------
+          # PARTITE FUTURE IDONEE DI OGGI
+          # -----------------------------------------------------
+
+          future = []
+
+          for match in api_matches:
               fixture = match.get("fixture", {})
               league = match.get("league", {})
               teams = match.get("teams", {})
 
               country = league.get("country", "")
               league_name = league.get("name", "")
-              status = fixture.get("status", {}).get("short")
 
               level = priority.get(
                   (country, league_name)
@@ -139,49 +280,34 @@ jobs:
               if level is None:
                   continue
 
+              status = (
+                  fixture
+                  .get("status", {})
+                  .get("short")
+              )
+
               if status not in ("NS", "TBD"):
                   continue
 
               home = teams.get("home", {})
               away = teams.get("away", {})
 
-              if not home.get("id"):
+              if not home.get("id") or not away.get("id"):
                   continue
 
-              if not away.get("id"):
-                  continue
+              future.append({
+                  "fixtureId": fixture.get("id"),
+                  "date": fixture.get("date"),
+                  "timestamp": fixture.get("timestamp"),
+                  "status": status,
 
-              filtered.append({
+                  "country": country,
+                  "league": league_name,
+                  "leagueId": league.get("id"),
+                  "season": league.get("season"),
+                  "round": league.get("round"),
 
-                  "fixtureId":
-                      fixture.get("id"),
-
-                  "date":
-                      fixture.get("date"),
-
-                  "timestamp":
-                      fixture.get("timestamp"),
-
-                  "status":
-                      status,
-
-                  "country":
-                      country,
-
-                  "league":
-                      league_name,
-
-                  "leagueId":
-                      league.get("id"),
-
-                  "season":
-                      league.get("season"),
-
-                  "round":
-                      league.get("round"),
-
-                  "priority":
-                      level,
+                  "priority": level,
 
                   "home": {
                       "id": home.get("id"),
@@ -194,54 +320,47 @@ jobs:
                       "name": away.get("name"),
                       "logo": away.get("logo")
                   }
-
               })
 
-          filtered.sort(
+          future.sort(
               key=lambda x: (
                   -x["priority"],
                   x.get("timestamp") or 0
               )
           )
 
-          feed = {
-
+          matches_output = {
               "generatedAt":
-                  datetime.now(
-                      timezone.utc
-                  ).isoformat(),
+                  datetime.now(timezone.utc).isoformat(),
 
-              "source":
-                  "API-Football",
+              "source": "API-Football",
 
-              "total":
-                  len(filtered),
+              "total": len(future),
 
-              "matches":
-                  filtered
+              "matches": future
           }
 
           with open(
-              OUTPUT,
+              MATCHES,
               "w",
               encoding="utf-8"
           ) as f:
-
               json.dump(
-                  feed,
+                  matches_output,
                   f,
                   ensure_ascii=False,
                   indent=2
               )
 
-          shortlist = filtered[:30]
+          # -----------------------------------------------------
+          # SHORTLIST
+          # -----------------------------------------------------
 
-          shortlist_data = {
+          shortlist = future[:30]
 
+          shortlist_output = {
               "generatedAt":
-                  datetime.now(
-                      timezone.utc
-                  ).isoformat(),
+                  datetime.now(timezone.utc).isoformat(),
 
               "total":
                   len(shortlist),
@@ -255,692 +374,236 @@ jobs:
               "w",
               encoding="utf-8"
           ) as f:
-
               json.dump(
-                  shortlist_data,
+                  shortlist_output,
                   f,
                   ensure_ascii=False,
                   indent=2
               )
 
-          print()
-          print(
-              "Partite API:",
-              len(matches)
-          )
-
-          print(
-              "Partite idonee BETLAB:",
-              len(filtered)
-          )
-
-          print(
-              "Shortlist:",
-              len(shortlist)
-          )
-
-          print()
-          print("PARTITE DA ANALIZZARE:")
-          print()
-
-          for match in shortlist:
-
-              print(
-                  f'P{match["priority"]} | '
-                  f'{match["country"]} | '
-                  f'{match["league"]} | '
-                  f'{match["home"]["name"]} - '
-                  f'{match["away"]["name"]}'
-              )
-
-          print()
-          print(
-              "BETLAB SHORTLIST ENGINE OK"
-          )
-
-          PY
-
-
-      # =========================================================
-      # 4. ANALISI FORMA
-      #
-      # Niente parametro "last".
-      # Scarichiamo le partite della stagione per ogni campionato
-      # presente nelle prime 5 candidate.
-      # =========================================================
-
-      - name: Analizza forma recente squadre
-        env:
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
-
-        run: |
-          python3 - <<'PY'
-
-          import json
-          import os
-          import urllib.request
-          import urllib.parse
-          import time
-
-          from datetime import datetime, timezone
-
-          SHORTLIST = "data/betlab-shortlist.json"
-          OUTPUT = "data/betlab-analysis.json"
-
-          API_KEY = os.environ[
-              "API_FOOTBALL_KEY"
-          ]
-
-          BASE_URL = (
-              "https://v3.football.api-sports.io"
-          )
-
-          with open(
-              SHORTLIST,
-              encoding="utf-8"
-          ) as f:
-
-              shortlist_data = json.load(f)
-
-          candidates = (
-              shortlist_data
-              .get("candidates", [])[:5]
-          )
-
-          league_cache = {}
-
-          api_requests = 0
-
-
           # -----------------------------------------------------
-          # API
+          # FORMA DAL NOSTRO ARCHIVIO
           # -----------------------------------------------------
 
-          def get_league_fixtures(
-              league_id,
-              season
-          ):
+          def calculate_form(team_id, before_timestamp):
+              games = []
 
-              global api_requests
+              for match in history:
+                  timestamp = match.get("timestamp") or 0
 
-              key = (
-                  league_id,
-                  season
-              )
-
-              if key in league_cache:
-                  return league_cache[key]
-
-              params = urllib.parse.urlencode({
-                  "league": league_id,
-                  "season": season
-              })
-
-              url = (
-                  f"{BASE_URL}/fixtures?"
-                  f"{params}"
-              )
-
-              request = urllib.request.Request(
-                  url,
-                  headers={
-                      "x-apisports-key":
-                          API_KEY
-                  }
-              )
-
-              try:
-
-                  with urllib.request.urlopen(
-                      request,
-                      timeout=60
-                  ) as response:
-
-                      payload = json.loads(
-                          response
-                          .read()
-                          .decode("utf-8")
-                      )
-
-                  api_requests += 1
-
-              except Exception as e:
-
-                  print(
-                      "ERRORE DOWNLOAD CAMPIONATO:",
-                      league_id,
-                      season,
-                      e
-                  )
-
-                  league_cache[key] = []
-
-                  return []
-
-              if payload.get("errors"):
-
-                  print(
-                      "ERRORE API CAMPIONATO:",
-                      league_id,
-                      season,
-                      payload["errors"]
-                  )
-
-                  league_cache[key] = []
-
-                  return []
-
-              fixtures = payload.get(
-                  "response",
-                  []
-              )
-
-              league_cache[key] = fixtures
-
-              print(
-                  f"Campionato {league_id} "
-                  f"stagione {season}: "
-                  f"{len(fixtures)} partite scaricate"
-              )
-
-              time.sleep(0.3)
-
-              return fixtures
-
-
-          # -----------------------------------------------------
-          # ULTIME 5 PARTITE
-          # -----------------------------------------------------
-
-          def get_last_five(
-              fixtures,
-              team_id,
-              target_timestamp
-          ):
-
-              completed = []
-
-              for match in fixtures:
-
-                  fixture = match.get(
-                      "fixture",
-                      {}
-                  )
-
-                  status = (
-                      fixture
-                      .get("status", {})
-                      .get("short")
-                  )
-
-                  if status not in (
-                      "FT",
-                      "AET",
-                      "PEN"
-                  ):
+                  if before_timestamp and timestamp >= before_timestamp:
                       continue
-
-                  timestamp = (
-                      fixture
-                      .get("timestamp")
-                      or 0
-                  )
-
-                  if (
-                      target_timestamp
-                      and timestamp
-                      >= target_timestamp
-                  ):
-                      continue
-
-                  teams = match.get(
-                      "teams",
-                      {}
-                  )
 
                   home_id = (
-                      teams
+                      match
                       .get("home", {})
                       .get("id")
                   )
 
                   away_id = (
-                      teams
+                      match
                       .get("away", {})
                       .get("id")
                   )
 
-                  if team_id not in (
-                      home_id,
-                      away_id
-                  ):
+                  if team_id not in (home_id, away_id):
                       continue
 
-                  completed.append(match)
+                  games.append(match)
 
-              completed.sort(
-                  key=lambda x:
-                      x.get(
-                          "fixture",
-                          {}
-                      ).get(
-                          "timestamp",
-                          0
-                      ),
+              games.sort(
+                  key=lambda x: x.get("timestamp") or 0,
                   reverse=True
               )
 
-              return completed[:5]
-
-
-          # -----------------------------------------------------
-          # CALCOLO FORMA
-          # -----------------------------------------------------
-
-          def calculate_form(
-              fixtures,
-              team_id
-          ):
+              games = games[:5]
 
               wins = 0
               draws = 0
               losses = 0
-
               goals_for = 0
               goals_against = 0
-
               points = 0
-
               recent = []
 
-              for match in fixtures:
+              for match in games:
+                  home = match["home"]
+                  away = match["away"]
+                  goals = match["goals"]
 
-                  fixture = match.get(
-                      "fixture",
-                      {}
-                  )
-
-                  teams = match.get(
-                      "teams",
-                      {}
-                  )
-
-                  goals = match.get(
-                      "goals",
-                      {}
-                  )
-
-                  home = teams.get(
-                      "home",
-                      {}
-                  )
-
-                  away = teams.get(
-                      "away",
-                      {}
-                  )
-
-                  home_goals = goals.get(
-                      "home"
-                  )
-
-                  away_goals = goals.get(
-                      "away"
-                  )
-
-                  if (
-                      home_goals is None
-                      or away_goals is None
-                  ):
-                      continue
-
-                  if team_id == home.get("id"):
-
-                      gf = home_goals
-                      ga = away_goals
-
-                      opponent = (
-                          away.get("name")
-                      )
-
+                  if team_id == home["id"]:
+                      gf = goals["home"]
+                      ga = goals["away"]
+                      opponent = away["name"]
                       venue = "HOME"
-
-                  elif team_id == away.get("id"):
-
-                      gf = away_goals
-                      ga = home_goals
-
-                      opponent = (
-                          home.get("name")
-                      )
-
+                  else:
+                      gf = goals["away"]
+                      ga = goals["home"]
+                      opponent = home["name"]
                       venue = "AWAY"
 
-                  else:
-                      continue
-
                   if gf > ga:
-
                       result = "W"
-
                       wins += 1
                       points += 3
 
                   elif gf == ga:
-
                       result = "D"
-
                       draws += 1
                       points += 1
 
                   else:
-
                       result = "L"
-
                       losses += 1
 
                   goals_for += gf
                   goals_against += ga
 
                   recent.append({
-
-                      "date":
-                          fixture.get("date"),
-
-                      "opponent":
-                          opponent,
-
-                      "venue":
-                          venue,
-
-                      "goalsFor":
-                          gf,
-
-                      "goalsAgainst":
-                          ga,
-
-                      "result":
-                          result
-
+                      "date": match.get("date"),
+                      "opponent": opponent,
+                      "venue": venue,
+                      "goalsFor": gf,
+                      "goalsAgainst": ga,
+                      "result": result
                   })
 
-              played = len(recent)
-
-              if played == 0:
-
-                  return {
-
-                      "played": 0,
-                      "wins": 0,
-                      "draws": 0,
-                      "losses": 0,
-
-                      "goalsFor": 0,
-                      "goalsAgainst": 0,
-
-                      "points": 0,
-
-                      "pointsPerGame": None,
-                      "avgGoalsFor": None,
-                      "avgGoalsAgainst": None,
-
-                      "recent": []
-                  }
+              played = len(games)
 
               return {
-
-                  "played":
-                      played,
-
-                  "wins":
-                      wins,
-
-                  "draws":
-                      draws,
-
-                  "losses":
-                      losses,
-
-                  "goalsFor":
-                      goals_for,
-
-                  "goalsAgainst":
-                      goals_against,
-
-                  "points":
-                      points,
+                  "played": played,
+                  "wins": wins,
+                  "draws": draws,
+                  "losses": losses,
+                  "goalsFor": goals_for,
+                  "goalsAgainst": goals_against,
+                  "points": points,
 
                   "pointsPerGame":
-                      round(
-                          points / played,
-                          2
-                      ),
+                      round(points / played, 2)
+                      if played else None,
 
                   "avgGoalsFor":
-                      round(
-                          goals_for / played,
-                          2
-                      ),
+                      round(goals_for / played, 2)
+                      if played else None,
 
                   "avgGoalsAgainst":
-                      round(
-                          goals_against / played,
-                          2
-                      ),
+                      round(goals_against / played, 2)
+                      if played else None,
 
-                  "recent":
-                      recent
+                  "recent": recent
               }
 
-
           # -----------------------------------------------------
-          # ANALISI
+          # ANALIZZA PRIME 5 CANDIDATE
           # -----------------------------------------------------
 
           analysis = []
 
           print()
-          print(
-              "================================="
-          )
-
-          print(
-              "BETLAB FORM ENGINE V2"
-          )
-
-          print(
-              "================================="
-          )
-
+          print("=================================")
+          print("BETLAB HISTORY ENGINE")
+          print("=================================")
           print()
 
-          for candidate in candidates:
-
+          for candidate in shortlist[:5]:
               home = candidate["home"]
               away = candidate["away"]
 
-              league_id = (
-                  candidate["leagueId"]
-              )
-
-              season = (
-                  candidate["season"]
-              )
-
-              target_timestamp = (
-                  candidate.get(
-                      "timestamp"
-                  )
-                  or 0
-              )
-
-              print(
-                  f'Analisi: '
-                  f'{home["name"]} - '
-                  f'{away["name"]}'
-              )
-
-              league_fixtures = (
-                  get_league_fixtures(
-                      league_id,
-                      season
-                  )
-              )
-
-              home_last = get_last_five(
-                  league_fixtures,
-                  home["id"],
-                  target_timestamp
-              )
-
-              away_last = get_last_five(
-                  league_fixtures,
-                  away["id"],
-                  target_timestamp
-              )
+              timestamp = candidate.get("timestamp") or 0
 
               home_form = calculate_form(
-                  home_last,
-                  home["id"]
+                  home["id"],
+                  timestamp
               )
 
               away_form = calculate_form(
-                  away_last,
-                  away["id"]
+                  away["id"],
+                  timestamp
               )
 
               analysis.append({
-
-                  "fixtureId":
-                      candidate["fixtureId"],
-
-                  "date":
-                      candidate["date"],
-
-                  "country":
-                      candidate["country"],
-
-                  "league":
-                      candidate["league"],
-
-                  "leagueId":
-                      league_id,
-
-                  "season":
-                      season,
+                  "fixtureId": candidate["fixtureId"],
+                  "date": candidate["date"],
+                  "country": candidate["country"],
+                  "league": candidate["league"],
 
                   "home": {
-
-                      "id":
-                          home["id"],
-
-                      "name":
-                          home["name"],
-
-                      "form":
-                          home_form
+                      "id": home["id"],
+                      "name": home["name"],
+                      "form": home_form
                   },
 
                   "away": {
-
-                      "id":
-                          away["id"],
-
-                      "name":
-                          away["name"],
-
-                      "form":
-                          away_form
+                      "id": away["id"],
+                      "name": away["name"],
+                      "form": away_form
                   }
-
               })
 
               print(
-                  f'  {home["name"]}: '
+                  f'{home["name"]}: '
                   f'{home_form["wins"]}V '
                   f'{home_form["draws"]}N '
-                  f'{home_form["losses"]}P | '
-                  f'{home_form["goalsFor"]}-'
-                  f'{home_form["goalsAgainst"]}'
+                  f'{home_form["losses"]}P '
+                  f'({home_form["played"]} gare)'
               )
 
               print(
-                  f'  {away["name"]}: '
+                  f'{away["name"]}: '
                   f'{away_form["wins"]}V '
                   f'{away_form["draws"]}N '
-                  f'{away_form["losses"]}P | '
-                  f'{away_form["goalsFor"]}-'
-                  f'{away_form["goalsAgainst"]}'
+                  f'{away_form["losses"]}P '
+                  f'({away_form["played"]} gare)'
               )
 
               print()
 
-
-          # -----------------------------------------------------
-          # OUTPUT
-          # -----------------------------------------------------
-
-          output = {
-
+          analysis_output = {
               "generatedAt":
-                  datetime.now(
-                      timezone.utc
-                  ).isoformat(),
-
-              "source":
-                  "API-Football",
+                  datetime.now(timezone.utc).isoformat(),
 
               "engine":
-                  "BETLAB FORM ENGINE V2",
+                  "BETLAB HISTORY ENGINE",
+
+              "historyMatches":
+                  len(history),
 
               "matchesAnalyzed":
                   len(analysis),
-
-              "apiRequestsUsed":
-                  api_requests,
 
               "analysis":
                   analysis
           }
 
           with open(
-              OUTPUT,
+              ANALYSIS,
               "w",
               encoding="utf-8"
           ) as f:
-
               json.dump(
-                  output,
+                  analysis_output,
                   f,
                   ensure_ascii=False,
                   indent=2
               )
 
-          print(
-              "Partite analizzate:",
-              len(analysis)
-          )
-
-          print(
-              "Campionati interrogati:",
-              len(league_cache)
-          )
-
-          print(
-              "Richieste API analisi:",
-              api_requests
-          )
-
+          print("=================================")
+          print("RISULTATO BETLAB")
+          print("=================================")
+          print("Partite API:", len(api_matches))
+          print("Storico:", len(history))
+          print("Nuovi risultati:", new_completed)
+          print("Partite idonee oggi:", len(future))
+          print("Shortlist:", len(shortlist))
+          print("Partite analizzate:", len(analysis))
           print()
-          print(
-              "BETLAB FORM ENGINE V2 OK"
-          )
+          print("BETLAB HISTORY ENGINE OK")
 
           PY
 
-
       # =========================================================
-      # 5. SALVATAGGIO
+      # 3. SALVA DATABASE
       # =========================================================
 
       - name: Salva dati BETLAB
@@ -948,6 +611,7 @@ jobs:
           git config user.name "BETLAB AI Bot"
           git config user.email "actions@github.com"
 
+          git add data/betlab-history.json
           git add data/betlab-matches.json
           git add data/betlab-shortlist.json
           git add data/betlab-analysis.json
@@ -956,7 +620,7 @@ jobs:
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna analisi BETLAB"
+            git commit -m "Aggiorna database BETLAB"
 
             git pull --rebase origin main
 
