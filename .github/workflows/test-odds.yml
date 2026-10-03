@@ -1,0 +1,245 @@
+name: BETLAB Test Quote
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-odds:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test API-Football Odds
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          python3 <<'PY'
+          import json
+          import os
+          import urllib.request
+          import urllib.parse
+          from pathlib import Path
+
+          API_KEY = os.environ.get("API_FOOTBALL_KEY")
+
+          if not API_KEY:
+              raise SystemExit("ERRORE: API_FOOTBALL_KEY non presente.")
+
+          analysis_file = Path("data/betlab-analysis.json")
+
+          if not analysis_file.exists():
+              raise SystemExit("ERRORE: data/betlab-analysis.json non trovato.")
+
+          with analysis_file.open("r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          if isinstance(data, dict):
+              matches = data.get("analysis") or data.get("matches") or []
+          elif isinstance(data, list):
+              matches = data
+          else:
+              matches = []
+
+          predicted = []
+
+          for match in matches:
+              prediction = match.get("prediction") or {}
+
+              if (
+                  prediction.get("available") is True
+                  and prediction.get("prediction")
+              ):
+                  predicted.append(match)
+
+          print("")
+          print("==============================================")
+          print("BETLAB TEST QUOTE")
+          print("==============================================")
+          print("")
+          print("Pronostici BETLAB trovati:", len(predicted))
+          print("")
+
+          if not predicted:
+              raise SystemExit("Nessun pronostico BETLAB disponibile.")
+
+          # Testiamo massimo 5 partite per non sprecare richieste API
+          predicted = predicted[:5]
+
+          def api_get(endpoint, params):
+              query = urllib.parse.urlencode(params)
+
+              url = (
+                  "https://v3.football.api-sports.io/"
+                  + endpoint
+                  + "?"
+                  + query
+              )
+
+              request = urllib.request.Request(
+                  url,
+                  headers={
+                      "x-apisports-key": API_KEY
+                  }
+              )
+
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return json.loads(
+                      response.read().decode("utf-8")
+                  )
+
+          def get_fixture_id(match):
+              possible = [
+                  match.get("fixtureId"),
+                  match.get("fixture_id"),
+                  match.get("id")
+              ]
+
+              fixture = match.get("fixture")
+
+              if isinstance(fixture, dict):
+                  possible.append(fixture.get("id"))
+
+              for value in possible:
+                  if value:
+                      try:
+                          return int(value)
+                      except:
+                          pass
+
+              return None
+
+          for number, match in enumerate(predicted, start=1):
+
+              home = (
+                  (match.get("home") or {}).get("name")
+                  or "Casa"
+              )
+
+              away = (
+                  (match.get("away") or {}).get("name")
+                  or "Trasferta"
+              )
+
+              prediction = match.get("prediction") or {}
+
+              betlab_pick = prediction.get("prediction", "-")
+              betlab_market = prediction.get("market", "-")
+              confidence = prediction.get("confidence", 0)
+
+              fixture_id = get_fixture_id(match)
+
+              print("")
+              print("==============================================")
+              print(f"{number}. {home} - {away}")
+              print("==============================================")
+              print("Fixture ID:", fixture_id)
+              print("Pronostico BETLAB:", betlab_pick)
+              print("Mercato BETLAB:", betlab_market)
+              print("Indice BETLAB:", confidence)
+              print("")
+
+              if not fixture_id:
+                  print("ATTENZIONE: fixture ID non trovato.")
+                  continue
+
+              try:
+                  odds_data = api_get(
+                      "odds",
+                      {
+                          "fixture": fixture_id
+                      }
+                  )
+
+              except Exception as error:
+                  print("ERRORE richiesta quote:", error)
+                  continue
+
+              errors = odds_data.get("errors")
+
+              if errors:
+                  print("ERRORE API:")
+                  print(errors)
+                  continue
+
+              response = odds_data.get("response") or []
+
+              print(
+                  "Blocchi quote ricevuti:",
+                  len(response)
+              )
+
+              if not response:
+                  print("NESSUNA QUOTA DISPONIBILE")
+                  continue
+
+              # Stampiamo i bookmaker e i mercati disponibili
+              # senza fare ancora alcun abbinamento automatico.
+
+              bookmakers_found = 0
+
+              for block in response:
+
+                  bookmakers = block.get("bookmakers") or []
+
+                  for bookmaker in bookmakers:
+
+                      bookmakers_found += 1
+
+                      bookmaker_name = bookmaker.get(
+                          "name",
+                          "Bookmaker"
+                      )
+
+                      print("")
+                      print("----------------------------------------------")
+                      print("BOOKMAKER:", bookmaker_name)
+                      print("----------------------------------------------")
+
+                      bets = bookmaker.get("bets") or []
+
+                      for bet in bets:
+
+                          bet_name = bet.get("name", "Mercato")
+
+                          values = bet.get("values") or []
+
+                          print("")
+                          print("MERCATO:", bet_name)
+
+                          shown = 0
+
+                          for value in values:
+
+                              selection = value.get("value")
+                              odd = value.get("odd")
+
+                              if selection is None or odd is None:
+                                  continue
+
+                              print(
+                                  "   ",
+                                  selection,
+                                  "=>",
+                                  odd
+                              )
+
+                              shown += 1
+
+                              # Evitiamo log enormi.
+                              if shown >= 20:
+                                  print("    ...")
+                                  break
+
+              print("")
+              print(
+                  "Bookmaker totali:",
+                  bookmakers_found
+              )
+
+          print("")
+          print("==============================================")
+          print("FINE TEST QUOTE BETLAB")
+          print("==============================================")
+          PY
