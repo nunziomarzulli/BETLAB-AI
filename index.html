@@ -1,1404 +1,900 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>BETLAB AI</title>
-
-<style>
-:root{
-  --green:#16a05d;
-  --green-dark:#087742;
-  --green-light:#eaf7f0;
-  --text:#171717;
-  --muted:#777;
-  --border:#e2e2e2;
-  --background:#f5f6f7;
-  --white:#ffffff;
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  background:var(--background);
-  color:var(--text);
-}
-
-header{
-  background:#fff;
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-.header-inner{
-  max-width:1100px;
-  margin:auto;
-  height:64px;
-  padding:0 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.logo{
-  font-size:23px;
-  font-weight:800;
-}
-
-.logo span{
-  color:var(--green);
-}
-
-.engine{
-  font-size:11px;
-  color:#888;
-  text-transform:uppercase;
-}
-
-main{
-  max-width:1100px;
-  margin:18px auto 50px;
-  padding:0 15px;
-}
-
-/* CALENDARIO */
-
-.calendar{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:9px;
-  overflow:hidden;
-  margin-bottom:12px;
-}
-
-.days{
-  display:flex;
-  overflow-x:auto;
-  scrollbar-width:thin;
-  border-bottom:1px solid var(--border);
-}
-
-.day{
-  flex:0 0 105px;
-  padding:10px 5px 9px;
-  text-align:center;
-  cursor:pointer;
-  border-right:1px solid var(--border);
-  background:#fff;
-  color:#777;
-  font-size:10px;
-}
-
-.day:hover{
-  background:#fafafa;
-}
-
-.day .label{
-  font-weight:600;
-}
-
-.day .date{
-  display:block;
-  margin-top:3px;
-  font-size:13px;
-  font-weight:700;
-  color:#222;
-}
-
-.day .games{
-  display:block;
-  margin-top:3px;
-  font-size:9px;
-  color:#999;
-}
-
-.day.active{
-  background:var(--green-light);
-  color:var(--green-dark);
-  border-bottom:3px solid var(--green);
-}
-
-.day.active .date{
-  color:var(--green-dark);
-}
-
-/* SEARCH */
-
-.tools{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:10px;
-}
-
-.search{
-  position:relative;
-  flex:1;
-}
-
-.search input{
-  width:100%;
-  height:38px;
-  border:1px solid #ddd;
-  border-radius:6px;
-  padding:0 12px 0 36px;
-  outline:none;
-  font-size:13px;
-}
-
-.search input:focus{
-  border-color:#aaa;
-}
-
-.search-icon{
-  position:absolute;
-  left:12px;
-  top:9px;
-  color:#999;
-}
-
-.total{
-  min-width:75px;
-  text-align:right;
-  color:#777;
-  font-size:11px;
-}
-
-/* DATA SELEZIONATA */
-
-.day-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:13px 2px 9px;
-  font-size:12px;
-}
-
-.day-title strong{
-  font-size:13px;
-}
-
-.version{
-  color:#999;
-  font-size:10px;
-}
-
-/* NAZIONE */
-
-.country{
-  margin-bottom:15px;
-}
-
-.country-title{
-  padding:7px 9px;
-  font-size:11px;
-  font-weight:700;
-  color:#666;
-  text-transform:uppercase;
-}
-
-/* CAMPIONATO */
-
-.competition{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:8px;
-  overflow:hidden;
-  margin-bottom:8px;
-}
-
-.competition-header{
-  height:42px;
-  padding:0 11px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fafafa;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-}
-
-.competition-left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  font-weight:700;
-}
-
-.competition-logo{
-  width:21px;
-  height:21px;
-  object-fit:contain;
-}
-
-.arrow{
-  color:#999;
-  font-size:10px;
-}
-
-/* PARTITA */
-
-.match{
-  min-height:55px;
-  display:grid;
-  grid-template-columns:60px 1fr 85px;
-  align-items:center;
-  padding:5px 10px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
-}
-
-.match:last-child{
-  border-bottom:0;
-}
-
-.match:hover{
-  background:#fafafa;
-}
-
-.time{
-  color:#666;
-  font-size:11px;
-  font-weight:600;
-}
-
-.teams{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.team{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-size:12px;
-  font-weight:500;
-}
-
-.crest{
-  width:18px;
-  height:18px;
-  object-fit:contain;
-}
-
-.analysis{
-  justify-self:end;
-  border:1px solid #d6d6d6;
-  border-radius:5px;
-  padding:6px 8px;
-  background:#fff;
-  color:#555;
-  font-size:10px;
-  font-weight:700;
-}
-
-.match:hover .analysis{
-  border-color:var(--green);
-  color:var(--green-dark);
-}
-
-/* EMPTY */
-
-.empty,
-.loading,
-.error{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:45px 20px;
-  text-align:center;
-  color:#777;
-  font-size:13px;
-}
-
-.empty strong{
-  display:block;
-  color:#333;
-  font-size:15px;
-  margin-bottom:7px;
-}
-
-.error{
-  color:#a33;
-  border-color:#e5bbbb;
-}
-
-/* FOOTER */
-
-footer{
-  max-width:1100px;
-  margin:30px auto;
-  padding:20px;
-  border-top:1px solid #ddd;
-  text-align:center;
-  color:#999;
-  font-size:10px;
-  line-height:1.8;
-}
-
-/* MOBILE */
-
-@media(max-width:650px){
-
-  .header-inner{
-    height:56px;
-  }
-
-  .engine{
-    display:none;
-  }
-
-  main{
-    margin-top:8px;
-    padding:0 7px;
-  }
-
-  .day{
-    flex-basis:88px;
-  }
-
-  .tools{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .total{
-    text-align:right;
-  }
-
-  .match{
-    grid-template-columns:48px 1fr 68px;
-    padding:5px 7px;
-  }
-
-  .analysis{
-    padding:5px;
-    font-size:9px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BETLAB AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7f8;
+      color: #15191d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+    }
+
+    header {
+      height: 74px;
+      background: #ffffff;
+      border-bottom: 1px solid #e4e8eb;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-inner {
+      width: 100%;
+      max-width: 1050px;
+      margin: auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .logo span {
+      color: #16ad69;
+    }
+
+    .engine {
+      color: #8a9299;
+      font-size: 11px;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 85px 22px 60px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 38px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 46px;
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: #16ad69;
+    }
+
+    .hero p {
+      margin: 17px auto 0;
+      max-width: 540px;
+      color: #737c84;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e0e5e8;
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 12px 35px rgba(20, 35, 45, .06);
+    }
+
+    .field {
+      margin-bottom: 30px;
+    }
+
+    .field-title {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .money-box {
+      position: relative;
+    }
+
+    .money-symbol {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      font-weight: 700;
+      color: #59636b;
+    }
+
+    #amount {
+      width: 100%;
+      height: 62px;
+      border: 1px solid #d9dfe3;
+      border-radius: 11px;
+      padding: 0 18px 0 46px;
+      font-size: 24px;
+      font-weight: 700;
+      outline: none;
+      background: #fafbfb;
+    }
+
+    #amount:focus {
+      border-color: #16ad69;
+      background: white;
+    }
+
+    .match-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .match-button {
+      height: 54px;
+      border-radius: 10px;
+      border: 1px solid #d9dfe3;
+      background: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .match-button:hover {
+      border-color: #16ad69;
+    }
+
+    .match-button.active {
+      background: #e9f8f1;
+      border-color: #16ad69;
+      color: #087947;
+    }
+
+    .main-button {
+      width: 100%;
+      height: 62px;
+      border: 0;
+      border-radius: 11px;
+      background: #16ad69;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      cursor: pointer;
+    }
+
+    .main-button:hover {
+      background: #11945a;
+    }
+
+    .main-button:disabled {
+      cursor: wait;
+      opacity: .65;
+    }
+
+    .availability {
+      text-align: center;
+      margin-top: 16px;
+      color: #8a9299;
+      font-size: 12px;
+    }
+
+    #result {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .result-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .result-date {
+      color: #92999e;
+      font-size: 12px;
+    }
+
+    .pick-card {
+      background: #ffffff;
+      border: 1px solid #e0e5e8;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+    }
+
+    .league {
+      font-size: 11px;
+      color: #8b949b;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .fixture {
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .forms {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-box {
+      background: #f6f8f9;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .form-box strong {
+      display: block;
+      color: #333a40;
+      margin-bottom: 2px;
+    }
+
+    .no-data {
+      color: #a0a7ac;
+    }
+
+    .summary {
+      background: #101820;
+      color: white;
+      border-radius: 13px;
+      margin-top: 16px;
+      padding: 20px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 7px 0;
+      font-size: 14px;
+    }
+
+    .summary-row strong {
+      font-size: 16px;
+    }
+
+    .warning {
+      margin-top: 17px;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #92999e;
+    }
+
+    footer {
+      margin-top: 60px;
+      border-top: 1px solid #e1e5e8;
+      padding: 22px;
+      text-align: center;
+      color: #a0a7ac;
+      font-size: 11px;
+    }
+
+    @media (max-width: 620px) {
+      main {
+        padding-top: 50px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .match-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .forms {
+        grid-template-columns: 1fr;
+      }
+
+      .engine {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-
   <div class="header-inner">
-
     <div class="logo">
       BETLAB <span>AI</span>
     </div>
 
     <div class="engine">
-      Data Engine · Multi League
+      Statistical Prediction Engine
     </div>
-
   </div>
-
 </header>
 
 
 <main>
 
-  <div class="calendar">
+  <section class="hero">
+    <h1>
+      Cosa giochiamo <span>oggi?</span>
+    </h1>
 
-    <div
-      class="days"
-      id="days">
-    </div>
+    <p>
+      Imposta la giocata. BETLAB analizza le partite disponibili
+      e seleziona quelle supportate dai dati.
+    </p>
+  </section>
 
-    <div class="tools">
 
-      <div class="search">
+  <section class="panel">
 
-        <span class="search-icon">
-          ⌕
+    <div class="field">
+
+      <label
+        class="field-title"
+        for="amount"
+      >
+        Quanto vuoi giocare?
+      </label>
+
+      <div class="money-box">
+
+        <span class="money-symbol">
+          €
         </span>
 
         <input
-          id="search"
-          type="text"
-          placeholder="Cerca squadra o campionato..."
+          id="amount"
+          type="number"
+          min="1"
+          step="1"
+          value="5"
         >
 
       </div>
 
-      <div class="total">
-        <span id="matchCount">0</span>
-        partite
+    </div>
+
+
+    <div class="field">
+
+      <span class="field-title">
+        Quante partite vuoi nella giocata?
+      </span>
+
+      <div class="match-buttons">
+
+        <button
+          class="match-button active"
+          data-count="2"
+        >
+          2
+        </button>
+
+        <button
+          class="match-button"
+          data-count="3"
+        >
+          3
+        </button>
+
+        <button
+          class="match-button"
+          data-count="4"
+        >
+          4
+        </button>
+
+        <button
+          class="match-button"
+          data-count="5"
+        >
+          5
+        </button>
+
       </div>
 
     </div>
 
-  </div>
+
+    <button
+      id="analyseButton"
+      class="main-button"
+    >
+      ANALIZZA E CREA LA GIOCATA
+    </button>
 
 
-  <div class="day-title">
-
-    <strong id="selectedDate">
-      Partite
-    </strong>
-
-    <span class="version">
-      BETLAB V0.4
-    </span>
-
-  </div>
-
-
-  <div id="content">
-
-    <div class="loading">
-      Caricamento partite...
+    <div
+      id="availability"
+      class="availability"
+    >
+      Caricamento dati BETLAB...
     </div>
 
-  </div>
+  </section>
+
+
+  <section id="result">
+
+    <div class="result-header">
+
+      <h2>
+        Analisi BETLAB
+      </h2>
+
+      <span
+        id="resultDate"
+        class="result-date"
+      ></span>
+
+    </div>
+
+
+    <div id="picks"></div>
+
+
+    <div class="summary">
+
+      <div class="summary-row">
+        <span>Importo</span>
+        <strong id="summaryAmount">
+          € 0,00
+        </strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Partite selezionate</span>
+        <strong id="summaryMatches">
+          0
+        </strong>
+      </div>
+
+    </div>
+
+
+    <div class="warning">
+      BETLAB utilizza analisi statistiche e probabilistiche.
+      Nessun risultato o vincita è garantito.
+    </div>
+
+  </section>
 
 </main>
 
 
 <footer>
-
-  BETLAB AI · Analisi statistica sperimentale ·
-  Nessuna vincita è garantita
-
-  <br>
-
-  Data provided by football-data.org
-
+  BETLAB AI · Statistical analysis engine
 </footer>
 
 
 <script>
 
-/* =========================================
-   BETLAB AI V0.4
-========================================= */
-
-let allMatches = [];
-
-let selectedDay = null;
+  let selectedCount = 2;
+  let betlabData = null;
 
 
-/* =========================================
-   CARICAMENTO DATI
-========================================= */
-
-async function loadData(){
-
-  try{
-
-    const response = await fetch(
-      "data/matches.json?v=" + Date.now()
+  const buttons =
+    document.querySelectorAll(
+      ".match-button"
     );
 
 
-    if(!response.ok){
-
-      throw new Error(
-        "Impossibile caricare matches.json"
-      );
-
-    }
-
-
-    const data = await response.json();
-
-
-    allMatches = data.matches || [];
-
-
-    allMatches.sort(
-      (a,b) =>
-        new Date(a.utcDate) -
-        new Date(b.utcDate)
+  const analyseButton =
+    document.getElementById(
+      "analyseButton"
     );
 
 
-    createDayNavigation();
-
-  }
-
-  catch(error){
-
-    console.error(error);
-
-
-    document
-      .getElementById("content")
-      .innerHTML = `
-
-        <div class="error">
-
-          Errore nel caricamento
-          delle partite.
-
-        </div>
-
-      `;
-
-  }
-
-}
-
-
-/* =========================================
-   DATA LOCALE ITALIANA
-========================================= */
-
-function localDateKey(date){
-
-  const parts =
-    new Intl.DateTimeFormat(
-      "it-IT",
-      {
-        timeZone:"Europe/Rome",
-        year:"numeric",
-        month:"2-digit",
-        day:"2-digit"
-      }
-    )
-    .formatToParts(date);
-
-
-  const year =
-    parts.find(
-      part => part.type === "year"
-    ).value;
-
-
-  const month =
-    parts.find(
-      part => part.type === "month"
-    ).value;
-
-
-  const day =
-    parts.find(
-      part => part.type === "day"
-    ).value;
-
-
-  return `${year}-${month}-${day}`;
-
-}
-
-
-/* =========================================
-   CALENDARIO CONTINUO
-========================================= */
-
-function createDayNavigation(){
-
-  const container =
-    document.getElementById("days");
-
-
-  container.innerHTML = "";
-
-
-  /*
-    Creiamo:
-    ieri
-    oggi
-    + 9 giorni
-
-    Nessun giorno viene saltato.
-  */
-
-  const today = new Date();
-
-  today.setHours(
-    12,
-    0,
-    0,
-    0
-  );
-
-
-  selectedDay =
-    localDateKey(today);
-
-
-  for(
-    let offset = -1;
-    offset <= 9;
-    offset++
-  ){
-
-    const date =
-      new Date(today);
-
-
-    date.setDate(
-      today.getDate() + offset
+  const availability =
+    document.getElementById(
+      "availability"
     );
 
 
-    const dateKey =
-      localDateKey(date);
+  const result =
+    document.getElementById(
+      "result"
+    );
 
 
-    /*
-      Nome giorno
-    */
-
-    let label;
-
-
-    if(offset === -1){
-
-      label = "IERI";
-
-    }
-
-    else if(offset === 0){
-
-      label = "OGGI";
-
-    }
-
-    else if(offset === 1){
-
-      label = "DOMANI";
-
-    }
-
-    else{
-
-      label =
-        new Intl.DateTimeFormat(
-          "it-IT",
-          {
-            weekday:"short"
-          }
-        )
-        .format(date)
-        .replace(".","")
-        .toUpperCase();
-
-    }
+  const picks =
+    document.getElementById(
+      "picks"
+    );
 
 
-    /*
-      Data DD/MM
-    */
+  // ==========================================================
+  // SELEZIONE NUMERO PARTITE
+  // ==========================================================
 
-    const formattedDate =
-      new Intl.DateTimeFormat(
-        "it-IT",
-        {
-          day:"2-digit",
-          month:"2-digit"
-        }
-      )
-      .format(date);
+  buttons.forEach(button => {
 
+    button.addEventListener(
+      "click",
+      () => {
 
-    /*
-      Numero partite presenti
-      nel nostro feed
-    */
-
-    const count =
-      allMatches.filter(
-        match =>
-          localDateKey(
-            new Date(match.utcDate)
-          ) === dateKey
-      ).length;
-
-
-    const element =
-      document.createElement("div");
-
-
-    element.className =
-      "day" +
-      (
-        dateKey === selectedDay
-          ? " active"
-          : ""
-      );
-
-
-    element.innerHTML = `
-
-      <span class="label">
-        ${label}
-      </span>
-
-      <span class="date">
-        ${formattedDate}
-      </span>
-
-      <span class="games">
-        ${count} ${count === 1 ? "partita" : "partite"}
-      </span>
-
-    `;
-
-
-    element.onclick = () => {
-
-      selectedDay =
-        dateKey;
-
-
-      document
-        .querySelectorAll(".day")
-        .forEach(
+        buttons.forEach(
           item =>
             item.classList.remove(
               "active"
             )
         );
 
-
-      element
-        .classList
-        .add("active");
-
-
-      renderMatches();
-
-    };
-
-
-    container.appendChild(
-      element
-    );
-
-  }
-
-
-  /*
-    Centra OGGI
-  */
-
-  setTimeout(
-    () => {
-
-      const active =
-        container.querySelector(
-          ".active"
+        button.classList.add(
+          "active"
         );
 
-
-      if(active){
-
-        active.scrollIntoView({
-          behavior:"smooth",
-          block:"nearest",
-          inline:"center"
-        });
-
-      }
-
-    },
-    100
-  );
-
-
-  renderMatches();
-
-}
-
-
-/* =========================================
-   PARTITE
-========================================= */
-
-function renderMatches(){
-
-  const search =
-    document
-      .getElementById("search")
-      .value
-      .trim()
-      .toLowerCase();
-
-
-  const matches =
-    allMatches.filter(
-      match => {
-
-
-        /*
-          FILTRO DATA
-        */
-
-        const matchDate =
-          localDateKey(
-            new Date(match.utcDate)
+        selectedCount =
+          Number(
+            button.dataset.count
           );
 
-
-        if(
-          matchDate !== selectedDay
-        ){
-
-          return false;
-
-        }
-
-
-        /*
-          FILTRO RICERCA
-        */
-
-        if(!search){
-
-          return true;
-
-        }
-
-
-        const home =
-          (
-            match.homeTeam?.name ||
-            match.homeTeam?.shortName ||
-            ""
-          ).toLowerCase();
-
-
-        const away =
-          (
-            match.awayTeam?.name ||
-            match.awayTeam?.shortName ||
-            ""
-          ).toLowerCase();
-
-
-        const competition =
-          (
-            match.competition?.name ||
-            ""
-          ).toLowerCase();
-
-
-        const country =
-          (
-            match.area?.name ||
-            ""
-          ).toLowerCase();
-
-
-        return (
-
-          home.includes(search) ||
-
-          away.includes(search) ||
-
-          competition.includes(search) ||
-
-          country.includes(search)
-
-        );
-
       }
     );
 
-
-  document
-    .getElementById("matchCount")
-    .textContent =
-      matches.length;
+  });
 
 
-  updateSelectedDate();
+  // ==========================================================
+  // CARICA ANALISI BETLAB
+  // ==========================================================
+
+  async function loadBetlabData() {
+
+    try {
+
+      const response =
+        await fetch(
+          "data/betlab-analysis.json?v=" +
+          Date.now()
+        );
 
 
-  if(
-    matches.length === 0
-  ){
-
-    document
-      .getElementById("content")
-      .innerHTML = `
-
-        <div class="empty">
-
-          <strong>
-            Nessuna partita disponibile
-          </strong>
-
-          Il feed BETLAB non contiene
-          incontri per questa giornata.
-
-        </div>
-
-      `;
-
-    return;
-
-  }
-
-
-  /*
-    Raggruppamento:
-    NAZIONE -> CAMPIONATO
-  */
-
-  const groups = {};
-
-
-  matches.forEach(
-    match => {
-
-
-      const country =
-        match.area?.name ||
-        "Internazionale";
-
-
-      const competition =
-        match.competition?.name ||
-        "Competizione";
-
-
-      if(!groups[country]){
-
-        groups[country] = {};
-
+      if (!response.ok) {
+        throw new Error(
+          "File analisi non disponibile"
+        );
       }
 
 
-      if(
-        !groups[country][competition]
-      ){
-
-        groups[country][competition] =
-          [];
-
-      }
+      betlabData =
+        await response.json();
 
 
-      groups[country][competition]
-        .push(match);
+      const available =
+        Array.isArray(
+          betlabData.analysis
+        )
+        ? betlabData.analysis.length
+        : 0;
+
+
+      availability.textContent =
+        available +
+        (
+          available === 1
+          ? " partita analizzata"
+          : " partite analizzate"
+        ) +
+        " dal motore BETLAB";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      availability.textContent =
+        "Dati BETLAB momentaneamente non disponibili.";
+
+      betlabData = null;
 
     }
-  );
+
+  }
 
 
-  let html = "";
+  // ==========================================================
+  // PUNTEGGIO QUALITÀ DATI
+  //
+  // Per ora NON inventiamo pronostici.
+  // Selezioniamo prima le partite con più storico disponibile.
+  // ==========================================================
+
+  function dataScore(match) {
+
+    const homePlayed =
+      Number(
+        match?.home?.form?.played || 0
+      );
 
 
-  Object
-    .keys(groups)
-    .sort()
-    .forEach(
-      country => {
+    const awayPlayed =
+      Number(
+        match?.away?.form?.played || 0
+      );
 
 
-        html += `
+    return homePlayed + awayPlayed;
 
-          <section class="country">
+  }
 
-            <div class="country-title">
-              ${escapeHtml(country)}
+
+  // ==========================================================
+  // FORM
+  // ==========================================================
+
+  function formText(form) {
+
+    if (!form || !form.played) {
+
+      return `
+        <span class="no-data">
+          Storico insufficiente
+        </span>
+      `;
+
+    }
+
+
+    return `
+      ${form.wins}V
+      ${form.draws}N
+      ${form.losses}P
+      ·
+      ${form.goalsFor}-${form.goalsAgainst}
+      ·
+      ${form.played} gare
+    `;
+
+  }
+
+
+  // ==========================================================
+  // CREA RISULTATO
+  // ==========================================================
+
+  function createBet() {
+
+    const amount =
+      Number(
+        document
+          .getElementById("amount")
+          .value
+      );
+
+
+    if (
+      !Number.isFinite(amount)
+      ||
+      amount <= 0
+    ) {
+
+      alert(
+        "Inserisci un importo valido."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !betlabData
+      ||
+      !Array.isArray(
+        betlabData.analysis
+      )
+    ) {
+
+      alert(
+        "I dati BETLAB non sono ancora disponibili."
+      );
+
+      return;
+
+    }
+
+
+    analyseButton.disabled = true;
+
+    analyseButton.textContent =
+      "ANALISI IN CORSO...";
+
+
+    const candidates =
+      [...betlabData.analysis];
+
+
+    // Prima le partite con più dati.
+
+    candidates.sort(
+      (a, b) =>
+        dataScore(b) -
+        dataScore(a)
+    );
+
+
+    const usable =
+      candidates.filter(
+        match =>
+          dataScore(match) > 0
+      );
+
+
+    const selected =
+      usable.slice(
+        0,
+        selectedCount
+      );
+
+
+    picks.innerHTML = "";
+
+
+    if (selected.length === 0) {
+
+      picks.innerHTML = `
+        <div class="pick-card">
+          <div class="fixture">
+            Nessuna partita dispone ancora
+            di storico sufficiente.
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      selected.forEach(
+        (match, index) => {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "pick-card";
+
+
+          card.innerHTML = `
+
+            <div class="league">
+              ${match.country || ""}
+              ·
+              ${match.league || ""}
             </div>
 
-        `;
+            <div class="fixture">
+              ${index + 1}.
+              ${match.home.name}
+              –
+              ${match.away.name}
+            </div>
+
+            <div class="forms">
+
+              <div class="form-box">
+
+                <strong>
+                  ${match.home.name}
+                </strong>
+
+                ${formText(
+                  match.home.form
+                )}
+
+              </div>
+
+              <div class="form-box">
+
+                <strong>
+                  ${match.away.name}
+                </strong>
+
+                ${formText(
+                  match.away.form
+                )}
+
+              </div>
+
+            </div>
+
+          `;
 
 
-        Object
-          .keys(groups[country])
-          .sort()
-          .forEach(
-            competition => {
-
-
-              const games =
-                groups[country][competition];
-
-
-              const competitionData =
-                games[0]?.competition ||
-                {};
-
-
-              const logo =
-                competitionData.emblem
-                  ? `
-
-                    <img
-                      class="competition-logo"
-                      src="${competitionData.emblem}"
-                      alt=""
-                    >
-
-                  `
-                  : "";
-
-
-              const id =
-                "league-" +
-                Math.random()
-                  .toString(36)
-                  .substring(2);
-
-
-              html += `
-
-                <div class="competition">
-
-
-                  <div
-                    class="competition-header"
-                    onclick="
-                      toggleCompetition(
-                        '${id}',
-                        this
-                      )
-                    "
-                  >
-
-
-                    <div class="competition-left">
-
-                      ${logo}
-
-                      <span>
-                        ${escapeHtml(competition)}
-                      </span>
-
-                    </div>
-
-
-                    <span class="arrow">
-                      ▼
-                    </span>
-
-
-                  </div>
-
-
-                  <div
-                    class="competition-matches"
-                    id="${id}"
-                  >
-
-              `;
-
-
-              games.forEach(
-                match => {
-
-                  html +=
-                    createMatchRow(
-                      match
-                    );
-
-                }
-              );
-
-
-              html += `
-
-                  </div>
-
-                </div>
-
-              `;
-
-            }
+          picks.appendChild(
+            card
           );
 
-
-        html += `
-
-          </section>
-
-        `;
-
-      }
-    );
-
-
-  document
-    .getElementById("content")
-    .innerHTML =
-      html;
-
-}
-
-
-/* =========================================
-   RIGA PARTITA
-========================================= */
-
-function createMatchRow(match){
-
-  const date =
-    new Date(
-      match.utcDate
-    );
-
-
-  const time =
-    new Intl.DateTimeFormat(
-      "it-IT",
-      {
-        timeZone:"Europe/Rome",
-        hour:"2-digit",
-        minute:"2-digit"
-      }
-    )
-    .format(date);
-
-
-  const home =
-    match.homeTeam?.shortName ||
-    match.homeTeam?.name ||
-    "Casa";
-
-
-  const away =
-    match.awayTeam?.shortName ||
-    match.awayTeam?.name ||
-    "Trasferta";
-
-
-  const homeLogo =
-    match.homeTeam?.crest
-      ? `
-
-        <img
-          class="crest"
-          src="${match.homeTeam.crest}"
-          alt=""
-        >
-
-      `
-      : "";
-
-
-  const awayLogo =
-    match.awayTeam?.crest
-      ? `
-
-        <img
-          class="crest"
-          src="${match.awayTeam.crest}"
-          alt=""
-        >
-
-      `
-      : "";
-
-
-  return `
-
-    <div
-      class="match"
-      data-match-id="${match.id || ""}"
-    >
-
-
-      <div class="time">
-        ${time}
-      </div>
-
-
-      <div class="teams">
-
-
-        <div class="team">
-
-          ${homeLogo}
-
-          <span>
-            ${escapeHtml(home)}
-          </span>
-
-        </div>
-
-
-        <div class="team">
-
-          ${awayLogo}
-
-          <span>
-            ${escapeHtml(away)}
-          </span>
-
-        </div>
-
-
-      </div>
-
-
-      <div class="analysis">
-        ANALISI ›
-      </div>
-
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================
-   DATA SELEZIONATA
-========================================= */
-
-function updateSelectedDate(){
-
-  if(!selectedDay){
-
-    return;
-
-  }
-
-
-  const date =
-    new Date(
-      selectedDay +
-      "T12:00:00"
-    );
-
-
-  const formatted =
-    new Intl.DateTimeFormat(
-      "it-IT",
-      {
-        weekday:"long",
-        day:"numeric",
-        month:"long",
-        year:"numeric"
-      }
-    )
-    .format(date);
-
-
-  const text =
-    formatted
-      .charAt(0)
-      .toUpperCase() +
-    formatted.slice(1);
-
-
-  document
-    .getElementById(
-      "selectedDate"
-    )
-    .textContent =
-      text;
-
-}
-
-
-/* =========================================
-   APRI / CHIUDI CAMPIONATO
-========================================= */
-
-function toggleCompetition(
-  id,
-  header
-){
-
-  const element =
-    document.getElementById(id);
-
-
-  const arrow =
-    header.querySelector(
-      ".arrow"
-    );
-
-
-  if(
-    element.style.display ===
-    "none"
-  ){
-
-    element.style.display =
+        }
+      );
+
+    }
+
+
+    document.getElementById(
+      "summaryAmount"
+    ).textContent =
+      amount.toLocaleString(
+        "it-IT",
+        {
+          style: "currency",
+          currency: "EUR"
+        }
+      );
+
+
+    document.getElementById(
+      "summaryMatches"
+    ).textContent =
+      selected.length;
+
+
+    document.getElementById(
+      "resultDate"
+    ).textContent =
+      new Date()
+        .toLocaleDateString(
+          "it-IT",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          }
+        );
+
+
+    result.style.display =
       "block";
 
-    arrow.textContent =
-      "▼";
+
+    result.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+
+    analyseButton.disabled = false;
+
+    analyseButton.textContent =
+      "ANALIZZA E CREA LA GIOCATA";
 
   }
 
-  else{
 
-    element.style.display =
-      "none";
-
-    arrow.textContent =
-      "▶";
-
-  }
-
-}
-
-
-/* =========================================
-   PROTEZIONE HTML
-========================================= */
-
-function escapeHtml(text){
-
-  return String(text)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-/* =========================================
-   RICERCA
-========================================= */
-
-document
-  .getElementById("search")
-  .addEventListener(
-    "input",
-    renderMatches
+  analyseButton.addEventListener(
+    "click",
+    createBet
   );
 
 
-/* =========================================
-   START
-========================================= */
-
-loadData();
+  loadBetlabData();
 
 </script>
 
