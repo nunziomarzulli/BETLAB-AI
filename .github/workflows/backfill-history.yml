@@ -1,4 +1,4 @@
-name: BETLAB Import storico
+name: BETLAB Import storico V2
 
 on:
   workflow_dispatch:
@@ -14,15 +14,18 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Importa storico OpenFootball
+      - name: Importa storico OpenFootball V2
         run: |
           mkdir -p data
 
           python3 - <<'PY'
+
           import json
           import os
           import urllib.request
           import hashlib
+          import re
+          import unicodedata
 
           from datetime import datetime, timezone
 
@@ -34,91 +37,110 @@ jobs:
           )
 
           # =====================================================
-          # CAMPIONATI DA IMPORTARE
-          # STAGIONE 2025/26
+          # DATASET
+          #
+          # Europa: stagione attuale 2026/27
+          # Brasile: stagione 2026
           # =====================================================
 
           DATASETS = [
-              ("2025-26", "en.1.json", "England", "Premier League"),
-              ("2025-26", "en.2.json", "England", "Championship"),
 
-              ("2025-26", "it.1.json", "Italy", "Serie A"),
-              ("2025-26", "it.2.json", "Italy", "Serie B"),
+              # EUROPA 2026/27
 
-              ("2025-26", "es.1.json", "Spain", "La Liga"),
-              ("2025-26", "es.2.json", "Spain", "Segunda División"),
+              ("2026-27", "en.1.json",
+               "England", "Premier League"),
 
-              ("2025-26", "de.1.json", "Germany", "Bundesliga"),
-              ("2025-26", "de.2.json", "Germany", "2. Bundesliga"),
+              ("2026-27", "en.2.json",
+               "England", "Championship"),
 
-              ("2025-26", "fr.1.json", "France", "Ligue 1"),
-              ("2025-26", "fr.2.json", "France", "Ligue 2"),
+              ("2026-27", "it.1.json",
+               "Italy", "Serie A"),
 
-              ("2025-26", "pt.1.json", "Portugal", "Primeira Liga"),
-              ("2025-26", "nl.1.json", "Netherlands", "Eredivisie"),
-              ("2025-26", "be.1.json", "Belgium", "Jupiler Pro League"),
-              ("2025-26", "tr.1.json", "Turkey", "Süper Lig"),
-              ("2025-26", "sco.1.json", "Scotland", "Premiership"),
+              ("2026-27", "it.2.json",
+               "Italy", "Serie B"),
 
-              ("2025-26", "at.1.json", "Austria", "Bundesliga"),
-              ("2025-26", "gr.1.json", "Greece", "Super League 1")
+              ("2026-27", "es.1.json",
+               "Spain", "La Liga"),
+
+              ("2026-27", "es.2.json",
+               "Spain", "Segunda División"),
+
+              ("2026-27", "de.1.json",
+               "Germany", "Bundesliga"),
+
+              ("2026-27", "de.2.json",
+               "Germany", "2. Bundesliga"),
+
+              ("2026-27", "fr.1.json",
+               "France", "Ligue 1"),
+
+              ("2026-27", "fr.2.json",
+               "France", "Ligue 2"),
+
+              ("2026-27", "pt.1.json",
+               "Portugal", "Primeira Liga"),
+
+              ("2026-27", "nl.1.json",
+               "Netherlands", "Eredivisie"),
+
+              ("2026-27", "be.1.json",
+               "Belgium", "Jupiler Pro League"),
+
+              ("2026-27", "tr.1.json",
+               "Turkey", "Süper Lig"),
+
+              ("2026-27", "sco.1.json",
+               "Scotland", "Premiership"),
+
+              ("2026-27", "at.1.json",
+               "Austria", "Bundesliga"),
+
+              ("2026-27", "gr.1.json",
+               "Greece", "Super League 1"),
+
+              # BRASILE 2026
+
+              ("2026", "br.1.json",
+               "Brazil", "Serie A")
           ]
 
-          # =====================================================
-          # CARICA STORICO BETLAB ESISTENTE
-          # =====================================================
-
-          if os.path.exists(HISTORY_FILE):
-              try:
-                  with open(
-                      HISTORY_FILE,
-                      encoding="utf-8"
-                  ) as f:
-                      existing = json.load(f)
-
-                  history = existing.get(
-                      "matches",
-                      []
-                  )
-
-              except Exception:
-                  history = []
-          else:
-              history = []
-
-          print("=================================")
-          print("BETLAB OPENFOOTBALL IMPORT")
-          print("=================================")
-          print()
-
-          print(
-              "Storico BETLAB iniziale:",
-              len(history)
-          )
 
           # =====================================================
-          # INDICE DATI GIÀ PRESENTI
+          # NORMALIZZAZIONE
           # =====================================================
 
-          history_keys = set()
+          def normalize(name):
 
-          for match in history:
+              if not name:
+                  return ""
 
-              key = (
-                  str(match.get("date", ""))[:10],
-                  match.get("home", {}).get("name", ""),
-                  match.get("away", {}).get("name", "")
+              name = unicodedata.normalize(
+                  "NFKD",
+                  name
               )
 
-              history_keys.add(key)
+              name = "".join(
+                  c for c in name
+                  if not unicodedata.combining(c)
+              )
 
-          total_downloaded = 0
-          total_imported = 0
-          successful_datasets = 0
-          failed_datasets = 0
+              name = name.lower()
+
+              name = re.sub(
+                  r"[^a-z0-9]+",
+                  " ",
+                  name
+              )
+
+              return re.sub(
+                  r"\s+",
+                  " ",
+                  name
+              ).strip()
+
 
           # =====================================================
-          # NORMALIZZAZIONE RISULTATO
+          # RISULTATO
           # =====================================================
 
           def extract_score(score):
@@ -126,26 +148,20 @@ jobs:
               if score is None:
                   return None
 
-              # Alcuni file OpenFootball usano:
-              # "score": [1, 0]
-
               if isinstance(score, list):
 
-                  if len(score) >= 2:
+                  if (
+                      len(score) >= 2
+                      and isinstance(score[0], int)
+                      and isinstance(score[1], int)
+                  ):
 
-                      if (
-                          isinstance(score[0], int)
-                          and isinstance(score[1], int)
-                      ):
-                          return [
-                              score[0],
-                              score[1]
-                          ]
+                      return [
+                          score[0],
+                          score[1]
+                      ]
 
                   return None
-
-              # Altri usano:
-              # "score": {"ft":[1,0], "ht":[0,0]}
 
               if isinstance(score, dict):
 
@@ -157,6 +173,7 @@ jobs:
                       and isinstance(ft[0], int)
                       and isinstance(ft[1], int)
                   ):
+
                       return [
                           ft[0],
                           ft[1]
@@ -164,8 +181,91 @@ jobs:
 
               return None
 
+
           # =====================================================
-          # ID INTERNO BETLAB
+          # CARICA STORICO
+          # =====================================================
+
+          if os.path.exists(HISTORY_FILE):
+
+              try:
+
+                  with open(
+                      HISTORY_FILE,
+                      encoding="utf-8"
+                  ) as f:
+
+                      old = json.load(f)
+
+                  history = old.get(
+                      "matches",
+                      []
+                  )
+
+              except Exception:
+
+                  history = []
+
+          else:
+
+              history = []
+
+
+          print("=================================")
+          print("BETLAB OPENFOOTBALL IMPORT V2")
+          print("=================================")
+
+          print(
+              "Storico iniziale:",
+              len(history)
+          )
+
+          print()
+
+
+          # =====================================================
+          # CHIAVI ESISTENTI
+          # =====================================================
+
+          existing = set()
+
+          for match in history:
+
+              date = str(
+                  match.get("date", "")
+              )[:10]
+
+              home = normalize(
+                  match.get(
+                      "home",
+                      {}
+                  ).get(
+                      "name",
+                      ""
+                  )
+              )
+
+              away = normalize(
+                  match.get(
+                      "away",
+                      {}
+                  ).get(
+                      "name",
+                      ""
+                  )
+              )
+
+              existing.add(
+                  (
+                      date,
+                      home,
+                      away
+                  )
+              )
+
+
+          # =====================================================
+          # ID
           # =====================================================
 
           def create_id(
@@ -178,7 +278,6 @@ jobs:
           ):
 
               raw = (
-                  f"openfootball|"
                   f"{season}|"
                   f"{country}|"
                   f"{league}|"
@@ -187,17 +286,24 @@ jobs:
                   f"{away}"
               )
 
-              digest = hashlib.sha1(
-                  raw.encode("utf-8")
-              ).hexdigest()[:16]
-
               return (
-                  "OF-" + digest
+                  "OF-" +
+                  hashlib.sha1(
+                      raw.encode("utf-8")
+                  ).hexdigest()[:16]
               )
 
+
           # =====================================================
-          # DOWNLOAD DATASET
+          # IMPORT
           # =====================================================
+
+          successful = 0
+          failed = 0
+
+          total_read = 0
+          total_added = 0
+
 
           for (
               season,
@@ -213,8 +319,10 @@ jobs:
               )
 
               print(
-                  f"Scarico {country} - "
-                  f"{league}..."
+                  f"Scarico "
+                  f"{country} - "
+                  f"{league} "
+                  f"({season})..."
               )
 
               try:
@@ -223,7 +331,7 @@ jobs:
                       url,
                       headers={
                           "User-Agent":
-                              "BETLAB-AI/1.0"
+                              "BETLAB-AI/2.0"
                       }
                   )
 
@@ -240,34 +348,31 @@ jobs:
 
               except Exception as e:
 
-                  failed_datasets += 1
+                  failed += 1
 
                   print(
-                      "  ERRORE:",
+                      "  NON DISPONIBILE:",
                       e
                   )
 
                   continue
 
-              successful_datasets += 1
+
+              successful += 1
 
               matches = payload.get(
                   "matches",
                   []
               )
 
-              total_downloaded += len(matches)
+              total_read += len(matches)
 
-              imported_league = 0
+              league_added = 0
 
-              # =================================================
-              # IMPORT PARTITE
-              # =================================================
 
               for match in matches:
 
                   date = match.get("date")
-
                   home = match.get("team1")
                   away = match.get("team2")
 
@@ -280,40 +385,43 @@ jobs:
                   if not away:
                       continue
 
+
                   result = extract_score(
                       match.get("score")
                   )
 
-                  # Se non c'è risultato finale,
-                  # la partita non entra nello storico.
+                  # Ignora partite non ancora giocate
+
                   if result is None:
                       continue
+
 
                   home_goals = result[0]
                   away_goals = result[1]
 
+
                   key = (
                       str(date)[:10],
-                      home,
-                      away
+                      normalize(home),
+                      normalize(away)
                   )
 
-                  if key in history_keys:
+
+                  if key in existing:
                       continue
 
-                  fixture_id = create_id(
-                      season,
-                      country,
-                      league,
-                      date,
-                      home,
-                      away
-                  )
 
-                  item = {
+                  history.append({
 
                       "fixtureId":
-                          fixture_id,
+                          create_id(
+                              season,
+                              country,
+                              league,
+                              date,
+                              home,
+                              away
+                          ),
 
                       "source":
                           "OpenFootball",
@@ -343,6 +451,7 @@ jobs:
                           match.get("round"),
 
                       "home": {
+
                           "id":
                               None,
 
@@ -351,6 +460,7 @@ jobs:
                       },
 
                       "away": {
+
                           "id":
                               None,
 
@@ -359,47 +469,43 @@ jobs:
                       },
 
                       "goals": {
+
                           "home":
                               home_goals,
 
                           "away":
                               away_goals
                       }
-                  }
 
-                  history.append(item)
+                  })
 
-                  history_keys.add(key)
 
-                  imported_league += 1
-                  total_imported += 1
+                  existing.add(key)
+
+                  league_added += 1
+                  total_added += 1
+
 
               print(
                   f"  {len(matches)} partite | "
-                  f"+{imported_league} importate"
+                  f"+{league_added} risultati"
               )
 
-          # =====================================================
-          # ORDINA
-          #
-          # OpenFootball non usa timestamp Unix nel nostro formato,
-          # quindi usiamo la data come ordinamento principale.
-          # =====================================================
-
-          history.sort(
-              key=lambda x: (
-                  str(
-                      x.get("date", "")
-                  )[:10],
-                  str(
-                      x.get("fixtureId", "")
-                  )
-              )
-          )
 
           # =====================================================
           # SALVA
           # =====================================================
+
+          history.sort(
+              key=lambda x:
+                  str(
+                      x.get(
+                          "date",
+                          ""
+                      )
+                  )
+          )
+
 
           output = {
 
@@ -420,6 +526,7 @@ jobs:
                   history
           }
 
+
           with open(
               HISTORY_FILE,
               "w",
@@ -433,29 +540,30 @@ jobs:
                   indent=2
               )
 
+
           print()
           print("=================================")
-          print("RISULTATO IMPORT")
+          print("RISULTATO IMPORT V2")
           print("=================================")
 
           print(
               "Dataset riusciti:",
-              successful_datasets
+              successful
           )
 
           print(
-              "Dataset falliti:",
-              failed_datasets
+              "Dataset non disponibili:",
+              failed
           )
 
           print(
               "Partite lette:",
-              total_downloaded
+              total_read
           )
 
           print(
-              "Nuove partite importate:",
-              total_imported
+              "Nuovi risultati:",
+              total_added
           )
 
           print(
@@ -465,10 +573,11 @@ jobs:
 
           print()
           print(
-              "BETLAB OPENFOOTBALL IMPORT OK"
+              "BETLAB OPENFOOTBALL IMPORT V2 OK"
           )
 
           PY
+
 
       - name: Salva storico BETLAB
         run: |
@@ -481,7 +590,7 @@ jobs:
           then
             echo "Nessun nuovo dato."
           else
-            git commit -m "Importa storico OpenFootball"
+            git commit -m "Importa storico BETLAB V2"
 
             git pull --rebase origin main
 
