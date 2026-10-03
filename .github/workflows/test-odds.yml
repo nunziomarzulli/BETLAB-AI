@@ -1,4 +1,4 @@
-name: BETLAB Test Risultati Esatti
+name: BETLAB Test Risultati Esatti V2
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Analizza quote risultato esatto
+      - name: Analizza risultati esatti plausibili
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -22,11 +22,17 @@ jobs:
 
           import json
           import os
+          import math
+          import re
+          import unicodedata
           import urllib.request
           import urllib.parse
 
 
           API_KEY = os.environ["API_FOOTBALL_KEY"]
+
+          MIN_SCORE_PROBABILITY = 0.025
+          MAX_GOALS = 5
 
 
           # ==========================================================
@@ -69,7 +75,449 @@ jobs:
 
 
           # ==========================================================
-          # CARICA BETLAB
+          # NORMALIZZAZIONE SQUADRE
+          # ==========================================================
+
+          def normalize(value):
+
+              value = str(value or "")
+
+              value = unicodedata.normalize(
+                  "NFKD",
+                  value
+              )
+
+              value = "".join(
+                  c
+                  for c in value
+                  if not unicodedata.combining(c)
+              )
+
+              value = value.lower()
+
+              value = re.sub(
+                  r"[^a-z0-9]+",
+                  " ",
+                  value
+              )
+
+              return " ".join(
+                  value.split()
+              )
+
+
+          aliases = {
+
+              "atletico mg":
+                  "atletico mineiro",
+
+              "ca mineiro":
+                  "atletico mineiro",
+
+              "clube atletico mineiro":
+                  "atletico mineiro",
+
+              "rb bragantino":
+                  "bragantino",
+
+              "red bull bragantino":
+                  "bragantino",
+
+              "real sociedad ii":
+                  "real sociedad b",
+
+              "ud las palmas":
+                  "las palmas",
+
+              "valladolid":
+                  "real valladolid",
+
+              "cd castellon":
+                  "castellon",
+
+              "rcd mallorca":
+                  "mallorca"
+
+          }
+
+
+          def canonical(value):
+
+              key = normalize(value)
+
+              return aliases.get(
+                  key,
+                  key
+              )
+
+
+          # ==========================================================
+          # STORICO
+          # ==========================================================
+
+          with open(
+              "data/betlab-history.json",
+              "r",
+              encoding="utf-8"
+          ) as f:
+
+              history_data = json.load(f)
+
+
+          if isinstance(history_data, dict):
+
+              history = (
+                  history_data.get("matches")
+                  or
+                  history_data.get("history")
+                  or
+                  []
+              )
+
+          else:
+
+              history = history_data
+
+
+          # ==========================================================
+          # LETTURA RECORD STORICI
+          # ==========================================================
+
+          def team_name(record, side):
+
+              value = record.get(side)
+
+              if isinstance(value, dict):
+                  return value.get("name")
+
+              return value
+
+
+          def goals(record):
+
+              hg = record.get("homeGoals")
+              ag = record.get("awayGoals")
+
+              if hg is not None and ag is not None:
+                  return hg, ag
+
+              goal_data = (
+                  record.get("goals")
+                  or
+                  {}
+              )
+
+              return (
+                  goal_data.get("home"),
+                  goal_data.get("away")
+              )
+
+
+          # ==========================================================
+          # PARTITE DI UNA SQUADRA
+          # ==========================================================
+
+          def team_games(
+              team,
+              before_date,
+              limit=10
+          ):
+
+              key = canonical(team)
+
+              games = []
+
+
+              for record in history:
+
+                  date = str(
+                      record.get("date")
+                      or
+                      ""
+                  )[:10]
+
+
+                  if not date:
+                      continue
+
+
+                  if date >= before_date:
+                      continue
+
+
+                  home = team_name(
+                      record,
+                      "home"
+                  )
+
+                  away = team_name(
+                      record,
+                      "away"
+                  )
+
+
+                  if not home or not away:
+                      continue
+
+
+                  hg, ag = goals(record)
+
+
+                  if hg is None or ag is None:
+                      continue
+
+
+                  if canonical(home) == key:
+
+                      games.append({
+
+                          "date": date,
+                          "gf": int(hg),
+                          "ga": int(ag),
+                          "venue": "home"
+
+                      })
+
+
+                  elif canonical(away) == key:
+
+                      games.append({
+
+                          "date": date,
+                          "gf": int(ag),
+                          "ga": int(hg),
+                          "venue": "away"
+
+                      })
+
+
+              games.sort(
+                  key=lambda x: x["date"]
+              )
+
+
+              return games[-limit:]
+
+
+          # ==========================================================
+          # MEDIA PESATA
+          # ==========================================================
+
+          def weighted_average(
+              games,
+              field
+          ):
+
+              if not games:
+                  return None
+
+
+              total = 0.0
+              weight_total = 0.0
+
+
+              for index, game in enumerate(
+                  games,
+                  start=1
+              ):
+
+                  weight = index
+
+                  total += (
+                      game[field]
+                      *
+                      weight
+                  )
+
+                  weight_total += weight
+
+
+              return (
+                  total /
+                  weight_total
+              )
+
+
+          # ==========================================================
+          # POISSON
+          # ==========================================================
+
+          def poisson(
+              goals,
+              expected
+          ):
+
+              return (
+                  math.exp(-expected)
+                  *
+                  (
+                      expected ** goals
+                  )
+                  /
+                  math.factorial(goals)
+              )
+
+
+          # ==========================================================
+          # EXPECTED GOALS BETLAB
+          # ==========================================================
+
+          def expected_goals(
+              home_games,
+              away_games
+          ):
+
+              home_attack = weighted_average(
+                  home_games,
+                  "gf"
+              )
+
+              home_defence = weighted_average(
+                  home_games,
+                  "ga"
+              )
+
+              away_attack = weighted_average(
+                  away_games,
+                  "gf"
+              )
+
+              away_defence = weighted_average(
+                  away_games,
+                  "ga"
+              )
+
+
+              if (
+                  home_attack is None
+                  or
+                  home_defence is None
+                  or
+                  away_attack is None
+                  or
+                  away_defence is None
+              ):
+
+                  return None, None
+
+
+              expected_home = (
+                  home_attack
+                  +
+                  away_defence
+              ) / 2
+
+
+              expected_away = (
+                  away_attack
+                  +
+                  home_defence
+              ) / 2
+
+
+              # leggerissimo vantaggio casa
+
+              expected_home *= 1.08
+
+              expected_away *= 0.92
+
+
+              # evita estremi prodotti da campioni piccoli
+
+              expected_home = max(
+                  0.25,
+                  min(
+                      expected_home,
+                      3.5
+                  )
+              )
+
+              expected_away = max(
+                  0.20,
+                  min(
+                      expected_away,
+                      3.5
+                  )
+              )
+
+
+              return (
+                  expected_home,
+                  expected_away
+              )
+
+
+          # ==========================================================
+          # NORMALIZZA SCORE API
+          # ==========================================================
+
+          def normalize_score(value):
+
+              value = str(
+                  value or ""
+              ).strip()
+
+
+              match = re.fullmatch(
+                  r"\s*(\d+)\s*[:\-]\s*(\d+)\s*",
+                  value
+              )
+
+
+              if not match:
+                  return None
+
+
+              return (
+                  int(match.group(1)),
+                  int(match.group(2))
+              )
+
+
+          # ==========================================================
+          # SOLO EXACT SCORE FULL TIME
+          # ==========================================================
+
+          def is_full_time_exact_score(
+              market
+          ):
+
+              name = normalize(
+                  market
+              )
+
+
+              forbidden = [
+
+                  "first half",
+                  "second half",
+                  "1st half",
+                  "2nd half",
+                  "half time",
+                  "halftime"
+
+              ]
+
+
+              for text in forbidden:
+
+                  if text in name:
+                      return False
+
+
+              return (
+                  name == "exact score"
+                  or
+                  name == "correct score"
+                  or
+                  name == "full time correct score"
+                  or
+                  name == "fulltime correct score"
+              )
+
+
+          # ==========================================================
+          # CARICA ANALISI
           # ==========================================================
 
           with open(
@@ -78,19 +526,20 @@ jobs:
               encoding="utf-8"
           ) as f:
 
-              data = json.load(f)
+              analysis_data = json.load(f)
 
 
           matches = (
-              data.get("analysis")
+              analysis_data.get("analysis")
               or
-              data.get("matches")
+              analysis_data.get("matches")
               or
               []
           )
 
 
           matches = [
+
               match
               for match in matches
               if (
@@ -100,23 +549,24 @@ jobs:
                   ).get("available")
                   is True
               )
+
           ]
 
 
           print("")
-          print("==========================================")
-          print("BETLAB - TEST RISULTATI ESATTI")
-          print("==========================================")
+          print("==============================================")
+          print("BETLAB EXACT SCORE ENGINE TEST V2")
+          print("==============================================")
           print("")
+
           print(
-              "Partite con pronostico:",
+              "Partite analizzate:",
               len(matches)
           )
-          print("")
 
 
           # ==========================================================
-          # OGNI PARTITA
+          # ANALIZZA PARTITE
           # ==========================================================
 
           for index, match in enumerate(
@@ -124,38 +574,132 @@ jobs:
               start=1
           ):
 
-              fixture_id = match.get("fixtureId")
+              fixture_id = match.get(
+                  "fixtureId"
+              )
 
               home = (
-                  match.get("home", {})
-                  .get("name", "Casa")
+                  match.get(
+                      "home",
+                      {}
+                  ).get(
+                      "name"
+                  )
               )
 
               away = (
-                  match.get("away", {})
-                  .get("name", "Trasferta")
+                  match.get(
+                      "away",
+                      {}
+                  ).get(
+                      "name"
+                  )
               )
+
+              match_date = str(
+                  match.get("date")
+                  or
+                  ""
+              )[:10]
 
 
               print("")
-              print("==========================================")
+              print("==============================================")
               print(
                   f"{index}. {home} - {away}"
               )
-              print(
-                  "Fixture:",
-                  fixture_id
+              print("==============================================")
+
+
+              home_games = team_games(
+                  home,
+                  match_date,
+                  10
               )
-              print("==========================================")
+
+              away_games = team_games(
+                  away,
+                  match_date,
+                  10
+              )
 
 
-              # ------------------------------------------------------
-              # LEGGI TUTTE LE PAGINE ODDS
-              # ------------------------------------------------------
+              print(
+                  "Storico:",
+                  f"{len(home_games)} + {len(away_games)}"
+              )
+
+
+              if (
+                  len(home_games) < 3
+                  or
+                  len(away_games) < 3
+              ):
+
+                  print(
+                      "STORICO INSUFFICIENTE PER RISULTATO ESATTO"
+                  )
+
+                  continue
+
+
+              expected_home, expected_away = (
+                  expected_goals(
+                      home_games,
+                      away_games
+                  )
+              )
+
+
+              print(
+                  "Gol attesi BETLAB:",
+                  f"{expected_home:.2f} - {expected_away:.2f}"
+              )
+
+
+              # ======================================================
+              # PROBABILITA RISULTATI
+              # ======================================================
+
+              model_scores = {}
+
+
+              for hg in range(
+                  MAX_GOALS + 1
+              ):
+
+                  for ag in range(
+                      MAX_GOALS + 1
+                  ):
+
+                      probability = (
+
+                          poisson(
+                              hg,
+                              expected_home
+                          )
+
+                          *
+
+                          poisson(
+                              ag,
+                              expected_away
+                          )
+
+                      )
+
+
+                      model_scores[
+                          (hg, ag)
+                      ] = probability
+
+
+              # ======================================================
+              # QUOTE API - TUTTE LE PAGINE
+              # ======================================================
 
               page = 1
-
-              all_blocks = []
+              odds_blocks = []
 
 
               while True:
@@ -163,137 +707,142 @@ jobs:
                   odds_data = api_get(
                       "odds",
                       {
-                          "fixture": fixture_id,
-                          "page": page
+                          "fixture":
+                              fixture_id,
+
+                          "page":
+                              page
                       }
                   )
 
 
-                  blocks = (
-                      odds_data.get("response")
+                  odds_blocks.extend(
+                      odds_data.get(
+                          "response"
+                      )
                       or
                       []
                   )
 
 
-                  all_blocks.extend(blocks)
-
-
                   paging = (
-                      odds_data.get("paging")
+                      odds_data.get(
+                          "paging"
+                      )
                       or
                       {}
                   )
 
 
-                  current_page = int(
-                      paging.get("current")
+                  current = int(
+                      paging.get(
+                          "current"
+                      )
                       or
                       page
                   )
 
-                  total_pages = int(
-                      paging.get("total")
+                  total = int(
+                      paging.get(
+                          "total"
+                      )
                       or
                       1
                   )
 
 
-                  print(
-                      f"Pagina quote {current_page}/{total_pages}"
-                  )
-
-
-                  if current_page >= total_pages:
+                  if current >= total:
                       break
 
 
                   page += 1
 
 
-              # ------------------------------------------------------
-              # CERCA CORRECT SCORE
-              # ------------------------------------------------------
+              # ======================================================
+              # MIGLIORE QUOTA PER RISULTATO
+              # ======================================================
 
-              correct_scores = []
+              best_odds = {}
 
 
-              for block in all_blocks:
+              for block in odds_blocks:
 
-                  bookmakers = (
-                      block.get("bookmakers")
+                  for bookmaker in (
+                      block.get(
+                          "bookmakers"
+                      )
                       or
                       []
-                  )
-
-
-                  for bookmaker in bookmakers:
+                  ):
 
                       bookmaker_name = (
-                          bookmaker.get("name")
+                          bookmaker.get(
+                              "name"
+                          )
                           or
                           "Bookmaker"
                       )
 
 
-                      bets = (
-                          bookmaker.get("bets")
+                      for bet in (
+                          bookmaker.get(
+                              "bets"
+                          )
                           or
                           []
-                      )
-
-
-                      for bet in bets:
+                      ):
 
                           market_name = (
-                              bet.get("name")
+                              bet.get(
+                                  "name"
+                              )
                               or
                               ""
                           )
 
 
-                          market_lower = (
-                              market_name.lower()
-                          )
-
-
-                          if not (
-                              "correct score"
-                              in market_lower
-
-                              or
-
-                              "exact score"
-                              in market_lower
+                          if not is_full_time_exact_score(
+                              market_name
                           ):
                               continue
 
 
-                          values = (
-                              bet.get("values")
+                          for value in (
+                              bet.get(
+                                  "values"
+                              )
                               or
                               []
-                          )
+                          ):
 
-
-                          for value in values:
-
-                              selection = str(
-                                  value.get("value")
-                                  or
-                                  ""
-                              ).strip()
-
-
-                              odd_raw = (
-                                  value.get("odd")
+                              score = normalize_score(
+                                  value.get(
+                                      "value"
+                                  )
                               )
+
+
+                              if score is None:
+                                  continue
+
+
+                              hg, ag = score
+
+
+                              if (
+                                  hg > MAX_GOALS
+                                  or
+                                  ag > MAX_GOALS
+                              ):
+                                  continue
 
 
                               try:
 
                                   odd = float(
-                                      odd_raw
+                                      value.get(
+                                          "odd"
+                                      )
                                   )
 
                               except:
@@ -301,124 +850,235 @@ jobs:
                                   continue
 
 
-                              correct_scores.append({
-
-                                  "score":
-                                      selection,
-
-                                  "odd":
-                                      odd,
-
-                                  "bookmaker":
-                                      bookmaker_name,
-
-                                  "market":
-                                      market_name
-
-                              })
+                              old = best_odds.get(
+                                  score
+                              )
 
 
-              # ------------------------------------------------------
-              # RISULTATI
-              # ------------------------------------------------------
+                              if (
+                                  old is None
+                                  or
+                                  odd > old["odd"]
+                              ):
 
-              if not correct_scores:
+                                  best_odds[
+                                      score
+                                  ] = {
 
-                  print("")
-                  print(
-                      "NESSUN MERCATO RISULTATO ESATTO TROVATO"
-                  )
+                                      "odd":
+                                          odd,
 
-                  continue
+                                      "bookmaker":
+                                          bookmaker_name,
+
+                                      "market":
+                                          market_name
+
+                                  }
 
 
-              # dedupe: teniamo quota migliore per risultato
+              # ======================================================
+              # UNISCI MODELLO + QUOTE
+              # ======================================================
 
-              best_by_score = {}
+              candidates = []
 
 
-              for item in correct_scores:
-
-                  score = item["score"]
-
-                  old = best_by_score.get(score)
-
+              for score, probability in model_scores.items():
 
                   if (
-                      old is None
-                      or
-                      item["odd"] > old["odd"]
+                      probability
+                      <
+                      MIN_SCORE_PROBABILITY
                   ):
-
-                      best_by_score[score] = item
-
-
-              results = list(
-                  best_by_score.values()
-              )
+                      continue
 
 
-              results.sort(
+                  quote = best_odds.get(
+                      score
+                  )
+
+
+                  if quote is None:
+                      continue
+
+
+                  odd = quote["odd"]
+
+
+                  fair_odd = (
+                      1 / probability
+                  )
+
+
+                  value = (
+                      probability
+                      *
+                      odd
+                  )
+
+
+                  candidates.append({
+
+                      "score":
+                          score,
+
+                      "probability":
+                          probability,
+
+                      "fairOdd":
+                          fair_odd,
+
+                      "odd":
+                          odd,
+
+                      "value":
+                          value,
+
+                      "bookmaker":
+                          quote[
+                              "bookmaker"
+                          ],
+
+                      "market":
+                          quote[
+                              "market"
+                          ]
+
+                  })
+
+
+              candidates.sort(
                   key=lambda item:
-                      item["odd"]
+                      item[
+                          "probability"
+                      ],
+                  reverse=True
               )
 
 
               print("")
               print(
-                  "RISULTATI ESATTI DISPONIBILI:",
-                  len(results)
+                  "RISULTATI ESATTI PLAUSIBILI:",
+                  len(candidates)
               )
 
               print("")
 
 
-              for item in results:
+              if not candidates:
 
                   print(
-                      f'{item["score"]:>8}'
-                      f'  @ {item["odd"]:.2f}'
-                      f'  | {item["bookmaker"]}'
-                      f'  | {item["market"]}'
+                      "Nessun risultato esatto supera la soglia."
                   )
 
-
-              # ------------------------------------------------------
-              # QUOTE VICINE A 20
-              # ------------------------------------------------------
-
-              target = 20.0
+                  continue
 
 
-              nearest = sorted(
-                  results,
-                  key=lambda item:
-                      abs(
-                          item["odd"]
-                          -
-                          target
-                      )
-              )[:5]
+              for item in candidates:
 
-
-              print("")
-              print("------------------------------------------")
-              print("QUOTE PIU VICINE A 20.00")
-              print("------------------------------------------")
-
-
-              for item in nearest:
+                  hg, ag = item["score"]
 
                   print(
-                      f'{item["score"]}'
-                      f' @ {item["odd"]:.2f}'
+                      f'{hg}:{ag}'
+                      f' | MODELLO {item["probability"] * 100:.1f}%'
+                      f' | QUOTA {item["odd"]:.2f}'
+                      f' | FAIR {item["fairOdd"]:.2f}'
+                      f' | VALUE {item["value"]:.2f}'
                       f' | {item["bookmaker"]}'
                   )
 
 
+              # ======================================================
+              # MIGLIORI PER PROBABILITA
+              # ======================================================
+
+              print("")
+              print("----------------------------------------------")
+              print("TOP 5 PER PROBABILITA BETLAB")
+              print("----------------------------------------------")
+
+
+              for item in candidates[:5]:
+
+                  hg, ag = item["score"]
+
+                  print(
+                      f'{hg}:{ag}'
+                      f' -> {item["probability"] * 100:.1f}%'
+                      f' @ {item["odd"]:.2f}'
+                  )
+
+
+              # ======================================================
+              # MIGLIORI VALUE
+              # ======================================================
+
+              value_candidates = sorted(
+                  candidates,
+                  key=lambda item:
+                      item["value"],
+                  reverse=True
+              )
+
+
+              print("")
+              print("----------------------------------------------")
+              print("TOP 5 VALUE BETLAB")
+              print("----------------------------------------------")
+
+
+              for item in value_candidates[:5]:
+
+                  hg, ag = item["score"]
+
+                  print(
+                      f'{hg}:{ag}'
+                      f' -> MODELLO {item["probability"] * 100:.1f}%'
+                      f' | QUOTA {item["odd"]:.2f}'
+                      f' | VALUE {item["value"]:.2f}'
+                  )
+
+
+              # ======================================================
+              # VICINI A QUOTA 20
+              # ======================================================
+
+              target_odd = 20.0
+
+
+              target_candidates = sorted(
+                  candidates,
+                  key=lambda item:
+                      abs(
+                          item["odd"]
+                          -
+                          target_odd
+                      )
+              )
+
+
+              print("")
+              print("----------------------------------------------")
+              print("PLAUSIBILI PIU VICINI A QUOTA 20")
+              print("----------------------------------------------")
+
+
+              for item in target_candidates[:5]:
+
+                  hg, ag = item["score"]
+
+                  print(
+                      f'{hg}:{ag}'
+                      f' -> MODELLO {item["probability"] * 100:.1f}%'
+                      f' | QUOTA {item["odd"]:.2f}'
+                      f' | VALUE {item["value"]:.2f}'
+                  )
+
+
           print("")
-          print("==========================================")
-          print("FINE TEST")
-          print("==========================================")
+          print("==============================================")
+          print("BETLAB EXACT SCORE TEST COMPLETATO")
+          print("==============================================")
 
           PY
