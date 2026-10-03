@@ -1,660 +1,1276 @@
 {
-  "updatedAt": "2026-10-03T20:52:02.773440+02:00",
-  "engine": "BETLAB Prediction + Odds V1",
+  "engine": "BETLAB V7 MULTI-MARKET",
+  "generatedAt": "2026-10-03T21:07:48.261370+02:00",
+  "days": [
+    "2026-10-03",
+    "2026-10-04"
+  ],
+  "historyCount": 5645,
+  "matchesAnalyzed": 30,
+  "matchesWithCandidates": 4,
+  "marketCandidates": 74,
+  "candidatesWithOdds": 73,
+  "exactScoresWithOdds": 44,
   "analysis": [
     {
-      "fixtureId": 1569951,
-      "date": "2026-10-04T16:30:00+00:00",
-      "timestamp": 1791131400,
-      "country": "Spain",
-      "league": "Segunda División",
-      "leagueId": 141,
-      "priority": 4,
-      "home": {
-        "id": 5254,
-        "name": "Castellón",
-        "form": {
-          "played": 5,
-          "wins": 2,
-          "draws": 1,
-          "losses": 2,
-          "gf": 5,
-          "ga": 4,
-          "points": 7,
-          "ppg": 1.4,
-          "avgGF": 1.0,
-          "avgGA": 0.8,
-          "recent": [
-            {
-              "date": "2025-10-05",
-              "gf": 3,
-              "ga": 1,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-12",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-19",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            },
-            {
-              "date": "2025-10-26",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            },
-            {
-              "date": "2025-11-02",
-              "gf": 2,
-              "ga": 1,
-              "result": "V"
-            }
-          ]
-        }
-      },
-      "away": {
-        "id": 10139,
-        "name": "AD Ceuta FC",
-        "form": {
-          "played": 5,
-          "wins": 3,
-          "draws": 1,
-          "losses": 1,
-          "gf": 4,
-          "ga": 2,
-          "points": 10,
-          "ppg": 2.0,
-          "avgGF": 0.8,
-          "avgGA": 0.4,
-          "recent": [
-            {
-              "date": "2025-10-03",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-12",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-18",
-              "gf": 2,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-25",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-11-02",
-              "gf": 0,
-              "ga": 2,
-              "result": "P"
-            }
-          ]
-        }
-      },
-      "historyScore": 10,
-      "dataCoverage": 1.0,
-      "prediction": {
-        "available": true,
-        "market": "Totale Gol",
-        "prediction": "UNDER 3.5",
-        "confidence": 90.0,
-        "sample": 10,
-        "oddAvailable": true,
-        "odd": 1.93,
-        "bookmaker": "1xBet",
-        "apiMarket": "Goals Over/Under",
-        "apiSelection": "Under 3.5"
-      }
-    },
-    {
-      "fixtureId": 1569955,
-      "date": "2026-10-04T19:00:00+00:00",
-      "timestamp": 1791140400,
-      "country": "Spain",
-      "league": "Segunda División",
-      "leagueId": 141,
-      "priority": 4,
-      "home": {
-        "id": 547,
-        "name": "Girona",
-        "form": {
-          "played": 5,
-          "wins": 0,
-          "draws": 3,
-          "losses": 2,
-          "gf": 3,
-          "ga": 5,
-          "points": 3,
-          "ppg": 0.6,
-          "avgGF": 0.6,
-          "avgGA": 1.0,
-          "recent": [
-            {
-              "date": "2026-05-01",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            },
-            {
-              "date": "2026-05-11",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2026-05-14",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2026-05-17",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            },
-            {
-              "date": "2026-05-23",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            }
-          ]
-        }
-      },
-      "away": {
-        "id": 798,
-        "name": "Mallorca",
-        "form": {
-          "played": 5,
-          "wins": 2,
-          "draws": 1,
-          "losses": 2,
-          "gf": 6,
-          "ga": 6,
-          "points": 7,
-          "ppg": 1.4,
-          "avgGF": 1.2,
-          "avgGA": 1.2,
-          "recent": [
-            {
-              "date": "2026-05-01",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2026-05-10",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2026-05-13",
-              "gf": 1,
-              "ga": 3,
-              "result": "P"
-            },
-            {
-              "date": "2026-05-17",
-              "gf": 0,
-              "ga": 2,
-              "result": "P"
-            },
-            {
-              "date": "2026-05-23",
-              "gf": 3,
-              "ga": 0,
-              "result": "V"
-            }
-          ]
-        }
-      },
-      "historyScore": 10,
-      "dataCoverage": 1.0,
-      "prediction": {
-        "available": true,
-        "market": "Totale Gol",
-        "prediction": "UNDER 3.5",
-        "confidence": 90.0,
-        "sample": 10,
-        "oddAvailable": true,
-        "odd": 1.8,
-        "bookmaker": "Marathonbet",
-        "apiMarket": "Away Corners Over/Under",
-        "apiSelection": "Under 3.5"
-      }
-    },
-    {
       "fixtureId": 1569957,
-      "date": "2026-10-04T12:00:00+00:00",
+      "date": "2026-10-04",
       "timestamp": 1791115200,
       "country": "Spain",
       "league": "Segunda División",
-      "leagueId": 141,
       "priority": 4,
       "home": {
-        "id": 9585,
         "name": "Real Sociedad II",
         "form": {
-          "played": 5,
+          "played": 10,
           "wins": 1,
-          "draws": 1,
-          "losses": 3,
-          "gf": 6,
-          "ga": 8,
-          "points": 4,
-          "ppg": 0.8,
-          "avgGF": 1.2,
-          "avgGA": 1.6,
-          "recent": [
-            {
-              "date": "2025-09-28",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-04",
-              "gf": 2,
-              "ga": 5,
-              "result": "P"
-            },
-            {
-              "date": "2025-10-11",
-              "gf": 3,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-25",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            },
-            {
-              "date": "2025-10-31",
-              "gf": 0,
-              "ga": 1,
-              "result": "P"
-            }
-          ]
+          "draws": 3,
+          "losses": 6,
+          "gf": 13,
+          "ga": 18,
+          "ppg": 0.6,
+          "avgGF": 1.3,
+          "avgGA": 1.8
         }
       },
       "away": {
-        "id": 715,
         "name": "Granada CF",
         "form": {
-          "played": 5,
-          "wins": 1,
-          "draws": 3,
-          "losses": 1,
-          "gf": 6,
-          "ga": 4,
-          "points": 6,
-          "ppg": 1.2,
-          "avgGF": 1.2,
-          "avgGA": 0.8,
-          "recent": [
-            {
-              "date": "2025-10-04",
-              "gf": 5,
-              "ga": 2,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-10",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-17",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-25",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-11-03",
-              "gf": 1,
-              "ga": 2,
-              "result": "P"
-            }
-          ]
+          "played": 10,
+          "wins": 2,
+          "draws": 5,
+          "losses": 3,
+          "gf": 11,
+          "ga": 11,
+          "ppg": 1.1,
+          "avgGF": 1.1,
+          "avgGA": 1.1
         }
       },
-      "historyScore": 10,
-      "dataCoverage": 1.0,
+      "historyScore": 20,
       "prediction": {
         "available": true,
+        "selection": "X2",
         "market": "Doppia Chance",
-        "prediction": "X2",
         "confidence": 80.0,
-        "sample": 10,
         "oddAvailable": true,
-        "odd": 1.63,
-        "bookmaker": "1xBet",
-        "apiMarket": "Corners. Double Chance",
+        "odd": 1.53,
+        "bookmaker": "Betano",
+        "apiMarket": "Double Chance",
         "apiSelection": "Draw/Away"
-      }
+      },
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.8,
+          "index": 80.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.53,
+          "bookmaker": "Betano",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 1.224
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.75,
+          "index": 75.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.36,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 1.02
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.65,
+          "index": 65.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.31,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 0.852
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.48,
+          "bookmaker": "1xBet",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 0.888
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.36,
+          "bookmaker": "Bet365",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.816
+        },
+        {
+          "market": "Pari/Dispari",
+          "selection": "DISPARI",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.02,
+          "bookmaker": "Bet365",
+          "apiMarket": "Odd/Even",
+          "apiSelection": "Odd",
+          "value": 1.111
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "GOAL",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.73,
+          "bookmaker": "William Hill",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "Yes",
+          "value": 0.952
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:1",
+          "modelProbability": 0.13161,
+          "index": 13.2,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 6.5,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:1",
+          "value": 0.855,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:1",
+          "modelProbability": 0.11758,
+          "index": 11.8,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.5,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:1",
+          "value": 1.117,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:0",
+          "modelProbability": 0.10778,
+          "index": 10.8,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:0",
+          "value": 0.97,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:0",
+          "modelProbability": 0.09629,
+          "index": 9.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 10.12,
+          "bookmaker": "SBO",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:0",
+          "value": 0.974,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:2",
+          "modelProbability": 0.08035,
+          "index": 8.0,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 11.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:2",
+          "value": 0.884,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:1",
+          "modelProbability": 0.07365,
+          "index": 7.4,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 10.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:1",
+          "value": 0.736,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:2",
+          "modelProbability": 0.07179,
+          "index": 7.2,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 15.5,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:2",
+          "value": 1.113,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:0",
+          "modelProbability": 0.06032,
+          "index": 6.0,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 14.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:0",
+          "value": 0.844,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:2",
+          "modelProbability": 0.04497,
+          "index": 4.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 13.5,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:2",
+          "value": 0.607,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:3",
+          "modelProbability": 0.03271,
+          "index": 3.3,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 24.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:3",
+          "value": 0.785,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:3",
+          "modelProbability": 0.02922,
+          "index": 2.9,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 35.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:3",
+          "value": 1.023,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:1",
+          "modelProbability": 0.02748,
+          "index": 2.7,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 22.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:1",
+          "value": 0.605,
+          "expectedHomeGoals": 1.119,
+          "expectedAwayGoals": 1.221
+        }
+      ]
     },
     {
-      "fixtureId": 1569956,
-      "date": "2026-10-04T16:30:00+00:00",
+      "fixtureId": 1569951,
+      "date": "2026-10-04",
       "timestamp": 1791131400,
       "country": "Spain",
       "league": "Segunda División",
-      "leagueId": 141,
       "priority": 4,
       "home": {
-        "id": 534,
-        "name": "Las Palmas",
+        "name": "Castellón",
         "form": {
-          "played": 5,
-          "wins": 2,
+          "played": 10,
+          "wins": 4,
           "draws": 3,
-          "losses": 0,
-          "gf": 5,
-          "ga": 2,
-          "points": 9,
-          "ppg": 1.8,
-          "avgGF": 1.0,
-          "avgGA": 0.4,
-          "recent": [
-            {
-              "date": "2025-10-05",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-10",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-19",
-              "gf": 3,
-              "ga": 1,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-24",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2025-11-02",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            }
-          ]
+          "losses": 3,
+          "gf": 14,
+          "ga": 11,
+          "ppg": 1.5,
+          "avgGF": 1.4,
+          "avgGA": 1.1
         }
       },
       "away": {
-        "id": 720,
-        "name": "Valladolid",
+        "name": "AD Ceuta FC",
         "form": {
-          "played": 5,
-          "wins": 2,
-          "draws": 2,
-          "losses": 1,
-          "gf": 7,
-          "ga": 6,
-          "points": 8,
-          "ppg": 1.6,
-          "avgGF": 1.4,
-          "avgGA": 1.2,
-          "recent": [
-            {
-              "date": "2025-10-05",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2025-10-12",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-19",
-              "gf": 2,
-              "ga": 3,
-              "result": "P"
-            },
-            {
-              "date": "2025-10-26",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2025-11-03",
-              "gf": 2,
-              "ga": 1,
-              "result": "V"
-            }
-          ]
+          "played": 10,
+          "wins": 5,
+          "draws": 3,
+          "losses": 2,
+          "gf": 11,
+          "ga": 10,
+          "ppg": 1.8,
+          "avgGF": 1.1,
+          "avgGA": 1.0
         }
       },
-      "historyScore": 10,
-      "dataCoverage": 1.0,
+      "historyScore": 20,
       "prediction": {
         "available": true,
-        "market": "Doppia Chance",
-        "prediction": "1X",
-        "confidence": 80.0,
-        "sample": 10,
+        "selection": "UNDER 3.5",
+        "market": "Totale Gol",
+        "confidence": 75.0,
         "oddAvailable": true,
-        "odd": 1.44,
+        "odd": 1.94,
         "bookmaker": "1xBet",
-        "apiMarket": "Corners. Double Chance",
-        "apiSelection": "Home/Draw"
-      }
+        "apiMarket": "Goals Over/Under",
+        "apiSelection": "Under 3.5"
+      },
+      "candidates": [
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.75,
+          "index": 75.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.94,
+          "bookmaker": "1xBet",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 1.455
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.7,
+          "index": 70.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 4.33,
+          "bookmaker": "Betfair",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 3.031
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.7,
+          "index": 70.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.12,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.784
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 2.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 3.22,
+          "bookmaker": "Pinnacle",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 2.5",
+          "value": 1.932
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.07,
+          "bookmaker": "Betano",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 0.642
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "NO GOAL",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.01,
+          "bookmaker": "1xBet",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "No",
+          "value": 1.105
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.13,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 0.621
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:0",
+          "modelProbability": 0.15916,
+          "index": 15.9,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 32.0,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:0",
+          "value": 5.093,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:0",
+          "modelProbability": 0.1594,
+          "index": 15.9,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 11.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:0",
+          "value": 1.753,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:1",
+          "modelProbability": 0.13312,
+          "index": 13.3,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 38.0,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:1",
+          "value": 5.059,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:1",
+          "modelProbability": 0.13331,
+          "index": 13.3,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 13.0,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:1",
+          "value": 1.733,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:0",
+          "modelProbability": 0.07981,
+          "index": 8.0,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 8.25,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:0",
+          "value": 0.658,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:1",
+          "modelProbability": 0.06675,
+          "index": 6.7,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.75,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:1",
+          "value": 0.651,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:2",
+          "modelProbability": 0.05567,
+          "index": 5.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 80.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:2",
+          "value": 4.454,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:2",
+          "modelProbability": 0.05575,
+          "index": 5.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 32.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:2",
+          "value": 1.784,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:2",
+          "modelProbability": 0.02792,
+          "index": 2.8,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 22.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:2",
+          "value": 0.614,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:0",
+          "modelProbability": 0.02664,
+          "index": 2.7,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:0",
+          "value": 0.24,
+          "expectedHomeGoals": 1.001,
+          "expectedAwayGoals": 0.836
+        }
+      ]
+    },
+    {
+      "fixtureId": 1569956,
+      "date": "2026-10-04",
+      "timestamp": 1791131400,
+      "country": "Spain",
+      "league": "Segunda División",
+      "priority": 4,
+      "home": {
+        "name": "Las Palmas",
+        "form": {
+          "played": 10,
+          "wins": 4,
+          "draws": 4,
+          "losses": 2,
+          "gf": 8,
+          "ga": 5,
+          "ppg": 1.6,
+          "avgGF": 0.8,
+          "avgGA": 0.5
+        }
+      },
+      "away": {
+        "name": "Valladolid",
+        "form": {
+          "played": 10,
+          "wins": 3,
+          "draws": 4,
+          "losses": 3,
+          "gf": 11,
+          "ga": 11,
+          "ppg": 1.3,
+          "avgGF": 1.1,
+          "avgGA": 1.1
+        }
+      },
+      "historyScore": 20,
+      "prediction": {
+        "available": true,
+        "selection": "UNDER 3.5",
+        "market": "Totale Gol",
+        "confidence": 85.0,
+        "oddAvailable": true,
+        "odd": 1.31,
+        "bookmaker": "Betano",
+        "apiMarket": "Goals Over/Under",
+        "apiSelection": "Under 3.5"
+      },
+      "candidates": [
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.85,
+          "index": 85.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.31,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 1.113
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 2.5",
+          "modelProbability": 0.75,
+          "index": 75.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.86,
+          "bookmaker": "1xBet",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 2.5",
+          "value": 1.395
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.75,
+          "index": 75.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.33,
+          "bookmaker": "1xBet",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 0.998
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.65,
+          "index": 65.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.7,
+          "bookmaker": "Betano",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 1.105
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.36,
+          "bookmaker": "Bet365",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.816
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "NO GOAL",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.01,
+          "bookmaker": "1xBet",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "No",
+          "value": 1.105
+        },
+        {
+          "market": "Pari/Dispari",
+          "selection": "PARI",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.91,
+          "bookmaker": "SBO",
+          "apiMarket": "Odd/Even",
+          "apiSelection": "Even",
+          "value": 1.05
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:0",
+          "modelProbability": 0.16474,
+          "index": 16.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 7.5,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:0",
+          "value": 1.236,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:0",
+          "modelProbability": 0.14465,
+          "index": 14.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.25,
+          "bookmaker": "SBO",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:0",
+          "value": 1.338,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:1",
+          "modelProbability": 0.13089,
+          "index": 13.1,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 6.3,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:1",
+          "value": 0.825,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:1",
+          "modelProbability": 0.11493,
+          "index": 11.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 10.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:1",
+          "value": 1.149,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:0",
+          "modelProbability": 0.09381,
+          "index": 9.4,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 11.25,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:0",
+          "value": 1.055,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:1",
+          "modelProbability": 0.07454,
+          "index": 7.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.5,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:1",
+          "value": 0.708,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:2",
+          "modelProbability": 0.052,
+          "index": 5.2,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 13.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:2",
+          "value": 0.676,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:2",
+          "modelProbability": 0.04566,
+          "index": 4.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 20.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:2",
+          "value": 0.913,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:0",
+          "modelProbability": 0.03561,
+          "index": 3.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 23.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:0",
+          "value": 0.819,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:2",
+          "modelProbability": 0.02961,
+          "index": 3.0,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 14.92,
+          "bookmaker": "SBO",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:2",
+          "value": 0.442,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:1",
+          "modelProbability": 0.0283,
+          "index": 2.8,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 19.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:1",
+          "value": 0.538,
+          "expectedHomeGoals": 1.139,
+          "expectedAwayGoals": 0.795
+        }
+      ]
     },
     {
       "fixtureId": 1492310,
-      "date": "2026-10-03T21:30:00+00:00",
+      "date": "2026-10-03",
       "timestamp": 1791063000,
       "country": "Brazil",
       "league": "Serie A",
-      "leagueId": 71,
       "priority": 3,
       "home": {
-        "id": 1062,
         "name": "Atletico-MG",
         "form": {
-          "played": 5,
-          "wins": 2,
-          "draws": 2,
+          "played": 10,
+          "wins": 5,
+          "draws": 4,
           "losses": 1,
-          "gf": 6,
-          "ga": 5,
-          "points": 8,
-          "ppg": 1.6,
-          "avgGF": 1.2,
-          "avgGA": 1.0,
-          "recent": [
-            {
-              "date": "2026-08-22",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            },
-            {
-              "date": "2026-08-29",
-              "gf": 2,
-              "ga": 1,
-              "result": "V"
-            },
-            {
-              "date": "2026-09-05",
-              "gf": 0,
-              "ga": 2,
-              "result": "P"
-            },
-            {
-              "date": "2026-09-12",
-              "gf": 3,
-              "ga": 1,
-              "result": "V"
-            },
-            {
-              "date": "2026-09-19",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            }
-          ]
+          "gf": 15,
+          "ga": 9,
+          "ppg": 1.9,
+          "avgGF": 1.5,
+          "avgGA": 0.9
         }
       },
       "away": {
-        "id": 794,
         "name": "RB Bragantino",
         "form": {
-          "played": 5,
-          "wins": 1,
-          "draws": 1,
-          "losses": 3,
-          "gf": 6,
-          "ga": 8,
-          "points": 4,
-          "ppg": 0.8,
-          "avgGF": 1.2,
-          "avgGA": 1.6,
-          "recent": [
-            {
-              "date": "2026-08-23",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2026-08-29",
-              "gf": 1,
-              "ga": 2,
-              "result": "P"
-            },
-            {
-              "date": "2026-09-05",
-              "gf": 2,
-              "ga": 3,
-              "result": "P"
-            },
-            {
-              "date": "2026-09-12",
-              "gf": 1,
-              "ga": 1,
-              "result": "N"
-            },
-            {
-              "date": "2026-09-20",
-              "gf": 1,
-              "ga": 2,
-              "result": "P"
-            }
-          ]
+          "played": 10,
+          "wins": 2,
+          "draws": 4,
+          "losses": 4,
+          "gf": 11,
+          "ga": 13,
+          "ppg": 1.0,
+          "avgGF": 1.1,
+          "avgGA": 1.3
         }
       },
-      "historyScore": 10,
-      "dataCoverage": 1.0,
+      "historyScore": 20,
       "prediction": {
         "available": true,
+        "selection": "1X",
         "market": "Doppia Chance",
-        "prediction": "1X",
-        "confidence": 80.0,
-        "sample": 10,
+        "confidence": 85.0,
         "oddAvailable": true,
-        "odd": 2.1,
-        "bookmaker": "1xBet",
-        "apiMarket": "Yellow Double Chance",
+        "odd": 1.33,
+        "bookmaker": "Betano",
+        "apiMarket": "Double Chance",
         "apiSelection": "Home/Draw"
-      }
+      },
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.85,
+          "index": 85.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.33,
+          "bookmaker": "Betano",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 1.131
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.8,
+          "index": 80.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.4,
+          "bookmaker": "Bet365",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 1.12
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.8,
+          "index": 80.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.28,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 1.024
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "GOAL",
+          "modelProbability": 0.65,
+          "index": 65.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.67,
+          "bookmaker": "Bet365",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "Yes",
+          "value": 1.085
+        },
+        {
+          "market": "Pari/Dispari",
+          "selection": "PARI",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.91,
+          "bookmaker": "SBO",
+          "apiMarket": "Odd/Even",
+          "apiSelection": "Even",
+          "value": 1.146
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.31,
+          "bookmaker": "1xBet",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.786
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 2.5",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.03,
+          "bookmaker": "Pinnacle",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 2.5",
+          "value": 1.117
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.8,
+          "bookmaker": "Bet365",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 0.99
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:0",
+          "modelProbability": 0.12413,
+          "index": 12.4,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 8.5,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:0",
+          "value": 1.055,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:1",
+          "modelProbability": 0.11731,
+          "index": 11.7,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 6.9,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:1",
+          "value": 0.809,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:0",
+          "modelProbability": 0.10115,
+          "index": 10.1,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 11.5,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:0",
+          "value": 1.163,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:1",
+          "modelProbability": 0.0956,
+          "index": 9.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 9.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:1",
+          "value": 0.86,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:0",
+          "modelProbability": 0.07616,
+          "index": 7.6,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 12.25,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:0",
+          "value": 0.933,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:1",
+          "modelProbability": 0.07198,
+          "index": 7.2,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 12.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:1",
+          "value": 0.864,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:0",
+          "modelProbability": 0.05495,
+          "index": 5.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 21.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:0",
+          "value": 1.154,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "1:2",
+          "modelProbability": 0.05544,
+          "index": 5.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 13.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "1:2",
+          "value": 0.721,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "3:1",
+          "modelProbability": 0.05194,
+          "index": 5.2,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 17.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "3:1",
+          "value": 0.883,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "2:2",
+          "modelProbability": 0.04517,
+          "index": 4.5,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 14.0,
+          "bookmaker": "Betano",
+          "apiMarket": "Exact Score",
+          "apiSelection": "2:2",
+          "value": 0.632,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "0:2",
+          "modelProbability": 0.03401,
+          "index": 3.4,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 21.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Exact Score",
+          "apiSelection": "0:2",
+          "value": 0.714,
+          "expectedHomeGoals": 1.63,
+          "expectedAwayGoals": 0.945
+        }
+      ]
     },
     {
       "fixtureId": 1569954,
-      "date": "2026-10-04T14:15:00+00:00",
+      "date": "2026-10-04",
       "timestamp": 1791123300,
       "country": "Spain",
       "league": "Segunda División",
-      "leagueId": 141,
       "priority": 4,
       "home": {
-        "id": 731,
         "name": "Sporting Gijon",
         "form": {
-          "played": 5,
-          "wins": 3,
+          "played": 10,
+          "wins": 4,
           "draws": 1,
-          "losses": 1,
-          "gf": 7,
-          "ga": 6,
-          "points": 10,
-          "ppg": 2.0,
+          "losses": 5,
+          "gf": 14,
+          "ga": 16,
+          "ppg": 1.3,
           "avgGF": 1.4,
-          "avgGA": 1.2,
-          "recent": [
-            {
-              "date": "2025-10-05",
-              "gf": 1,
-              "ga": 3,
-              "result": "P"
-            },
-            {
-              "date": "2025-10-12",
-              "gf": 2,
-              "ga": 1,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-19",
-              "gf": 3,
-              "ga": 2,
-              "result": "V"
-            },
-            {
-              "date": "2025-10-26",
-              "gf": 1,
-              "ga": 0,
-              "result": "V"
-            },
-            {
-              "date": "2025-11-02",
-              "gf": 0,
-              "ga": 0,
-              "result": "N"
-            }
-          ]
+          "avgGA": 1.6
         }
       },
       "away": {
-        "id": 9571,
         "name": "Celta de Vigo II",
         "form": {
           "played": 0,
@@ -663,33 +1279,32 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
-      "historyScore": 5,
-      "dataCoverage": 0.5,
+      "historyScore": 10,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493153,
-      "date": "2026-10-03T20:00:00+00:00",
-      "timestamp": 1791057600,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1569955,
+      "date": "2026-10-04",
+      "timestamp": 1791140400,
+      "country": "Spain",
+      "league": "Segunda División",
+      "priority": 4,
       "home": {
-        "id": 455,
-        "name": "Atletico Tucuman",
+        "name": "Girona",
         "form": {
           "played": 0,
           "wins": 0,
@@ -697,67 +1312,60 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "away": {
-        "id": 2432,
-        "name": "Barracas Central",
+        "name": "Mallorca",
         "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "points": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "played": 10,
+          "wins": 4,
+          "draws": 2,
+          "losses": 4,
+          "gf": 14,
+          "ga": 12,
+          "ppg": 1.4,
+          "avgGF": 1.4,
+          "avgGA": 1.2
         }
       },
-      "historyScore": 0,
-      "dataCoverage": 0.0,
+      "historyScore": 10,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493163,
-      "date": "2026-10-03T20:00:00+00:00",
-      "timestamp": 1791057600,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1496168,
+      "date": "2026-10-04",
+      "timestamp": 1791118800,
+      "country": "Norway",
+      "league": "2. Division - Group 1",
+      "priority": 2,
       "home": {
-        "id": 457,
-        "name": "Newells Old Boys",
+        "name": "Sandviken",
         "form": {
-          "played": 0,
-          "wins": 0,
+          "played": 1,
+          "wins": 1,
           "draws": 0,
           "losses": 0,
-          "gf": 0,
+          "gf": 1,
           "ga": 0,
-          "points": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "ppg": 3.0,
+          "avgGF": 1.0,
+          "avgGA": 0.0
         }
       },
       "away": {
-        "id": 446,
-        "name": "Lanus",
+        "name": "Arendal",
         "form": {
           "played": 0,
           "wins": 0,
@@ -765,33 +1373,32 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
-      "historyScore": 0,
-      "dataCoverage": 0.0,
+      "historyScore": 1,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493160,
-      "date": "2026-10-04T17:45:00+00:00",
-      "timestamp": 1791135900,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1607023,
+      "date": "2026-10-04",
+      "timestamp": 1791104400,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
       "home": {
-        "id": 445,
-        "name": "Huracan",
+        "name": "Ingolstadt W",
         "form": {
           "played": 0,
           "wins": 0,
@@ -799,16 +1406,13 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "away": {
-        "id": 463,
-        "name": "Aldosivi",
+        "name": "Bochum W",
         "form": {
           "played": 0,
           "wins": 0,
@@ -816,33 +1420,32 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "historyScore": 0,
-      "dataCoverage": 0.0,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493164,
-      "date": "2026-10-04T17:45:00+00:00",
-      "timestamp": 1791135900,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1570767,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 1",
+      "priority": 5,
       "home": {
-        "id": 474,
-        "name": "Sarmiento Junin",
+        "name": "Athletic Club II",
         "form": {
           "played": 0,
           "wins": 0,
@@ -850,16 +1453,13 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "away": {
-        "id": 435,
-        "name": "River Plate",
+        "name": "Extremadura 1924",
         "form": {
           "played": 0,
           "wins": 0,
@@ -867,33 +1467,32 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "historyScore": 0,
-      "dataCoverage": 0.0,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493165,
-      "date": "2026-10-04T20:00:00+00:00",
-      "timestamp": 1791144000,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1570773,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 1",
+      "priority": 5,
       "home": {
-        "id": 456,
-        "name": "Talleres Cordoba",
+        "name": "UD Logroñés",
         "form": {
           "played": 0,
           "wins": 0,
@@ -901,16 +1500,13 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "away": {
-        "id": 440,
-        "name": "Belgrano Cordoba",
+        "name": "Deportivo La Coruña II",
         "form": {
           "played": 0,
           "wins": 0,
@@ -918,33 +1514,32 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "historyScore": 0,
-      "dataCoverage": 0.0,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     },
     {
-      "fixtureId": 1493152,
-      "date": "2026-10-04T22:15:00+00:00",
-      "timestamp": 1791152100,
-      "country": "Argentina",
-      "league": "Liga Profesional Argentina",
-      "leagueId": 128,
-      "priority": 3,
+      "fixtureId": 1571151,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 2",
+      "priority": 5,
       "home": {
-        "id": 458,
-        "name": "Argentinos JRS",
+        "name": "Real Murcia",
         "form": {
           "played": 0,
           "wins": 0,
@@ -952,16 +1547,13 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "away": {
-        "id": 452,
-        "name": "Tigre",
+        "name": "Gimnastic",
         "form": {
           "played": 0,
           "wins": 0,
@@ -969,21 +1561,915 @@
           "losses": 0,
           "gf": 0,
           "ga": 0,
-          "points": 0,
           "ppg": 0,
           "avgGF": 0,
-          "avgGA": 0,
-          "recent": []
+          "avgGA": 0
         }
       },
       "historyScore": 0,
-      "dataCoverage": 0.0,
       "prediction": {
         "available": false,
-        "reason": "Storico insufficiente",
+        "selection": null,
+        "market": null,
+        "confidence": null,
         "oddAvailable": false,
-        "odd": null
-      }
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1571154,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 2",
+      "priority": 5,
+      "home": {
+        "name": "Villarreal II",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Ibiza",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1573601,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División Femenina",
+      "priority": 5,
+      "home": {
+        "name": "Granad. Tenerife W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Edf Logrono W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1573604,
+      "date": "2026-10-04",
+      "timestamp": 1791108000,
+      "country": "Spain",
+      "league": "Primera División Femenina",
+      "priority": 5,
+      "home": {
+        "name": "Granada",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Eibar W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1601258,
+      "date": "2026-10-04",
+      "timestamp": 1791109800,
+      "country": "Italy",
+      "league": "Serie A Women",
+      "priority": 5,
+      "home": {
+        "name": "Napoli W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Como 1907 W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1593148,
+      "date": "2026-10-04",
+      "timestamp": 1791114300,
+      "country": "Germany",
+      "league": "Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "VfL Wolfsburg W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Hamburger SV W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607024,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Borussia Monchengladbach W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Viktoria Berlin W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607025,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Hertha Berlin W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Hoffenheim II W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607026,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Carl Zeiss Jena  W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "SC Sand W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607027,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Turbine Potsdam W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Eintracht Frankfurt II W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607028,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "SGS Essen W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Meppen W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1607144,
+      "date": "2026-10-04",
+      "timestamp": 1791115200,
+      "country": "Germany",
+      "league": "2. Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "FC Koln II W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Andernach W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1571150,
+      "date": "2026-10-04",
+      "timestamp": 1791116100,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 2",
+      "priority": 5,
+      "home": {
+        "name": "Huesca",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Europa Fc",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1601254,
+      "date": "2026-10-04",
+      "timestamp": 1791118800,
+      "country": "Italy",
+      "league": "Serie A Women",
+      "priority": 5,
+      "home": {
+        "name": "AC Milan W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Juventus W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1593147,
+      "date": "2026-10-04",
+      "timestamp": 1791122400,
+      "country": "Germany",
+      "league": "Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Stuttgart W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Union Berlin W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1570769,
+      "date": "2026-10-04",
+      "timestamp": 1791124200,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 1",
+      "priority": 5,
+      "home": {
+        "name": "Ponferradina",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Mirandes",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1570775,
+      "date": "2026-10-04",
+      "timestamp": 1791124200,
+      "country": "Spain",
+      "league": "Primera División RFEF - Group 1",
+      "priority": 5,
+      "home": {
+        "name": "Zamora",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "CD Coria",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1573600,
+      "date": "2026-10-04",
+      "timestamp": 1791126000,
+      "country": "Spain",
+      "league": "Primera División Femenina",
+      "priority": 5,
+      "home": {
+        "name": "Barcelona W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Real Madrid W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1601256,
+      "date": "2026-10-04",
+      "timestamp": 1791129600,
+      "country": "Italy",
+      "league": "Serie A Women",
+      "priority": 5,
+      "home": {
+        "name": "Como W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "Inter Milano W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
+    },
+    {
+      "fixtureId": 1593142,
+      "date": "2026-10-04",
+      "timestamp": 1791131400,
+      "country": "Germany",
+      "league": "Frauen Bundesliga",
+      "priority": 5,
+      "home": {
+        "name": "Nürnberg W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "away": {
+        "name": "1899 Hoffenheim W",
+        "form": {
+          "played": 0,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "gf": 0,
+          "ga": 0,
+          "ppg": 0,
+          "avgGF": 0,
+          "avgGA": 0
+        }
+      },
+      "historyScore": 0,
+      "prediction": {
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
+      },
+      "candidates": []
     }
   ]
 }
