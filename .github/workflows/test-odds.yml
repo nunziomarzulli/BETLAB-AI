@@ -1,4 +1,4 @@
-name: BETLAB Test Quote
+name: BETLAB Test Quote Matching
 
 on:
   workflow_dispatch:
@@ -11,64 +11,52 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Test API-Football Odds
+      - name: Cerca quote pronostici BETLAB
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           python3 <<'PY'
+
           import json
           import os
+          import re
           import urllib.request
           import urllib.parse
           from pathlib import Path
 
+
+          # ============================================================
+          # CONFIGURAZIONE
+          # ============================================================
+
           API_KEY = os.environ.get("API_FOOTBALL_KEY")
 
           if not API_KEY:
-              raise SystemExit("ERRORE: API_FOOTBALL_KEY non presente.")
+              raise SystemExit(
+                  "ERRORE: API_FOOTBALL_KEY non presente."
+              )
 
-          analysis_file = Path("data/betlab-analysis.json")
 
-          if not analysis_file.exists():
-              raise SystemExit("ERRORE: data/betlab-analysis.json non trovato.")
+          ANALYSIS_FILE = Path(
+              "data/betlab-analysis.json"
+          )
 
-          with analysis_file.open("r", encoding="utf-8") as f:
-              data = json.load(f)
 
-          if isinstance(data, dict):
-              matches = data.get("analysis") or data.get("matches") or []
-          elif isinstance(data, list):
-              matches = data
-          else:
-              matches = []
+          if not ANALYSIS_FILE.exists():
+              raise SystemExit(
+                  "ERRORE: data/betlab-analysis.json non trovato."
+              )
 
-          predicted = []
 
-          for match in matches:
-              prediction = match.get("prediction") or {}
-
-              if (
-                  prediction.get("available") is True
-                  and prediction.get("prediction")
-              ):
-                  predicted.append(match)
-
-          print("")
-          print("==============================================")
-          print("BETLAB TEST QUOTE")
-          print("==============================================")
-          print("")
-          print("Pronostici BETLAB trovati:", len(predicted))
-          print("")
-
-          if not predicted:
-              raise SystemExit("Nessun pronostico BETLAB disponibile.")
-
-          # Testiamo massimo 5 partite per non sprecare richieste API
-          predicted = predicted[:5]
+          # ============================================================
+          # API
+          # ============================================================
 
           def api_get(endpoint, params):
-              query = urllib.parse.urlencode(params)
+
+              query = urllib.parse.urlencode(
+                  params
+              )
 
               url = (
                   "https://v3.football.api-sports.io/"
@@ -84,162 +72,1289 @@ jobs:
                   }
               )
 
-              with urllib.request.urlopen(request, timeout=30) as response:
+              with urllib.request.urlopen(
+                  request,
+                  timeout=30
+              ) as response:
+
                   return json.loads(
-                      response.read().decode("utf-8")
+                      response
+                      .read()
+                      .decode("utf-8")
                   )
 
+
+          # ============================================================
+          # NORMALIZZAZIONE
+          # ============================================================
+
+          def normalize(value):
+
+              value = str(
+                  value or ""
+              ).strip().lower()
+
+              value = value.replace(
+                  "–",
+                  "-"
+              )
+
+              value = value.replace(
+                  "—",
+                  "-"
+              )
+
+              value = re.sub(
+                  r"\s+",
+                  " ",
+                  value
+              )
+
+              return value
+
+
+          # ============================================================
+          # FIXTURE ID
+          # ============================================================
+
           def get_fixture_id(match):
+
               possible = [
                   match.get("fixtureId"),
                   match.get("fixture_id"),
                   match.get("id")
               ]
 
-              fixture = match.get("fixture")
+              fixture = match.get(
+                  "fixture"
+              )
 
-              if isinstance(fixture, dict):
-                  possible.append(fixture.get("id"))
+              if isinstance(
+                  fixture,
+                  dict
+              ):
+                  possible.append(
+                      fixture.get("id")
+                  )
 
               for value in possible:
-                  if value:
-                      try:
-                          return int(value)
-                      except:
-                          pass
+
+                  if value is None:
+                      continue
+
+                  try:
+                      return int(value)
+
+                  except:
+                      pass
 
               return None
 
-          for number, match in enumerate(predicted, start=1):
+
+          # ============================================================
+          # CLASSIFICAZIONE MERCATI API
+          # ============================================================
+
+          def is_full_time_total_goals(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              if (
+                  "first half" in name
+                  or
+                  "1st half" in name
+                  or
+                  "second half" in name
+                  or
+                  "2nd half" in name
+                  or
+                  "home" in name
+                  or
+                  "away" in name
+              ):
+                  return False
+
+              accepted = [
+                  "goals over/under",
+                  "goal over/under",
+                  "over/under",
+                  "total goals"
+              ]
+
+              return any(
+                  item in name
+                  for item in accepted
+              )
+
+
+          def is_match_winner(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              return (
+                  name == "match winner"
+                  or
+                  name == "1x2"
+              )
+
+
+          def is_double_chance(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              return (
+                  "double chance" in name
+              )
+
+
+          def is_btts(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              return (
+                  "both teams score" in name
+                  or
+                  "both teams to score" in name
+              )
+
+
+          def is_odd_even(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              if (
+                  "first half" in name
+                  or
+                  "second half" in name
+              ):
+                  return False
+
+              return (
+                  "odd/even" in name
+                  or
+                  "odd even" in name
+                  or
+                  "goals odd/even" in name
+              )
+
+
+          def is_total_goals_range(
+              market_name
+          ):
+
+              name = normalize(
+                  market_name
+              )
+
+              if (
+                  "first half" in name
+                  or
+                  "second half" in name
+              ):
+                  return False
+
+              accepted = [
+                  "total goals",
+                  "goal range",
+                  "goals range",
+                  "total goal"
+              ]
+
+              return any(
+                  item in name
+                  for item in accepted
+              )
+
+
+          # ============================================================
+          # ABBINAMENTO SELEZIONE
+          # ============================================================
+
+          def value_matches(
+              betlab_pick,
+              api_value
+          ):
+
+              pick = normalize(
+                  betlab_pick
+              )
+
+              value = normalize(
+                  api_value
+              )
+
+
+              # --------------------------------------------------------
+              # 1
+              # --------------------------------------------------------
+
+              if pick == "1":
+
+                  return value in [
+                      "home",
+                      "1"
+                  ]
+
+
+              # --------------------------------------------------------
+              # X
+              # --------------------------------------------------------
+
+              if pick == "x":
+
+                  return value in [
+                      "draw",
+                      "x"
+                  ]
+
+
+              # --------------------------------------------------------
+              # 2
+              # --------------------------------------------------------
+
+              if pick == "2":
+
+                  return value in [
+                      "away",
+                      "2"
+                  ]
+
+
+              # --------------------------------------------------------
+              # DOPPIA CHANCE
+              # --------------------------------------------------------
+
+              if pick == "1x":
+
+                  compact = value.replace(
+                      " ",
+                      ""
+                  )
+
+                  return compact in [
+                      "1x",
+                      "home/draw",
+                      "homedraw",
+                      "homeordraw"
+                  ]
+
+
+              if pick == "x2":
+
+                  compact = value.replace(
+                      " ",
+                      ""
+                  )
+
+                  return compact in [
+                      "x2",
+                      "draw/away",
+                      "drawaway",
+                      "draworaway"
+                  ]
+
+
+              if pick == "12":
+
+                  compact = value.replace(
+                      " ",
+                      ""
+                  )
+
+                  return compact in [
+                      "12",
+                      "home/away",
+                      "homeaway",
+                      "homeoraway"
+                  ]
+
+
+              # --------------------------------------------------------
+              # OVER / UNDER
+              # --------------------------------------------------------
+
+              if (
+                  pick.startswith("over ")
+                  or
+                  pick.startswith("under ")
+              ):
+
+                  return (
+                      value
+                      ==
+                      pick
+                  )
+
+
+              # --------------------------------------------------------
+              # GOAL / NO GOAL
+              # --------------------------------------------------------
+
+              if pick in [
+                  "goal",
+                  "gg",
+                  "yes"
+              ]:
+
+                  return value in [
+                      "yes",
+                      "goal",
+                      "gg"
+                  ]
+
+
+              if pick in [
+                  "no goal",
+                  "nogol",
+                  "ng",
+                  "no"
+              ]:
+
+                  return value in [
+                      "no",
+                      "no goal",
+                      "nogol",
+                      "ng"
+                  ]
+
+
+              # --------------------------------------------------------
+              # PARI / DISPARI
+              # --------------------------------------------------------
+
+              if pick in [
+                  "pari",
+                  "even"
+              ]:
+
+                  return value in [
+                      "even",
+                      "pari"
+                  ]
+
+
+              if pick in [
+                  "dispari",
+                  "odd"
+              ]:
+
+                  return value in [
+                      "odd",
+                      "dispari"
+                  ]
+
+
+              # --------------------------------------------------------
+              # SOMMA GOL
+              # --------------------------------------------------------
+
+              if pick in [
+                  "0-1",
+                  "2-3",
+                  "4-5",
+                  "6+"
+              ]:
+
+                  compact = value.replace(
+                      " ",
+                      ""
+                  )
+
+                  target = pick.replace(
+                      " ",
+                      ""
+                  )
+
+                  if compact == target:
+                      return True
+
+                  if (
+                      pick == "6+"
+                      and compact in [
+                          "6+",
+                          "6ormore",
+                          "6ormoregoals"
+                      ]
+                  ):
+                      return True
+
+
+              return False
+
+
+          # ============================================================
+          # CONTROLLO MERCATO
+          # ============================================================
+
+          def market_matches(
+              betlab_market,
+              betlab_pick,
+              api_market
+          ):
+
+              market = normalize(
+                  betlab_market
+              )
+
+              pick = normalize(
+                  betlab_pick
+              )
+
+
+              # --------------------------------------------------------
+              # 1X2
+              # --------------------------------------------------------
+
+              if pick in [
+                  "1",
+                  "x",
+                  "2"
+              ]:
+
+                  return is_match_winner(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # DOPPIA CHANCE
+              # --------------------------------------------------------
+
+              if pick in [
+                  "1x",
+                  "x2",
+                  "12"
+              ]:
+
+                  return is_double_chance(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # OVER / UNDER FULL TIME
+              # --------------------------------------------------------
+
+              if (
+                  pick.startswith("over ")
+                  or
+                  pick.startswith("under ")
+              ):
+
+                  return is_full_time_total_goals(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # GOAL / NO GOAL
+              # --------------------------------------------------------
+
+              if pick in [
+                  "goal",
+                  "no goal",
+                  "nogol",
+                  "gg",
+                  "ng",
+                  "yes",
+                  "no"
+              ]:
+
+                  return is_btts(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # PARI / DISPARI
+              # --------------------------------------------------------
+
+              if pick in [
+                  "pari",
+                  "dispari",
+                  "odd",
+                  "even"
+              ]:
+
+                  return is_odd_even(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # SOMMA GOL
+              # --------------------------------------------------------
+
+              if pick in [
+                  "0-1",
+                  "2-3",
+                  "4-5",
+                  "6+"
+              ]:
+
+                  return is_total_goals_range(
+                      api_market
+                  )
+
+
+              # --------------------------------------------------------
+              # FALLBACK DAL NOME MERCATO BETLAB
+              # --------------------------------------------------------
+
+              if (
+                  "doppia" in market
+              ):
+
+                  return is_double_chance(
+                      api_market
+                  )
+
+
+              if (
+                  "totale gol" in market
+                  and
+                  (
+                      pick.startswith("over ")
+                      or
+                      pick.startswith("under ")
+                  )
+              ):
+
+                  return is_full_time_total_goals(
+                      api_market
+                  )
+
+
+              return False
+
+
+          # ============================================================
+          # CERCA QUOTA
+          # ============================================================
+
+          def find_odds(
+              odds_response,
+              betlab_market,
+              betlab_pick
+          ):
+
+              found = []
+
+              for block in odds_response:
+
+                  bookmakers = (
+                      block.get(
+                          "bookmakers"
+                      )
+                      or
+                      []
+                  )
+
+                  for bookmaker in bookmakers:
+
+                      bookmaker_name = (
+                          bookmaker.get(
+                              "name"
+                          )
+                          or
+                          "Bookmaker"
+                      )
+
+                      bookmaker_id = (
+                          bookmaker.get(
+                              "id"
+                          )
+                      )
+
+                      bets = (
+                          bookmaker.get(
+                              "bets"
+                          )
+                          or
+                          []
+                      )
+
+                      for bet in bets:
+
+                          api_market = (
+                              bet.get(
+                                  "name"
+                              )
+                              or
+                              ""
+                          )
+
+                          if not market_matches(
+                              betlab_market,
+                              betlab_pick,
+                              api_market
+                          ):
+                              continue
+
+                          values = (
+                              bet.get(
+                                  "values"
+                              )
+                              or
+                              []
+                          )
+
+                          for value in values:
+
+                              api_value = (
+                                  value.get(
+                                      "value"
+                                  )
+                              )
+
+                              odd = (
+                                  value.get(
+                                      "odd"
+                                  )
+                              )
+
+                              if (
+                                  api_value is None
+                                  or
+                                  odd is None
+                              ):
+                                  continue
+
+                              if not value_matches(
+                                  betlab_pick,
+                                  api_value
+                              ):
+                                  continue
+
+                              try:
+                                  odd_number = float(
+                                      odd
+                                  )
+
+                              except:
+                                  continue
+
+                              found.append({
+                                  "bookmaker": bookmaker_name,
+                                  "bookmakerId": bookmaker_id,
+                                  "market": api_market,
+                                  "selection": api_value,
+                                  "odd": odd_number
+                              })
+
+
+              if not found:
+                  return None, []
+
+
+              # Per ora scegliamo la quota più alta disponibile.
+              # Dopo potremo decidere se fissare un bookmaker preciso.
+
+              found.sort(
+                  key=lambda item:
+                      item["odd"],
+                  reverse=True
+              )
+
+
+              return found[0], found
+
+
+          # ============================================================
+          # CARICA BETLAB
+          # ============================================================
+
+          with ANALYSIS_FILE.open(
+              "r",
+              encoding="utf-8"
+          ) as f:
+
+              data = json.load(
+                  f
+              )
+
+
+          if isinstance(
+              data,
+              dict
+          ):
+
+              matches = (
+                  data.get("analysis")
+                  or
+                  data.get("matches")
+                  or
+                  []
+              )
+
+          elif isinstance(
+              data,
+              list
+          ):
+
+              matches = data
+
+          else:
+
+              matches = []
+
+
+          # ============================================================
+          # SOLO PRONOSTICI DISPONIBILI
+          # ============================================================
+
+          predicted = []
+
+          for match in matches:
+
+              prediction = (
+                  match.get(
+                      "prediction"
+                  )
+                  or
+                  {}
+              )
+
+              if (
+                  prediction.get(
+                      "available"
+                  )
+                  is True
+                  and
+                  prediction.get(
+                      "prediction"
+                  )
+              ):
+
+                  predicted.append(
+                      match
+                  )
+
+
+          print("")
+          print(
+              "============================================================"
+          )
+          print(
+              "BETLAB QUOTE MATCHING V1"
+          )
+          print(
+              "============================================================"
+          )
+          print("")
+
+          print(
+              "Pronostici BETLAB:",
+              len(predicted)
+          )
+
+          print("")
+
+
+          if not predicted:
+
+              raise SystemExit(
+                  "Nessun pronostico BETLAB disponibile."
+              )
+
+
+          # Limitiamo il test ai pronostici esistenti.
+          # Attualmente sono 4.
+
+          predicted = predicted[:10]
+
+
+          results = []
+
+
+          # ============================================================
+          # ANALISI QUOTE
+          # ============================================================
+
+          for index, match in enumerate(
+              predicted,
+              start=1
+          ):
 
               home = (
-                  (match.get("home") or {}).get("name")
-                  or "Casa"
+                  (
+                      match.get(
+                          "home"
+                      )
+                      or
+                      {}
+                  ).get(
+                      "name"
+                  )
+                  or
+                  "Casa"
               )
 
               away = (
-                  (match.get("away") or {}).get("name")
-                  or "Trasferta"
+                  (
+                      match.get(
+                          "away"
+                      )
+                      or
+                      {}
+                  ).get(
+                      "name"
+                  )
+                  or
+                  "Trasferta"
               )
 
-              prediction = match.get("prediction") or {}
 
-              betlab_pick = prediction.get("prediction", "-")
-              betlab_market = prediction.get("market", "-")
-              confidence = prediction.get("confidence", 0)
+              prediction = (
+                  match.get(
+                      "prediction"
+                  )
+                  or
+                  {}
+              )
 
-              fixture_id = get_fixture_id(match)
 
-              print("")
-              print("==============================================")
-              print(f"{number}. {home} - {away}")
-              print("==============================================")
-              print("Fixture ID:", fixture_id)
-              print("Pronostico BETLAB:", betlab_pick)
-              print("Mercato BETLAB:", betlab_market)
-              print("Indice BETLAB:", confidence)
-              print("")
+              betlab_pick = (
+                  prediction.get(
+                      "prediction"
+                  )
+                  or
+                  ""
+              )
+
+
+              betlab_market = (
+                  prediction.get(
+                      "market"
+                  )
+                  or
+                  ""
+              )
+
+
+              confidence = (
+                  prediction.get(
+                      "confidence"
+                  )
+                  or
+                  0
+              )
+
+
+              fixture_id = get_fixture_id(
+                  match
+              )
+
+
+              print(
+                  "============================================================"
+              )
+
+              print(
+                  f"{index}. {home} - {away}"
+              )
+
+              print(
+                  "============================================================"
+              )
+
+              print(
+                  "Fixture ID:",
+                  fixture_id
+              )
+
+              print(
+                  "Pronostico BETLAB:",
+                  betlab_pick
+              )
+
+              print(
+                  "Mercato BETLAB:",
+                  betlab_market
+              )
+
+              print(
+                  "Indice BETLAB:",
+                  confidence
+              )
+
+
+              result = {
+                  "fixtureId": fixture_id,
+                  "home": home,
+                  "away": away,
+                  "prediction": betlab_pick,
+                  "market": betlab_market,
+                  "confidence": confidence,
+                  "oddFound": False,
+                  "odd": None,
+                  "bookmaker": None,
+                  "apiMarket": None,
+                  "apiSelection": None
+              }
+
 
               if not fixture_id:
-                  print("ATTENZIONE: fixture ID non trovato.")
+
+                  print("")
+                  print(
+                      "❌ FIXTURE ID NON TROVATO"
+                  )
+                  print("")
+
+                  results.append(
+                      result
+                  )
+
                   continue
 
+
+              # --------------------------------------------------------
+              # API QUOTE
+              # --------------------------------------------------------
+
               try:
+
                   odds_data = api_get(
                       "odds",
                       {
-                          "fixture": fixture_id
+                          "fixture":
+                              fixture_id
                       }
                   )
 
               except Exception as error:
-                  print("ERRORE richiesta quote:", error)
+
+                  print("")
+                  print(
+                      "❌ ERRORE API:",
+                      error
+                  )
+                  print("")
+
+                  results.append(
+                      result
+                  )
+
                   continue
 
-              errors = odds_data.get("errors")
 
-              if errors:
-                  print("ERRORE API:")
-                  print(errors)
-                  continue
-
-              response = odds_data.get("response") or []
-
-              print(
-                  "Blocchi quote ricevuti:",
-                  len(response)
+              errors = (
+                  odds_data.get(
+                      "errors"
+                  )
               )
 
-              if not response:
-                  print("NESSUNA QUOTA DISPONIBILE")
+
+              if errors:
+
+                  print("")
+                  print(
+                      "❌ ERRORE API:"
+                  )
+
+                  print(
+                      errors
+                  )
+
+                  print("")
+
+                  results.append(
+                      result
+                  )
+
                   continue
 
-              # Stampiamo i bookmaker e i mercati disponibili
-              # senza fare ancora alcun abbinamento automatico.
 
-              bookmakers_found = 0
+              response = (
+                  odds_data.get(
+                      "response"
+                  )
+                  or
+                  []
+              )
 
-              for block in response:
 
-                  bookmakers = block.get("bookmakers") or []
+              if not response:
 
-                  for bookmaker in bookmakers:
+                  print("")
+                  print(
+                      "❌ NESSUNA QUOTA DISPONIBILE"
+                  )
+                  print("")
 
-                      bookmakers_found += 1
+                  results.append(
+                      result
+                  )
 
-                      bookmaker_name = bookmaker.get(
-                          "name",
-                          "Bookmaker"
-                      )
+                  continue
 
-                      print("")
-                      print("----------------------------------------------")
-                      print("BOOKMAKER:", bookmaker_name)
-                      print("----------------------------------------------")
 
-                      bets = bookmaker.get("bets") or []
+              best,
+              all_matches = find_odds(
+                  response,
+                  betlab_market,
+                  betlab_pick
+              )
 
-                      for bet in bets:
 
-                          bet_name = bet.get("name", "Mercato")
+              if best is None:
 
-                          values = bet.get("values") or []
+                  print("")
+                  print(
+                      "❌ QUOTA ESATTA NON TROVATA"
+                  )
 
-                          print("")
-                          print("MERCATO:", bet_name)
+                  print(
+                      "Il fixture ha quote, ma non"
+                  )
 
-                          shown = 0
+                  print(
+                      "trovo ancora il mercato/selezione"
+                  )
 
-                          for value in values:
+                  print(
+                      "corrispondente al pronostico BETLAB."
+                  )
 
-                              selection = value.get("value")
-                              odd = value.get("odd")
+                  print("")
 
-                              if selection is None or odd is None:
-                                  continue
+                  results.append(
+                      result
+                  )
 
-                              print(
-                                  "   ",
-                                  selection,
-                                  "=>",
-                                  odd
-                              )
+                  continue
 
-                              shown += 1
 
-                              # Evitiamo log enormi.
-                              if shown >= 20:
-                                  print("    ...")
-                                  break
+              result[
+                  "oddFound"
+              ] = True
+
+              result[
+                  "odd"
+              ] = best[
+                  "odd"
+              ]
+
+              result[
+                  "bookmaker"
+              ] = best[
+                  "bookmaker"
+              ]
+
+              result[
+                  "apiMarket"
+              ] = best[
+                  "market"
+              ]
+
+              result[
+                  "apiSelection"
+              ] = best[
+                  "selection"
+              ]
+
 
               print("")
               print(
-                  "Bookmaker totali:",
-                  bookmakers_found
+                  "✅ QUOTA TROVATA"
               )
 
+              print(
+                  "QUOTA:",
+                  best["odd"]
+              )
+
+              print(
+                  "BOOKMAKER:",
+                  best["bookmaker"]
+              )
+
+              print(
+                  "MERCATO API:",
+                  best["market"]
+              )
+
+              print(
+                  "SELEZIONE API:",
+                  best["selection"]
+              )
+
+              print(
+                  "QUOTE COMPATIBILI TROVATE:",
+                  len(all_matches)
+              )
+
+              print("")
+
+
+              results.append(
+                  result
+              )
+
+
+          # ============================================================
+          # RIEPILOGO
+          # ============================================================
+
           print("")
-          print("==============================================")
-          print("FINE TEST QUOTE BETLAB")
-          print("==============================================")
+          print(
+              "============================================================"
+          )
+
+          print(
+              "RIEPILOGO BETLAB"
+          )
+
+          print(
+              "============================================================"
+          )
+
+          print("")
+
+
+          successful = [
+              item
+              for item in results
+              if item["oddFound"]
+          ]
+
+
+          for item in results:
+
+              print(
+                  item["home"],
+                  "-",
+                  item["away"]
+              )
+
+              print(
+                  "   BETLAB:",
+                  item["prediction"]
+              )
+
+              if item[
+                  "oddFound"
+              ]:
+
+                  print(
+                      "   QUOTA:",
+                      f'{item["odd"]:.2f}'
+                  )
+
+                  print(
+                      "   BOOKMAKER:",
+                      item["bookmaker"]
+                  )
+
+              else:
+
+                  print(
+                      "   QUOTA: NON TROVATA"
+                  )
+
+              print("")
+
+
+          print(
+              "Quote trovate:",
+              len(successful),
+              "/",
+              len(results)
+          )
+
+
+          # ============================================================
+          # ESEMPIO MULTIPLA DA 5 EURO
+          # ============================================================
+
+          if successful:
+
+              total_odd = 1.0
+
+              for item in successful:
+
+                  total_odd *= item[
+                      "odd"
+                  ]
+
+
+              stake = 5.0
+
+              potential_return = (
+                  stake
+                  *
+                  total_odd
+              )
+
+
+              print("")
+              print(
+                  "============================================================"
+              )
+
+              print(
+                  "ESEMPIO GIOCATA"
+              )
+
+              print(
+                  "============================================================"
+              )
+
+              print("")
+
+              print(
+                  "Partite:",
+                  len(successful)
+              )
+
+              print(
+                  "Quota totale:",
+                  f"{total_odd:.2f}"
+              )
+
+              print(
+                  "Puntata:",
+                  f"€ {stake:.2f}"
+              )
+
+              print(
+                  "Vincita potenziale:",
+                  f"€ {potential_return:.2f}"
+              )
+
+
+          print("")
+          print(
+              "============================================================"
+          )
+
+          print(
+              "BETLAB QUOTE MATCHING COMPLETATO"
+          )
+
+          print(
+              "============================================================"
+          )
+
           PY
