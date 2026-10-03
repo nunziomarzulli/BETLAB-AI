@@ -25,7 +25,6 @@ jobs:
 
         run: |
           mkdir -p data
-
           TODAY=$(date -u +%Y-%m-%d)
 
           echo "================================="
@@ -39,7 +38,7 @@ jobs:
             --header "x-apisports-key: $API_FOOTBALL_KEY" \
             -o data/api-football-raw.json
 
-      - name: Costruisci feed e preselezione BETLAB
+      - name: Costruisci shortlist BETLAB
         run: |
           python3 - <<'PY'
           import json
@@ -60,84 +59,87 @@ jobs:
           matches = data.get("response", [])
 
           # ==========================================
-          # PRIORITA' CAMPIONATI
-          # 3 = massima
-          # 2 = alta
+          # CAMPIONATI BETLAB
+          #
+          # 3 = massima priorita'
+          # 2 = alta priorita'
           # 1 = secondaria
+          #
+          # Le coppe nazionali minori vengono escluse.
           # ==========================================
 
           priority = {
-              # TOP EUROPA
+
+              # TOP 5 EUROPA
               ("Italy", "Serie A"): 3,
               ("England", "Premier League"): 3,
               ("Spain", "La Liga"): 3,
               ("Germany", "Bundesliga"): 3,
               ("France", "Ligue 1"): 3,
 
-              # COPPE EUROPEE
+              # UEFA
               ("World", "UEFA Champions League"): 3,
               ("World", "UEFA Europa League"): 3,
               ("World", "UEFA Europa Conference League"): 3,
 
-              # ALTRI CAMPIONATI IMPORTANTI
-              ("Portugal", "Primeira Liga"): 2,
-              ("Netherlands", "Eredivisie"): 2,
-              ("Belgium", "Jupiler Pro League"): 2,
-              ("Turkey", "Süper Lig"): 2,
-              ("Scotland", "Premiership"): 2,
-
-              # SECONDE DIVISIONI PRINCIPALI
+              # SECONDE DIVISIONI IMPORTANTI
               ("Italy", "Serie B"): 2,
               ("England", "Championship"): 2,
               ("Spain", "Segunda División"): 2,
               ("Germany", "2. Bundesliga"): 2,
               ("France", "Ligue 2"): 2,
 
-              # AMERICHE
+              # EUROPA
+              ("Portugal", "Primeira Liga"): 2,
+              ("Netherlands", "Eredivisie"): 2,
+              ("Belgium", "Jupiler Pro League"): 2,
+              ("Turkey", "Süper Lig"): 2,
+              ("Scotland", "Premiership"): 2,
+
+              # SUD AMERICA
               ("Brazil", "Serie A"): 2,
               ("Argentina", "Liga Profesional Argentina"): 2,
+
+              # NORD AMERICA
               ("USA", "Major League Soccer"): 2,
               ("Mexico", "Liga MX"): 2,
 
-              # ALTRI
+              # ALTRI CAMPIONATI
               ("Greece", "Super League 1"): 1,
               ("Austria", "Bundesliga"): 1,
               ("Switzerland", "Super League"): 1,
               ("Denmark", "Superliga"): 1,
               ("Norway", "Eliteserien"): 1,
-              ("Sweden", "Allsvenskan"): 1,
-
-              # COPPE NAZIONALI
-              ("England", "FA Cup"): 1,
-              ("England", "League Cup"): 1,
-              ("Spain", "Copa del Rey"): 1,
-              ("Germany", "DFB Pokal"): 1,
-              ("France", "Coupe de France"): 1
+              ("Sweden", "Allsvenskan"): 1
           }
 
           filtered = []
 
           for match in matches:
+
+              fixture = match.get("fixture", {})
               league = match.get("league", {})
+              teams = match.get("teams", {})
 
               country = league.get("country", "")
               league_name = league.get("name", "")
+              status = fixture.get("status", {}).get("short")
 
               level = priority.get((country, league_name))
 
               if level is None:
                   continue
 
-              fixture = match.get("fixture", {})
-              status = fixture.get("status", {}).get("short")
-
-              # BETLAB lavora sulle partite non ancora iniziate
+              # Solo partite non iniziate
               if status not in ("NS", "TBD"):
                   continue
 
-              teams = match.get("teams", {})
               home = teams.get("home", {})
               away = teams.get("away", {})
+
+              # Devono esserci entrambe le squadre
+              if not home.get("id") or not away.get("id"):
+                  continue
 
               item = {
                   "fixtureId": fixture.get("id"),
@@ -168,12 +170,14 @@ jobs:
 
               filtered.append(item)
 
-          # Feed cronologico completo
           filtered.sort(
-              key=lambda x: x.get("timestamp") or 0
+              key=lambda x: (
+                  -x["priority"],
+                  x.get("timestamp") or 0
+              )
           )
 
-          output = {
+          feed = {
               "generatedAt": datetime.now(timezone.utc).isoformat(),
               "source": "API-Football",
               "total": len(filtered),
@@ -182,37 +186,27 @@ jobs:
 
           with open(OUTPUT, "w", encoding="utf-8") as f:
               json.dump(
-                  output,
+                  feed,
                   f,
                   ensure_ascii=False,
                   indent=2
               )
 
           # ==========================================
-          # SHORTLIST INTERNA BETLAB
-          # ==========================================
-          # Per ora ordiniamo per affidabilita'
-          # strutturale della competizione.
-          # NON e' ancora una previsione.
+          # SHORTLIST
           # ==========================================
 
-          shortlist = sorted(
-              filtered,
-              key=lambda x: (
-                  -x["priority"],
-                  x.get("timestamp") or 0
-              )
-          )
+          shortlist = filtered[:30]
 
-          shortlist_output = {
+          shortlist_data = {
               "generatedAt": datetime.now(timezone.utc).isoformat(),
-              "totalCandidates": len(shortlist),
+              "total": len(shortlist),
               "candidates": shortlist
           }
 
           with open(SHORTLIST, "w", encoding="utf-8") as f:
               json.dump(
-                  shortlist_output,
+                  shortlist_data,
                   f,
                   ensure_ascii=False,
                   indent=2
@@ -220,32 +214,24 @@ jobs:
 
           print()
           print("Partite API:", len(matches))
-          print("Partite BETLAB:", len(filtered))
-          print("Candidate shortlist:", len(shortlist))
+          print("Partite idonee BETLAB:", len(filtered))
+          print("Shortlist:", len(shortlist))
           print()
 
-          levels = {3: 0, 2: 0, 1: 0}
+          print("PARTITE DA ANALIZZARE:")
+          print()
 
           for match in shortlist:
-              levels[match["priority"]] += 1
-
-          print("Priorita' 3:", levels[3])
-          print("Priorita' 2:", levels[2])
-          print("Priorita' 1:", levels[1])
-          print()
-
-          print("Prime candidate:")
-
-          for match in shortlist[:20]:
               print(
                   f'P{match["priority"]} | '
+                  f'{match["country"]} | '
                   f'{match["league"]} | '
                   f'{match["home"]["name"]} - '
                   f'{match["away"]["name"]}'
               )
 
           print()
-          print("BETLAB PRESELECTION ENGINE OK")
+          print("BETLAB SHORTLIST ENGINE OK")
           PY
 
       - name: Salva dati BETLAB
@@ -260,7 +246,7 @@ jobs:
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna feed e shortlist BETLAB"
+            git commit -m "Aggiorna shortlist BETLAB"
 
             git pull --rebase origin main
 
