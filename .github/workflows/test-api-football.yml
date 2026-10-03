@@ -2557,7 +2557,7 @@ jobs:
 
 
           # massimo 30 partite analizzate
-          for match in candidate_matches[:30]:
+          for match in candidate_matches:
 
               home_games = match[
                   "homeGames"
