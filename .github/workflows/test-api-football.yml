@@ -19,24 +19,25 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Scarica prossimi 7 giorni API-Football
+      - name: Scarica oggi e domani API-Football
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
 
         run: |
           mkdir -p data/future
-
           rm -f data/future/*.json
 
+          TODAY=$(TZ=Europe/Rome date +%Y-%m-%d)
+          TOMORROW=$(TZ=Europe/Rome date -d "+1 day" +%Y-%m-%d)
+
           echo "================================="
-          echo "BETLAB DATA ENGINE V5"
-          echo "Finestra: oggi + prossimi 6 giorni"
+          echo "BETLAB DATA ENGINE V5.1"
+          echo "Oggi: $TODAY"
+          echo "Domani: $TOMORROW"
           echo "================================="
 
-          for OFFSET in 0 1 2 3 4 5 6
+          for DAY in "$TODAY" "$TOMORROW"
           do
-            DAY=$(TZ=Europe/Rome date -v+"${OFFSET}"d +%Y-%m-%d 2>/dev/null || date -d "+${OFFSET} day" +%Y-%m-%d)
-
             echo "Scarico $DAY..."
 
             curl --fail --silent --show-error \
@@ -46,7 +47,7 @@ jobs:
               -o "data/future/$DAY.json"
           done
 
-      - name: Costruisci BETLAB V5
+      - name: Costruisci BETLAB V5.1
         run: |
           python3 - <<'PY'
 
@@ -66,7 +67,7 @@ jobs:
 
 
           # =====================================================
-          # CAMPIONATI BETLAB
+          # CAMPIONATI
           # =====================================================
 
           PRIORITY = {
@@ -109,7 +110,7 @@ jobs:
 
 
           # =====================================================
-          # NORMALIZZAZIONE
+          # NOMI SQUADRE
           # =====================================================
 
           def basic_normalize(name):
@@ -128,7 +129,6 @@ jobs:
               )
 
               name = name.lower()
-
               name = name.replace("&", " and ")
 
               name = re.sub(
@@ -145,8 +145,6 @@ jobs:
 
 
           ALIASES = {
-
-              # BRASILE
 
               "atletico mg":
                   "atletico mineiro",
@@ -169,8 +167,6 @@ jobs:
               "bragantino":
                   "bragantino",
 
-              # ITALIA
-
               "internazionale":
                   "inter",
 
@@ -185,8 +181,6 @@ jobs:
 
               "ac milan":
                   "milan",
-
-              # INGHILTERRA
 
               "man utd":
                   "manchester united",
@@ -206,23 +200,17 @@ jobs:
               "wolverhampton":
                   "wolverhampton wanderers",
 
-              # FRANCIA
-
               "psg":
                   "paris saint germain",
 
               "paris sg":
                   "paris saint germain",
 
-              # GERMANIA
-
               "bayern munich":
                   "bayern munchen",
 
               "bayern munchen":
                   "bayern munchen",
-
-              # SPAGNA
 
               "atletico madrid":
                   "atletico de madrid",
@@ -267,7 +255,7 @@ jobs:
 
 
           # =====================================================
-          # CARICA I 7 GIORNI
+          # CARICA API
           # =====================================================
 
           all_api_matches = []
@@ -279,7 +267,7 @@ jobs:
 
           print()
           print("=================================")
-          print("BETLAB ANALYSIS ENGINE V5")
+          print("BETLAB ANALYSIS ENGINE V5.1")
           print("=================================")
 
           print(
@@ -335,10 +323,11 @@ jobs:
 
 
           # =====================================================
-          # ELIMINA DUPLICATI API
+          # DEDUPLICA FIXTURE
           # =====================================================
 
           unique_api = {}
+
 
           for match in all_api_matches:
 
@@ -361,7 +350,6 @@ jobs:
           )
 
 
-          print()
           print(
               "Partite API uniche:",
               len(all_api_matches)
@@ -369,7 +357,7 @@ jobs:
 
 
           # =====================================================
-          # CARICA STORICO
+          # STORICO
           # =====================================================
 
           if os.path.exists(HISTORY):
@@ -398,7 +386,7 @@ jobs:
 
 
           # =====================================================
-          # AGGIUNGE RISULTATI TERMINATI PRESENTI NELLA FINESTRA
+          # AGGIUNGE RISULTATI TERMINATI
           # =====================================================
 
           completed_statuses = {
@@ -464,6 +452,14 @@ jobs:
                   {}
               )
 
+
+              if (
+                  goals.get("home") is None
+                  or goals.get("away") is None
+              ):
+                  continue
+
+
               home = teams.get(
                   "home",
                   {}
@@ -473,14 +469,6 @@ jobs:
                   "away",
                   {}
               )
-
-
-              if (
-                  goals.get("home") is None
-                  or goals.get("away") is None
-              ):
-                  continue
-
 
               league = match.get(
                   "league",
@@ -521,6 +509,7 @@ jobs:
                       league.get("round"),
 
                   "home": {
+
                       "id":
                           home.get("id"),
 
@@ -529,6 +518,7 @@ jobs:
                   },
 
                   "away": {
+
                       "id":
                           away.get("id"),
 
@@ -537,6 +527,7 @@ jobs:
                   },
 
                   "goals": {
+
                       "home":
                           goals.get("home"),
 
@@ -563,25 +554,16 @@ jobs:
 
           for match in history:
 
-              home_name = (
+              home_key = canonical_team(
                   match
                   .get("home", {})
                   .get("name")
               )
 
-              away_name = (
+              away_key = canonical_team(
                   match
                   .get("away", {})
                   .get("name")
-              )
-
-
-              home_key = canonical_team(
-                  home_name
-              )
-
-              away_key = canonical_team(
-                  away_name
               )
 
 
@@ -602,7 +584,7 @@ jobs:
 
 
           # =====================================================
-          # FORMA ULTIME 5
+          # FORMA
           # =====================================================
 
           def calculate_form(
@@ -614,17 +596,14 @@ jobs:
                   team_name
               )
 
-
               games = team_history.get(
                   team_key,
                   []
               )
 
-
               target_day = str(
                   target_date or ""
               )[:10]
-
 
               valid = []
 
@@ -706,7 +685,6 @@ jobs:
                       .get("name")
                   )
 
-
                   home_key = canonical_team(
                       home_name
                   )
@@ -714,7 +692,6 @@ jobs:
                   away_key = canonical_team(
                       away_name
                   )
-
 
                   home_goals = (
                       match
@@ -733,6 +710,7 @@ jobs:
 
                       gf = home_goals
                       ga = away_goals
+
                       opponent = away_name
                       venue = "HOME"
 
@@ -741,6 +719,7 @@ jobs:
 
                       gf = away_goals
                       ga = home_goals
+
                       opponent = home_name
                       venue = "AWAY"
 
@@ -864,7 +843,7 @@ jobs:
 
 
           # =====================================================
-          # CREA CANDIDATE PROSSIMI 7 GIORNI
+          # CANDIDATE OGGI + DOMANI
           # =====================================================
 
           candidates = []
@@ -895,7 +874,6 @@ jobs:
                   "league",
                   {}
               )
-
 
               country = league.get(
                   "country",
@@ -936,10 +914,10 @@ jobs:
               )
 
 
-              if not home.get("name"):
-                  continue
-
-              if not away.get("name"):
+              if (
+                  not home.get("name")
+                  or not away.get("name")
+              ):
                   continue
 
 
@@ -947,7 +925,6 @@ jobs:
                   home["name"],
                   fixture.get("date")
               )
-
 
               away_form = calculate_form(
                   away["name"],
@@ -959,15 +936,6 @@ jobs:
                   home_form["played"]
                   +
                   away_form["played"]
-              )
-
-
-              # Qualità dati:
-              # massimo 10 = 5 gare + 5 gare.
-
-              coverage = round(
-                  history_score / 10,
-                  2
               )
 
 
@@ -1007,7 +975,10 @@ jobs:
                       history_score,
 
                   "dataCoverage":
-                      coverage,
+                      round(
+                          history_score / 10,
+                          2
+                      ),
 
                   "home": {
 
@@ -1043,44 +1014,46 @@ jobs:
 
 
           # =====================================================
-          # ORDINAMENTO BETLAB
-          #
-          # 1. entrambe devono avere dati
-          # 2. quantità di storico
-          # 3. qualità campionato
-          # 4. partita più vicina
+          # CLASSIFICA QUALITÀ
           # =====================================================
 
           def candidate_rank(match):
 
-              home_played = (
+              hp = (
                   match["home"]
                   ["form"]
                   ["played"]
               )
 
-              away_played = (
+              ap = (
                   match["away"]
                   ["form"]
                   ["played"]
               )
 
 
-              both_have_data = (
+              both = (
                   1
-                  if (
-                      home_played > 0
-                      and away_played > 0
-                  )
+                  if hp > 0 and ap > 0
+                  else 0
+              )
+
+
+              complete = (
+                  1
+                  if hp == 5 and ap == 5
                   else 0
               )
 
 
               return (
-                  -both_have_data,
+
+                  -complete,
+                  -both,
                   -match["historyScore"],
                   -match["priority"],
                   match.get("timestamp") or 0
+
               )
 
 
@@ -1089,17 +1062,10 @@ jobs:
           )
 
 
-          # =====================================================
-          # SHORTLIST
-          # =====================================================
-
           shortlist = candidates[:50]
 
-
-          # Per il frontend prepariamo fino a 20 partite.
-          # Non ci limitiamo più a 5.
-
-          analysis = candidates[:20]
+          # Diamo alla homepage molte più possibilità.
+          analysis = candidates[:30]
 
 
           # =====================================================
@@ -1107,58 +1073,42 @@ jobs:
           # =====================================================
 
           print()
-          print("MIGLIORI CANDIDATE BETLAB")
+          print("MIGLIORI PARTITE DISPONIBILI")
           print()
 
 
-          for index, match in enumerate(
-              analysis[:10],
+          for i, match in enumerate(
+              analysis[:15],
               start=1
           ):
 
               home = match["home"]
               away = match["away"]
 
-              date_text = str(
+              day = str(
                   match["date"]
               )[:10]
 
 
               print(
-                  f'{index}. {date_text} | '
+                  f'{i}. {day} | '
                   f'{home["name"]} - '
                   f'{away["name"]}'
               )
 
 
               print(
-                  f'   {home["name"]}: '
-                  f'{home["form"]["played"]} gare | '
-                  f'{home["form"]["wins"]}V '
-                  f'{home["form"]["draws"]}N '
-                  f'{home["form"]["losses"]}P'
+                  f'   Storico: '
+                  f'{home["form"]["played"]}'
+                  f'+'
+                  f'{away["form"]["played"]}'
+                  f' | priorità '
+                  f'{match["priority"]}'
               )
-
-
-              print(
-                  f'   {away["name"]}: '
-                  f'{away["form"]["played"]} gare | '
-                  f'{away["form"]["wins"]}V '
-                  f'{away["form"]["draws"]}N '
-                  f'{away["form"]["losses"]}P'
-              )
-
-
-              print(
-                  f'   Copertura dati: '
-                  f'{match["dataCoverage"] * 100:.0f}%'
-              )
-
-              print()
 
 
           # =====================================================
-          # SALVATAGGIO
+          # OUTPUT
           # =====================================================
 
           generated_at = datetime.now(
@@ -1201,10 +1151,10 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB DATA ENGINE V5",
+                  "BETLAB DATA ENGINE V5.1",
 
               "windowDays":
-                  7,
+                  2,
 
               "total":
                   len(candidates),
@@ -1220,10 +1170,10 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB SHORTLIST V5",
+                  "BETLAB SHORTLIST V5.1",
 
               "windowDays":
-                  7,
+                  2,
 
               "total":
                   len(shortlist),
@@ -1239,10 +1189,10 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB ANALYSIS ENGINE V5",
+                  "BETLAB ANALYSIS ENGINE V5.1",
 
               "windowDays":
-                  7,
+                  2,
 
               "historyMatches":
                   len(history),
@@ -1328,8 +1278,9 @@ jobs:
           )
 
 
+          print()
           print("=================================")
-          print("RISULTATO BETLAB V5")
+          print("RISULTATO BETLAB V5.1")
           print("=================================")
 
           print(
@@ -1343,7 +1294,7 @@ jobs:
           )
 
           print(
-              "Candidate prossimi 7 giorni:",
+              "Candidate oggi + domani:",
               len(candidates)
           )
 
@@ -1358,13 +1309,13 @@ jobs:
           )
 
           print(
-              "Partite inviate al frontend:",
+              "Partite inviate alla homepage:",
               len(analysis)
           )
 
           print()
           print(
-              "BETLAB ANALYSIS ENGINE V5 OK"
+              "BETLAB ANALYSIS ENGINE V5.1 OK"
           )
 
           PY
@@ -1383,7 +1334,7 @@ jobs:
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna BETLAB V5 - finestra 7 giorni"
+            git commit -m "Aggiorna BETLAB V5.1"
 
             git pull --rebase origin main
 
