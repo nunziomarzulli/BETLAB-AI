@@ -9,69 +9,49 @@
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     :root {
-      --bg: #07101f;
-      --panel: #0e1829;
-      --panel2: #111d30;
-      --border: #223047;
-      --text: #f5f7fb;
-      --muted: #8d99ad;
-      --green: #48df88;
-      --green-dark: #0e3026;
-      --green-soft: rgba(72, 223, 136, 0.10);
-      --orange: #ffb454;
+      --bg: #06111f;
+      --panel: #0d1929;
+      --panel2: #101e30;
+      --border: #26374c;
+      --text: #f4f7fb;
+      --muted: #8f9caf;
+      --green: #49df91;
+      --green-dark: #123d2c;
+      --danger: #ff6b6b;
     }
 
     body {
-      background:
-        radial-gradient(
-          circle at top,
-          #10213a 0,
-          #07101f 420px
-        );
-
-      background-attachment: fixed;
-
+      margin: 0;
+      background: var(--bg);
       color: var(--text);
-
       font-family:
+        Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
         sans-serif;
-
-      min-height: 100vh;
     }
 
     .page {
-      width: 100%;
-      max-width: 720px;
+      width: min(920px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 34px 18px 80px;
+      padding: 42px 0 80px;
     }
 
-    /* ======================================================
-       HEADER
-    ====================================================== */
-
-    .brand {
+    header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 38px;
+      align-items: center;
+      margin-bottom: 60px;
     }
 
     .logo {
-      font-size: 23px;
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: -0.8px;
+      letter-spacing: -1px;
     }
 
     .logo span {
@@ -81,595 +61,460 @@
     .status {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--green);
       box-shadow: 0 0 12px var(--green);
     }
 
-    /* ======================================================
-       HERO
-    ====================================================== */
-
-    .hero {
-      margin-bottom: 24px;
-    }
-
-    .hero-label {
+    .eyebrow {
       color: var(--green);
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: 2px;
       margin-bottom: 10px;
     }
 
     h1 {
-      font-size: 38px;
-      line-height: 1.04;
-      letter-spacing: -1.7px;
-      margin-bottom: 12px;
+      margin: 0;
+      font-size: clamp(38px, 7vw, 58px);
+      letter-spacing: -2px;
+      line-height: 1;
     }
 
-    .hero p {
+    .subtitle {
+      margin-top: 18px;
       color: var(--muted);
       font-size: 15px;
-      line-height: 1.55;
-      max-width: 580px;
+      line-height: 1.6;
+      max-width: 720px;
     }
-
-    /* ======================================================
-       CONTROL PANEL
-    ====================================================== */
 
     .control-panel {
-      background: rgba(14, 24, 41, 0.94);
+      margin-top: 32px;
+      padding: 24px;
       border: 1px solid var(--border);
       border-radius: 22px;
-      padding: 22px;
-      margin-bottom: 34px;
-      box-shadow: 0 22px 60px rgba(0,0,0,.20);
+      background: var(--panel);
     }
 
-    .money-grid {
+    .inputs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 22px;
+      gap: 14px;
     }
 
-    .field label {
+    .field {
+      min-width: 0;
+    }
+
+    label {
       display: block;
       color: var(--muted);
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .8px;
-      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: 1.2px;
       margin-bottom: 8px;
     }
 
-    .input-box {
+    .input-wrap {
       position: relative;
     }
 
-    .input-box input {
+    input {
       width: 100%;
       height: 58px;
-
-      border-radius: 13px;
+      padding: 0 48px 0 16px;
       border: 1px solid var(--border);
-
-      background: #091322;
-      color: white;
-
-      font-size: 20px;
-      font-weight: 800;
-
-      padding: 0 45px 0 15px;
-
+      border-radius: 12px;
+      background: #091525;
+      color: var(--text);
       outline: none;
-
-      transition: .2s;
+      font-size: 19px;
+      font-weight: 800;
     }
 
-    .input-box input:focus {
+    input:focus {
       border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(72,223,136,.08);
     }
 
-    .currency {
+    .euro {
       position: absolute;
       right: 16px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--green);
-      font-size: 18px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
-    .optional {
-      color: #637087;
-      font-size: 9px;
-      margin-left: 3px;
+    .match-control {
+      margin-top: 20px;
     }
 
-    /* ======================================================
-       NUMBER MATCHES
-    ====================================================== */
-
-    .matches-title {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      margin-bottom: 9px;
-    }
-
-    .match-buttons {
+    .match-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 9px;
-      margin-bottom: 18px;
+      grid-template-columns: 170px 1fr;
+      gap: 12px;
     }
 
-    .match-button {
-      height: 52px;
-
-      border: 1px solid var(--border);
+    .auto-button {
+      height: 58px;
+      border: 1px solid var(--green);
       border-radius: 12px;
-
-      background: #091322;
-      color: white;
-
-      font-size: 16px;
-      font-weight: 800;
-
-      cursor: pointer;
-
-      transition: .18s;
-    }
-
-    .match-button:hover {
-      border-color: #40516d;
-    }
-
-    .match-button.active {
       background: var(--green);
-      border-color: var(--green);
-      color: #04140c;
+      color: #03140d;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
     }
 
-    /* ======================================================
-       MAIN BUTTON
-    ====================================================== */
+    .auto-button.off {
+      background: #091525;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    #matchCount:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .match-help {
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
 
     .create-button {
       width: 100%;
-      height: 58px;
-
+      height: 62px;
+      margin-top: 20px;
       border: 0;
-      border-radius: 13px;
-
+      border-radius: 12px;
       background: var(--green);
-      color: #04140c;
-
+      color: #03140d;
       font-size: 14px;
-      font-weight: 900;
-      letter-spacing: .2px;
-
+      font-weight: 950;
       cursor: pointer;
-
-      transition: .18s;
     }
 
     .create-button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.04);
+      filter: brightness(1.05);
     }
 
-    .create-button:active {
-      transform: translateY(0);
-    }
-
-    .engine-info {
+    .availability {
       text-align: center;
-      color: #778398;
-      font-size: 11px;
-      margin-top: 13px;
-      line-height: 1.45;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    /* ======================================================
-       RESULT HEADER
-    ====================================================== */
-
-    .result-area {
+    .error {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(255,107,107,.35);
+      border-radius: 12px;
+      color: #ffaaaa;
+      background: rgba(255,107,107,.07);
       display: none;
     }
 
-    .result-area.visible {
-      display: block;
+    .results {
+      margin-top: 42px;
+      display: none;
     }
 
-    .result-top {
+    .results-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: end;
       gap: 20px;
       margin-bottom: 14px;
     }
 
-    .result-top h2 {
-      font-size: 23px;
-      letter-spacing: -.7px;
+    .results h2 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -1px;
     }
 
-    .result-subtitle {
-      color: var(--muted);
-      font-size: 12px;
+    .results-sub {
       margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .target-badge {
+    .target-label {
       color: var(--green);
-      font-size: 11px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 900;
       text-align: right;
     }
 
-    /* ======================================================
-       MATCH CARDS
-    ====================================================== */
-
-    .cards {
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-    }
-
     .match-card {
-      background: var(--panel);
+      padding: 20px;
+      margin-bottom: 14px;
       border: 1px solid var(--border);
-      border-radius: 17px;
-      padding: 16px;
+      border-radius: 18px;
+      background: var(--panel);
     }
 
     .match-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-
-      color: #7d899d;
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: .65px;
+      gap: 15px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
       text-transform: uppercase;
-
-      margin-bottom: 7px;
-    }
-
-    .match-date {
-      white-space: nowrap;
-      text-transform: none;
-      letter-spacing: 0;
-      font-weight: 600;
     }
 
     .teams {
-      font-size: 15px;
-      font-weight: 850;
-      line-height: 1.3;
-      margin-bottom: 13px;
+      margin-top: 9px;
+      font-size: 17px;
+      font-weight: 900;
     }
 
     .pick-box {
+      margin-top: 15px;
       display: grid;
       grid-template-columns: 1fr auto auto;
       align-items: center;
-      gap: 11px;
-
-      background: #091522;
-      border: 1px solid rgba(72,223,136,.19);
-      border-radius: 12px;
-
-      padding: 12px 13px;
+      gap: 16px;
+      padding: 15px;
+      border: 1px solid rgba(73,223,145,.25);
+      border-radius: 13px;
+      background: #091725;
     }
 
     .pick-label {
-      color: #6f7c91;
+      color: var(--muted);
       font-size: 9px;
       font-weight: 900;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      margin-bottom: 3px;
+      letter-spacing: 1.3px;
     }
 
-    .pick {
+    .selection {
+      margin-top: 3px;
       color: var(--green);
-      font-size: 19px;
-      font-weight: 900;
-      line-height: 1.05;
+      font-size: 20px;
+      font-weight: 950;
     }
 
     .market {
-      color: #929eb0;
-      font-size: 10px;
       margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
     }
 
-    .odd-block {
+    .odd-box {
+      padding-left: 18px;
+      border-left: 1px solid var(--border);
       text-align: center;
-      min-width: 64px;
-      padding-left: 10px;
-      border-left: 1px solid #203047;
     }
 
-    .odd-label {
-      color: #6f7c91;
-      font-size: 8px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 3px;
+    .small-label {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
     }
 
     .odd {
-      color: white;
+      margin-top: 4px;
       font-size: 19px;
       font-weight: 900;
     }
 
-    .confidence {
-      background: var(--green-dark);
-      border-radius: 10px;
+    .index-box {
+      min-width: 64px;
       padding: 9px 10px;
+      border-radius: 10px;
+      background: var(--green-dark);
       text-align: center;
-      min-width: 58px;
     }
 
-    .confidence strong {
-      display: block;
+    .index-value {
       color: var(--green);
-      font-size: 15px;
-      font-weight: 900;
+      font-size: 17px;
+      font-weight: 950;
     }
 
-    .confidence span {
-      display: block;
-      color: #668577;
-      font-size: 7px;
-      font-weight: 800;
-      text-transform: uppercase;
+    .index-label {
       margin-top: 2px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 900;
     }
 
     .bookmaker {
-      margin-top: 8px;
-      color: #657288;
-      font-size: 9px;
+      margin-top: 9px;
       text-align: right;
+      color: var(--muted);
+      font-size: 10px;
     }
-
-    /* ======================================================
-       SUMMARY
-    ====================================================== */
 
     .summary {
-      margin-top: 16px;
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(72,223,136,.10),
-          rgba(14,24,41,.96)
-        );
-
-      border: 1px solid rgba(72,223,136,.25);
-      border-radius: 19px;
-
+      margin-top: 18px;
+      border: 1px solid rgba(73,223,145,.35);
+      border-radius: 18px;
       overflow: hidden;
-    }
-
-    .summary-main {
-      padding: 19px;
-    }
-
-    .summary-title {
-      color: #7d899d;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .9px;
-      text-transform: uppercase;
-      margin-bottom: 15px;
+      background: linear-gradient(
+        135deg,
+        rgba(73,223,145,.08),
+        rgba(73,223,145,.02)
+      );
     }
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 22px;
     }
 
-    .summary-item span {
-      display: block;
-      color: #7d899d;
-      font-size: 9px;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .summary-item strong {
-      display: block;
-      font-size: 19px;
+    .summary-label {
+      color: var(--muted);
+      font-size: 10px;
       font-weight: 900;
     }
 
-    .summary-item.return strong {
+    .summary-value {
+      margin-top: 6px;
+      font-size: 21px;
+      font-weight: 950;
+    }
+
+    .summary-value.green {
       color: var(--green);
-      font-size: 22px;
     }
 
-    .target-info {
-      border-top: 1px solid rgba(72,223,136,.13);
-      padding: 13px 19px;
-      color: #8793a6;
-      font-size: 11px;
-      line-height: 1.45;
+    .summary-message {
+      padding: 16px 22px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
     }
 
-    .target-info strong {
-      color: white;
+    .mode-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(73,223,145,.12);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 900;
+      vertical-align: middle;
     }
 
-    .target-hit {
-      color: var(--green) !important;
-    }
-
-    /* ======================================================
-       ERRORS
-    ====================================================== */
-
-    .message {
-      display: none;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-top: 20px;
-      color: #a5afbf;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .message.visible {
-      display: block;
-    }
-
-    /* ======================================================
-       MOBILE
-    ====================================================== */
-
-    @media (max-width: 560px) {
-
+    @media (max-width: 700px) {
       .page {
-        padding-top: 24px;
+        width: min(100% - 22px, 920px);
+        padding-top: 25px;
       }
 
-      h1 {
-        font-size: 32px;
+      header {
+        margin-bottom: 42px;
       }
 
-      .money-grid {
+      .inputs {
         grid-template-columns: 1fr;
+      }
+
+      .match-row {
+        grid-template-columns: 130px 1fr;
       }
 
       .pick-box {
         grid-template-columns: 1fr auto;
       }
 
-      .confidence {
-        grid-column: 2;
-        grid-row: 1;
-      }
-
-      .odd-block {
-        grid-column: 2;
-        grid-row: 2;
+      .index-box {
+        grid-column: 1 / -1;
       }
 
       .summary-grid {
         grid-template-columns: 1fr 1fr;
       }
 
-      .summary-item.return {
-        grid-column: 1 / -1;
-        padding-top: 8px;
+      .results-header {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
+      .target-label {
+        text-align: left;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <main class="page">
+<div class="page">
 
-    <!-- ====================================================
-         HEADER
-    ===================================================== -->
+  <header>
+    <div class="logo">
+      BETLAB <span>AI</span>
+    </div>
 
-    <header class="brand">
-
-      <div class="logo">
-        BETLAB <span>AI</span>
-      </div>
-
-      <div class="status">
-        <div class="status-dot"></div>
-        <span id="statusText">Caricamento...</span>
-      </div>
-
-    </header>
+    <div class="status">
+      <span class="dot"></span>
+      BETLAB pronto
+    </div>
+  </header>
 
 
-    <!-- ====================================================
-         HERO
-    ===================================================== -->
+  <main>
 
-    <section class="hero">
+    <div class="eyebrow">
+      ANALISI PROBABILISTICA
+    </div>
 
-      <div class="hero-label">
-        Analisi probabilistica
-      </div>
+    <h1>
+      Cosa giochiamo?
+    </h1>
 
-      <h1>
-        Cosa giochiamo?
-      </h1>
+    <div class="subtitle">
+      Inserisci la puntata e, se vuoi, l'obiettivo.
+      BETLAB confronta i mercati disponibili e costruisce
+      una combinazione utilizzando un solo pronostico per incontro.
+    </div>
 
-      <p>
-        Dimmi quanto vuoi giocare.
-        BETLAB analizza le partite disponibili,
-        sceglie un solo pronostico per evento
-        e costruisce la combinazione.
-      </p>
-
-    </section>
-
-
-    <!-- ====================================================
-         CONTROLS
-    ===================================================== -->
 
     <section class="control-panel">
 
-      <div class="money-grid">
+      <div class="inputs">
 
         <div class="field">
 
           <label for="stake">
-            Quanto vuoi giocare?
+            QUANTO VUOI GIOCARE?
           </label>
 
-          <div class="input-box">
+          <div class="input-wrap">
 
             <input
               id="stake"
               type="number"
-              min="1"
-              step="1"
+              min="0.01"
+              step="0.50"
               value="5"
             >
 
-            <span class="currency">€</span>
+            <span class="euro">€</span>
 
           </div>
 
@@ -679,23 +524,20 @@
         <div class="field">
 
           <label for="target">
-            Quanto vorresti vincere?
-            <span class="optional">
-              facoltativo
-            </span>
+            QUANTO VORRESTI VINCERE? · FACOLTATIVO
           </label>
 
-          <div class="input-box">
+          <div class="input-wrap">
 
             <input
               id="target"
               type="number"
               min="0"
               step="1"
-              placeholder="es. 50"
+              placeholder="es. 100"
             >
 
-            <span class="currency">€</span>
+            <span class="euro">€</span>
 
           </div>
 
@@ -704,40 +546,41 @@
       </div>
 
 
-      <div class="matches-title">
-        Quante partite?
-      </div>
+      <div class="match-control">
 
+        <label>
+          NUMERO INCONTRI
+        </label>
 
-      <div class="match-buttons">
+        <div class="match-row">
 
-        <button
-          class="match-button"
-          data-count="2"
+          <button
+            id="autoButton"
+            class="auto-button"
+            type="button"
+          >
+            AUTO
+          </button>
+
+          <input
+            id="matchCount"
+            type="number"
+            min="1"
+            max="20"
+            step="1"
+            value="4"
+            disabled
+            placeholder="Numero incontri"
+          >
+
+        </div>
+
+        <div
+          id="matchHelp"
+          class="match-help"
         >
-          2
-        </button>
-
-        <button
-          class="match-button"
-          data-count="3"
-        >
-          3
-        </button>
-
-        <button
-          class="match-button active"
-          data-count="4"
-        >
-          4
-        </button>
-
-        <button
-          class="match-button"
-          data-count="5"
-        >
-          5
-        </button>
+          AUTO: BETLAB decide quanti incontri utilizzare.
+        </div>
 
       </div>
 
@@ -745,122 +588,120 @@
       <button
         id="createButton"
         class="create-button"
+        type="button"
       >
         CREA LA GIOCATA
       </button>
 
 
-      <div class="engine-info" id="engineInfo">
-        Caricamento pronostici BETLAB...
+      <div
+        id="availability"
+        class="availability"
+      >
+        Caricamento pronostici...
       </div>
+
+
+      <div
+        id="error"
+        class="error"
+      ></div>
 
     </section>
 
 
-    <!-- ====================================================
-         MESSAGE
-    ===================================================== -->
-
-    <div
-      id="message"
-      class="message"
-    ></div>
-
-
-    <!-- ====================================================
-         RESULT
-    ===================================================== -->
-
     <section
-      id="resultArea"
-      class="result-area"
+      id="results"
+      class="results"
     >
 
-      <div class="result-top">
+      <div class="results-header">
 
         <div>
 
           <h2>
             La tua giocata
+            <span
+              id="modeBadge"
+              class="mode-badge"
+            ></span>
           </h2>
 
           <div
-            id="resultSubtitle"
-            class="result-subtitle"
+            id="resultsSub"
+            class="results-sub"
           ></div>
 
         </div>
 
         <div
-          id="targetBadge"
-          class="target-badge"
+          id="targetLabel"
+          class="target-label"
         ></div>
 
       </div>
 
 
-      <div
-        id="cards"
-        class="cards"
-      ></div>
+      <div id="cards"></div>
 
 
       <div class="summary">
 
-        <div class="summary-main">
+        <div class="summary-grid">
 
-          <div class="summary-title">
-            Riepilogo giocata
+          <div>
+            <div class="summary-label">
+              PUNTATA
+            </div>
+
+            <div
+              id="summaryStake"
+              class="summary-value"
+            ></div>
           </div>
 
-          <div class="summary-grid">
 
-            <div class="summary-item">
-
-              <span>
-                Puntata
-              </span>
-
-              <strong id="summaryStake">
-                € 0,00
-              </strong>
-
+          <div>
+            <div class="summary-label">
+              INCONTRI
             </div>
 
+            <div
+              id="summaryMatches"
+              class="summary-value"
+            ></div>
+          </div>
 
-            <div class="summary-item">
 
-              <span>
-                Quota totale
-              </span>
-
-              <strong id="summaryOdd">
-                0.00
-              </strong>
-
+          <div>
+            <div class="summary-label">
+              QUOTA TOTALE
             </div>
 
+            <div
+              id="summaryOdd"
+              class="summary-value"
+            ></div>
+          </div>
 
-            <div class="summary-item return">
 
-              <span>
-                Vincita potenziale
-              </span>
-
-              <strong id="summaryReturn">
-                € 0,00
-              </strong>
-
+          <div>
+            <div class="summary-label">
+              VINCITA POTENZIALE
             </div>
 
+            <div
+              id="summaryReturn"
+              class="summary-value green"
+            ></div>
           </div>
 
         </div>
 
 
         <div
-          id="targetInfo"
-          class="target-info"
+          id="summaryMessage"
+          class="summary-message"
         ></div>
 
       </div>
@@ -869,502 +710,846 @@
 
   </main>
 
-
-  <script>
-
-    /* ======================================================
-       STATE
-    ====================================================== */
-
-    let availableMatches = [];
-
-    let selectedCount = 4;
+</div>
 
 
-    /* ======================================================
-       ELEMENTS
-    ====================================================== */
-
-    const stakeInput =
-      document.getElementById("stake");
-
-    const targetInput =
-      document.getElementById("target");
-
-    const createButton =
-      document.getElementById("createButton");
-
-    const cards =
-      document.getElementById("cards");
-
-    const resultArea =
-      document.getElementById("resultArea");
-
-    const message =
-      document.getElementById("message");
-
-    const statusText =
-      document.getElementById("statusText");
-
-    const engineInfo =
-      document.getElementById("engineInfo");
-
-    const summaryStake =
-      document.getElementById("summaryStake");
-
-    const summaryOdd =
-      document.getElementById("summaryOdd");
-
-    const summaryReturn =
-      document.getElementById("summaryReturn");
-
-    const targetInfo =
-      document.getElementById("targetInfo");
-
-    const targetBadge =
-      document.getElementById("targetBadge");
-
-    const resultSubtitle =
-      document.getElementById("resultSubtitle");
+<script>
+  const DATA_URL =
+    "data/betlab-analysis.json?v=" + Date.now();
 
 
-    /* ======================================================
-       FORMAT
-    ====================================================== */
+  let betlabData = null;
 
-    function euro(value) {
-
-      return new Intl.NumberFormat(
-        "it-IT",
-        {
-          style: "currency",
-          currency: "EUR"
-        }
-      ).format(value);
-
-    }
+  let autoMode = true;
 
 
-    function formatDate(value) {
+  const stakeInput =
+    document.getElementById("stake");
 
-      if (!value) {
-        return "";
-      }
+  const targetInput =
+    document.getElementById("target");
 
-      const date =
-        new Date(value);
+  const matchCountInput =
+    document.getElementById("matchCount");
 
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return "";
-      }
+  const autoButton =
+    document.getElementById("autoButton");
 
-      return new Intl.DateTimeFormat(
-        "it-IT",
-        {
-          weekday: "short",
-          day: "2-digit",
-          month: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit"
-        }
-      ).format(date);
+  const matchHelp =
+    document.getElementById("matchHelp");
 
-    }
+  const createButton =
+    document.getElementById("createButton");
+
+  const availability =
+    document.getElementById("availability");
+
+  const errorBox =
+    document.getElementById("error");
+
+  const results =
+    document.getElementById("results");
+
+  const cards =
+    document.getElementById("cards");
 
 
-    function safeText(value) {
-
-      return String(
-        value ?? ""
-      )
+  function safeText(value) {
+    return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+
+  function money(value) {
+    return Number(value).toLocaleString(
+      "it-IT",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    ) + " €";
+  }
+
+
+  function oddText(value) {
+    return Number(value).toLocaleString(
+      "it-IT",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    );
+  }
+
+
+  function showError(message) {
+
+    errorBox.textContent = message;
+    errorBox.style.display = "block";
+
+  }
+
+
+  function clearError() {
+
+    errorBox.textContent = "";
+    errorBox.style.display = "none";
+
+  }
+
+
+  function getMatches() {
+
+    if (!betlabData) {
+      return [];
+    }
+
+    return Array.isArray(
+      betlabData.analysis
+    )
+      ? betlabData.analysis
+      : [];
+
+  }
+
+
+  function getUsableMatches() {
+
+    return getMatches()
+      .map(match => {
+
+        const candidates =
+          Array.isArray(match.candidates)
+            ? match.candidates
+            : [];
+
+        const usableCandidates =
+          candidates.filter(candidate => {
+
+            const odd =
+              Number(candidate.odd);
+
+            return (
+              candidate.oddAvailable === true &&
+              Number.isFinite(odd) &&
+              odd > 1
+            );
+
+          });
+
+        return {
+          ...match,
+          usableCandidates
+        };
+
+      })
+      .filter(
+        match =>
+          match.usableCandidates.length > 0
+      );
+
+  }
+
+
+  function candidateQuality(candidate) {
+
+    const index =
+      Number(candidate.index) || 0;
+
+    const probability =
+      Number(candidate.modelProbability) || 0;
+
+    const odd =
+      Number(candidate.odd) || 1;
+
+    /*
+      Il punteggio NON considera soltanto la quota.
+
+      Premia prima la qualità statistica.
+      La quota serve successivamente per avvicinarsi
+      all'obiettivo economico.
+    */
+
+    let quality =
+      index * 1.0;
+
+    if (
+      candidate.market ===
+      "Risultato Esatto"
+    ) {
+
+      /*
+        Penalizzazione prudenziale del risultato esatto.
+
+        Il modello Poisson è ancora sperimentale:
+        non vogliamo che una quota enorme domini
+        automaticamente la selezione.
+      */
+
+      quality *= 0.72;
+
+      if (probability < 0.05) {
+        quality *= 0.75;
+      }
+
+    }
+
+    /*
+      Piccola penalizzazione delle quote estreme.
+      Non le vietiamo.
+    */
+
+    if (odd >= 20) {
+      quality *= 0.92;
+    }
+
+    if (odd >= 50) {
+      quality *= 0.82;
+    }
+
+    return quality;
+
+  }
+
+
+  function candidateIsAllowed(candidate) {
+
+    const odd =
+      Number(candidate.odd);
+
+    const index =
+      Number(candidate.index);
+
+    const probability =
+      Number(
+        candidate.modelProbability
+      );
+
+
+    if (
+      !Number.isFinite(odd) ||
+      odd <= 1
+    ) {
+      return false;
+    }
+
+
+    if (
+      !Number.isFinite(index)
+    ) {
+      return false;
+    }
+
+
+    if (
+      candidate.market ===
+      "Risultato Esatto"
+    ) {
+
+      /*
+        Per ora il risultato esatto deve avere
+        almeno il 5% di probabilità modello.
+
+        Evitiamo 2%, 3% ecc. soltanto perché
+        hanno quota molto alta.
+      */
+
+      return (
+        Number.isFinite(probability) &&
+        probability >= 0.05
+      );
 
     }
 
 
-    /* ======================================================
-       MATCH BUTTONS
-    ====================================================== */
+    return index >= 55;
 
-    document
-      .querySelectorAll(
-        ".match-button"
-      )
-      .forEach(button => {
+  }
 
-        button.addEventListener(
-          "click",
-          () => {
 
-            selectedCount =
-              Number(
-                button.dataset.count
-              );
+  function prepareOptions() {
 
-            document
-              .querySelectorAll(
-                ".match-button"
-              )
-              .forEach(item => {
+    const matches =
+      getUsableMatches();
 
-                item.classList.remove(
-                  "active"
-                );
+    const options = [];
 
-              });
 
-            button.classList.add(
-              "active"
-            );
+    for (const match of matches) {
 
-          }
-        );
+      const allowed =
+        match.usableCandidates
+          .filter(candidateIsAllowed)
+          .sort(
+            (a, b) =>
+              candidateQuality(b) -
+              candidateQuality(a)
+          );
+
+
+      if (!allowed.length) {
+        continue;
+      }
+
+
+      /*
+        Non servono decine di mercati della stessa partita
+        durante la ricerca.
+
+        Prendiamo al massimo i 10 candidati migliori.
+      */
+
+      options.push({
+
+        match,
+
+        candidates:
+          allowed.slice(0, 10)
 
       });
 
+    }
 
-    /* ======================================================
-       COMBINATIONS
-    ====================================================== */
 
-    function combinations(
-      array,
-      size
-    ) {
+    return options;
 
-      const result = [];
+  }
 
-      function build(
-        start,
-        current
+
+  function combinationScore(
+    picks,
+    stake,
+    target
+  ) {
+
+    let totalOdd = 1;
+
+    let qualitySum = 0;
+
+    let probabilityProduct = 1;
+
+
+    for (const pick of picks) {
+
+      totalOdd *=
+        Number(pick.candidate.odd);
+
+      qualitySum +=
+        candidateQuality(
+          pick.candidate
+        );
+
+      const p =
+        Number(
+          pick.candidate
+            .modelProbability
+        );
+
+      if (
+        Number.isFinite(p) &&
+        p > 0 &&
+        p <= 1
       ) {
 
-        if (
-          current.length === size
-        ) {
+        probabilityProduct *= p;
 
-          result.push(
-            [...current]
+      } else {
+
+        probabilityProduct *=
+          (
+            Number(
+              pick.candidate.index
+            ) / 100
           );
 
-          return;
+      }
 
-        }
+    }
 
+
+    const potential =
+      stake * totalOdd;
+
+    const averageQuality =
+      qualitySum / picks.length;
+
+
+    /*
+      Senza obiettivo:
+      priorità alla qualità.
+    */
+
+    if (
+      !Number.isFinite(target) ||
+      target <= 0
+    ) {
+
+      return {
+
+        score:
+          averageQuality,
+
+        totalOdd,
+        potential,
+        averageQuality,
+        probabilityProduct
+
+      };
+
+    }
+
+
+    /*
+      Con obiettivo:
+      misuriamo quanto siamo lontani.
+
+      Usiamo il logaritmo perché una quota 10
+      rispetto a 20 deve essere trattata in modo
+      più sensato di una semplice differenza €.
+    */
+
+    const targetOdd =
+      target / stake;
+
+
+    const distance =
+      Math.abs(
+        Math.log(
+          Math.max(
+            totalOdd,
+            1.0001
+          )
+          /
+          Math.max(
+            targetOdd,
+            1.0001
+          )
+        )
+      );
+
+
+    /*
+      L'obiettivo conta, ma non può annullare
+      completamente la qualità statistica.
+    */
+
+    const score =
+      averageQuality
+      -
+      distance * 22;
+
+
+    return {
+
+      score,
+      totalOdd,
+      potential,
+      averageQuality,
+      probabilityProduct
+
+    };
+
+  }
+
+
+  function isBetterResult(
+    candidateResult,
+    currentBest,
+    stake,
+    target
+  ) {
+
+    if (!currentBest) {
+      return true;
+    }
+
+
+    /*
+      Se esiste un obiettivo, prima scegliamo
+      la combinazione col punteggio complessivo
+      più alto.
+    */
+
+    if (
+      candidateResult.metrics.score >
+      currentBest.metrics.score
+    ) {
+      return true;
+    }
+
+
+    if (
+      candidateResult.metrics.score <
+      currentBest.metrics.score
+    ) {
+      return false;
+    }
+
+
+    /*
+      Pareggio:
+      qualità media più alta.
+    */
+
+    if (
+      candidateResult.metrics.averageQuality >
+      currentBest.metrics.averageQuality
+    ) {
+      return true;
+    }
+
+
+    return false;
+
+  }
+
+
+  function searchFixedCount(
+    options,
+    requestedCount,
+    stake,
+    target
+  ) {
+
+    if (
+      requestedCount < 1 ||
+      requestedCount > options.length
+    ) {
+      return null;
+    }
+
+
+    /*
+      Ricerca beam.
+
+      Evita di generare milioni di combinazioni
+      quando aumentano incontri e mercati.
+    */
+
+    const BEAM_WIDTH = 3500;
+
+    let states = [
+      {
+        picks: [],
+        usedMatches: new Set()
+      }
+    ];
+
+
+    for (
+      let depth = 0;
+      depth < requestedCount;
+      depth++
+    ) {
+
+      const nextStates = [];
+
+
+      for (const state of states) {
 
         for (
-          let i = start;
-          i < array.length;
-          i++
+          let matchIndex = 0;
+          matchIndex < options.length;
+          matchIndex++
         ) {
 
-          current.push(
-            array[i]
-          );
-
-          build(
-            i + 1,
-            current
-          );
-
-          current.pop();
-
-        }
-
-      }
-
-
-      build(
-        0,
-        []
-      );
-
-      return result;
-
-    }
-
-
-    function totalOdd(
-      matches
-    ) {
-
-      return matches.reduce(
-        (total, match) => {
-
-          return (
-            total *
-            Number(
-              match.prediction.odd
-            )
-          );
-
-        },
-        1
-      );
-
-    }
-
-
-    /* ======================================================
-       QUALITY
-    ====================================================== */
-
-    function confidence(
-      match
-    ) {
-
-      return Number(
-        match?.prediction?.confidence
-        ||
-        0
-      );
-
-    }
-
-
-    function averageConfidence(
-      matches
-    ) {
-
-      if (!matches.length) {
-        return 0;
-      }
-
-      const total =
-        matches.reduce(
-          (sum, match) =>
-            sum + confidence(match),
-          0
-        );
-
-      return (
-        total /
-        matches.length
-      );
-
-    }
-
-
-    /* ======================================================
-       SELECT BET
-    ====================================================== */
-
-    function selectCombination(
-      count,
-      stake,
-      target
-    ) {
-
-      if (
-        availableMatches.length
-        <
-        count
-      ) {
-
-        return null;
-
-      }
-
-
-      const pool =
-        availableMatches.slice(
-          0,
-          12
-        );
-
-
-      const possible =
-        combinations(
-          pool,
-          count
-        );
-
-
-      if (!possible.length) {
-        return null;
-      }
-
-
-      /*
-       * Se l'utente NON specifica un obiettivo:
-       * scegliamo prima l'indice BETLAB medio più alto.
-       *
-       * Non scegliamo automaticamente la quota più alta.
-       */
-
-      if (
-        !target
-        ||
-        target <= 0
-      ) {
-
-        possible.sort(
-          (a, b) => {
-
-            const confidenceDifference =
-              averageConfidence(b)
-              -
-              averageConfidence(a);
-
-            if (
-              Math.abs(
-                confidenceDifference
-              )
-              >
-              0.001
-            ) {
-
-              return confidenceDifference;
-
-            }
-
-            return (
-              totalOdd(a)
-              -
-              totalOdd(b)
-            );
-
-          }
-        );
-
-
-        return possible[0];
-
-      }
-
-
-      /*
-       * Con obiettivo:
-       *
-       * cerchiamo tra pronostici REALI già generati
-       * dal modello.
-       *
-       * Non cambiamo il pronostico di una partita
-       * per forzare artificialmente la vincita.
-       */
-
-
-      const targetOdd =
-        target /
-        stake;
-
-
-      possible.sort(
-        (a, b) => {
-
-          const oddA =
-            totalOdd(a);
-
-          const oddB =
-            totalOdd(b);
-
-
-          const returnA =
-            stake * oddA;
-
-          const returnB =
-            stake * oddB;
-
-
-          const distanceA =
-            Math.abs(
-              returnA - target
-            );
-
-          const distanceB =
-            Math.abs(
-              returnB - target
-            );
-
-
           if (
-            Math.abs(
-              distanceA - distanceB
+            state.usedMatches.has(
+              matchIndex
             )
-            >
-            0.01
           ) {
-
-            return (
-              distanceA -
-              distanceB
-            );
-
+            continue;
           }
 
 
           /*
-           * A parità di distanza,
-           * preferiamo l'indice BETLAB maggiore.
-           */
+            Impedisce permutazioni duplicate:
+            gli incontri devono essere aggiunti
+            in ordine crescente.
+          */
 
-          return (
-            averageConfidence(b)
-            -
-            averageConfidence(a)
-          );
+          const lastMatchIndex =
+            state.picks.length
+              ? state.picks[
+                  state.picks.length - 1
+                ].matchIndex
+              : -1;
+
+
+          if (
+            matchIndex <=
+            lastMatchIndex
+          ) {
+            continue;
+          }
+
+
+          const option =
+            options[matchIndex];
+
+
+          for (
+            const candidate
+            of option.candidates
+          ) {
+
+            const newPicks = [
+              ...state.picks,
+              {
+                matchIndex,
+                match:
+                  option.match,
+                candidate
+              }
+            ];
+
+
+            const metrics =
+              combinationScore(
+                newPicks,
+                stake,
+                target
+              );
+
+
+            const newUsed =
+              new Set(
+                state.usedMatches
+              );
+
+            newUsed.add(
+              matchIndex
+            );
+
+
+            nextStates.push({
+
+              picks:
+                newPicks,
+
+              usedMatches:
+                newUsed,
+
+              metrics
+
+            });
+
+          }
 
         }
+
+      }
+
+
+      if (!nextStates.length) {
+        return null;
+      }
+
+
+      nextStates.sort(
+        (a, b) =>
+          b.metrics.score -
+          a.metrics.score
       );
 
 
-      return possible[0];
+      states =
+        nextStates.slice(
+          0,
+          BEAM_WIDTH
+        );
 
     }
 
 
-    /* ======================================================
-       RENDER CARD
-    ====================================================== */
+    let best = null;
 
-    function renderCard(
-      match
+
+    for (const state of states) {
+
+      const result = {
+
+        picks:
+          state.picks,
+
+        metrics:
+          combinationScore(
+            state.picks,
+            stake,
+            target
+          )
+
+      };
+
+
+      if (
+        isBetterResult(
+          result,
+          best,
+          stake,
+          target
+        )
+      ) {
+
+        best = result;
+
+      }
+
+    }
+
+
+    return best;
+
+  }
+
+
+  function searchAuto(
+    options,
+    stake,
+    target
+  ) {
+
+    /*
+      AUTO può utilizzare da 1 fino al massimo
+      degli incontri disponibili.
+
+      Limite tecnico 20 per evitare combinazioni
+      prive di utilità pratica.
+    */
+
+    const maxCount =
+      Math.min(
+        options.length,
+        20
+      );
+
+
+    let best = null;
+
+
+    for (
+      let count = 1;
+      count <= maxCount;
+      count++
     ) {
 
-      const prediction =
-        match.prediction;
-
-      const country =
-        match.country || "";
-
-      const league =
-        match.league || "";
-
-      const home =
-        match.home?.name || "Casa";
-
-      const away =
-        match.away?.name || "Trasferta";
-
-      const date =
-        formatDate(
-          match.date
+      const result =
+        searchFixedCount(
+          options,
+          count,
+          stake,
+          target
         );
 
-      const odd =
-        Number(
-          prediction.odd
-        );
 
-      const index =
-        Number(
-          prediction.confidence
-          ||
-          0
-        );
+      if (!result) {
+        continue;
+      }
 
-      const bookmaker =
-        prediction.bookmaker
-        ||
-        "";
+
+      /*
+        Piccola penalizzazione per ogni incontro
+        aggiuntivo.
+
+        A parità di risultato preferiamo una
+        schedina più corta.
+      */
+
+      result.metrics.score -=
+        (count - 1) * 1.5;
+
+
+      if (
+        isBetterResult(
+          result,
+          best,
+          stake,
+          target
+        )
+      ) {
+
+        best = result;
+
+      }
+
+    }
+
+
+    return best;
+
+  }
+
+
+  function formatDate(match) {
+
+    const raw =
+      match.date;
+
+    if (!raw) {
+      return "";
+    }
+
+
+    const parts =
+      String(raw)
+        .slice(0, 10)
+        .split("-");
+
+
+    if (parts.length !== 3) {
+      return safeText(raw);
+    }
+
+
+    return (
+      parts[2]
+      + "/"
+      + parts[1]
+      + "/"
+      + parts[0]
+    );
+
+  }
+
+
+  function renderResult(
+    result,
+    stake,
+    target
+  ) {
+
+    if (
+      !result ||
+      !result.picks ||
+      !result.picks.length
+    ) {
+
+      showError(
+        "BETLAB non ha trovato una combinazione valida con i parametri richiesti."
+      );
+
+      results.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    cards.innerHTML = "";
+
+
+    for (const pick of result.picks) {
+
+      const match =
+        pick.match;
+
+      const candidate =
+        pick.candidate;
 
 
       const card =
@@ -1380,23 +1565,25 @@
 
         <div class="match-meta">
 
-          <div>
-            ${safeText(country)}
-            ${country && league ? " · " : ""}
-            ${safeText(league)}
-          </div>
+          <span>
+            ${safeText(match.country)}
+            ·
+            ${safeText(match.league)}
+          </span>
 
-          <div class="match-date">
-            ${safeText(date)}
-          </div>
+          <span>
+            ${formatDate(match)}
+          </span>
 
         </div>
 
 
         <div class="teams">
-          ${safeText(home)}
+
+          ${safeText(match.home?.name)}
           –
-          ${safeText(away)}
+          ${safeText(match.away?.name)}
+
         </div>
 
 
@@ -1405,63 +1592,57 @@
           <div>
 
             <div class="pick-label">
-              Pronostico BETLAB
+              PRONOSTICO BETLAB
             </div>
 
-            <div class="pick">
-              ${safeText(
-                prediction.prediction
-              )}
+            <div class="selection">
+              ${safeText(candidate.selection)}
             </div>
 
             <div class="market">
-              ${safeText(
-                prediction.market
-              )}
+              ${safeText(candidate.market)}
             </div>
 
           </div>
 
 
-          <div class="odd-block">
+          <div class="odd-box">
 
-            <div class="odd-label">
-              Quota
+            <div class="small-label">
+              QUOTA
             </div>
 
             <div class="odd">
-              ${odd.toFixed(2)}
+              ${oddText(candidate.odd)}
             </div>
 
           </div>
 
 
-          <div class="confidence">
+          <div class="index-box">
 
-            <strong>
-              ${index.toFixed(0)}%
-            </strong>
+            <div class="index-value">
+              ${Number(candidate.index).toFixed(1)}%
+            </div>
 
-            <span>
-              indice
-            </span>
+            <div class="index-label">
+              INDICE
+            </div>
 
           </div>
 
         </div>
 
 
-        ${
-          bookmaker
-          ?
-          `
-          <div class="bookmaker">
-            Quota rilevata: ${safeText(bookmaker)}
-          </div>
-          `
-          :
-          ""
-        }
+        <div class="bookmaker">
+
+          Quota rilevata:
+          ${safeText(
+            candidate.bookmaker ||
+            "n.d."
+          )}
+
+        </div>
 
       `;
 
@@ -1473,84 +1654,277 @@
     }
 
 
-    /* ======================================================
-       CREATE BET
-    ====================================================== */
-
-    function createBet() {
-
-      message.classList.remove(
-        "visible"
-      );
-
-      resultArea.classList.remove(
-        "visible"
+    const metrics =
+      combinationScore(
+        result.picks,
+        stake,
+        target
       );
 
 
-      const stake =
-        Number(
-          stakeInput.value
-        );
+    document.getElementById(
+      "resultsSub"
+    ).textContent =
+      result.picks.length
+      +
+      (
+        result.picks.length === 1
+          ? " incontro selezionato"
+          : " incontri selezionati"
+      )
+      +
+      " · qualità media "
+      +
+      metrics.averageQuality.toFixed(1);
 
 
-      const target =
-        Number(
-          targetInput.value
-        );
+    document.getElementById(
+      "modeBadge"
+    ).textContent =
+      autoMode
+        ? "AUTO"
+        : "PERSONALIZZATA";
+
+
+    const targetLabel =
+      document.getElementById(
+        "targetLabel"
+      );
+
+
+    if (
+      Number.isFinite(target) &&
+      target > 0
+    ) {
+
+      targetLabel.textContent =
+        "Obiettivo "
+        +
+        money(target);
+
+    } else {
+
+      targetLabel.textContent =
+        "";
+
+    }
+
+
+    document.getElementById(
+      "summaryStake"
+    ).textContent =
+      money(stake);
+
+
+    document.getElementById(
+      "summaryMatches"
+    ).textContent =
+      result.picks.length;
+
+
+    document.getElementById(
+      "summaryOdd"
+    ).textContent =
+      oddText(
+        metrics.totalOdd
+      );
+
+
+    document.getElementById(
+      "summaryReturn"
+    ).textContent =
+      money(
+        metrics.potential
+      );
+
+
+    const message =
+      document.getElementById(
+        "summaryMessage"
+      );
+
+
+    if (
+      Number.isFinite(target) &&
+      target > 0
+    ) {
+
+      const requiredOdd =
+        target / stake;
+
+
+      const difference =
+        metrics.potential -
+        target;
 
 
       if (
-        !Number.isFinite(stake)
-        ||
-        stake <= 0
-      ) {
-
-        message.textContent =
-          "Inserisci un importo valido.";
-
-        message.classList.add(
-          "visible"
-        );
-
-        return;
-
-      }
-
-
-      if (
-        availableMatches.length
+        Math.abs(difference)
         <
-        selectedCount
+        Math.max(
+          1,
+          target * 0.03
+        )
       ) {
 
-        message.textContent =
-          `Al momento BETLAB dispone di ${availableMatches.length} pronostici completi di quota. Hai richiesto ${selectedCount} partite.`;
+        message.innerHTML =
+          "Per l'obiettivo di <strong>"
+          +
+          money(target)
+          +
+          "</strong> servirebbe quota circa <strong>"
+          +
+          oddText(requiredOdd)
+          +
+          "</strong>. BETLAB ha trovato una combinazione molto vicina all'obiettivo.";
 
-        message.classList.add(
-          "visible"
-        );
+      } else if (
+        difference > 0
+      ) {
 
-        return;
+        message.innerHTML =
+          "L'obiettivo richiede quota circa <strong>"
+          +
+          oddText(requiredOdd)
+          +
+          "</strong>. La combinazione selezionata arriva a una vincita potenziale superiore all'obiettivo.";
+
+      } else {
+
+        message.innerHTML =
+          "L'obiettivo richiede quota circa <strong>"
+          +
+          oddText(requiredOdd)
+          +
+          "</strong>. Tra i candidati statisticamente ammessi, BETLAB ha preferito questa combinazione senza forzare pronostici soltanto per raggiungere la quota.";
 
       }
 
+    } else {
 
-      const selected =
-        selectCombination(
-          selectedCount,
+      message.textContent =
+        "Nessun obiettivo economico impostato: BETLAB ha privilegiato la qualità dei candidati disponibili.";
+
+    }
+
+
+    results.style.display =
+      "block";
+
+
+    results.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  }
+
+
+  function createBet() {
+
+    clearError();
+
+
+    const stake =
+      Number(
+        stakeInput.value
+      );
+
+
+    const targetRaw =
+      targetInput.value.trim();
+
+
+    const target =
+      targetRaw === ""
+        ? NaN
+        : Number(targetRaw);
+
+
+    if (
+      !Number.isFinite(stake) ||
+      stake <= 0
+    ) {
+
+      showError(
+        "Inserisci una puntata valida."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      targetRaw !== ""
+      &&
+      (
+        !Number.isFinite(target)
+        ||
+        target <= 0
+      )
+    ) {
+
+      showError(
+        "Inserisci un obiettivo valido oppure lascia il campo vuoto."
+      );
+
+      return;
+
+    }
+
+
+    const options =
+      prepareOptions();
+
+
+    if (!options.length) {
+
+      showError(
+        "Non ci sono pronostici con quota utilizzabili."
+      );
+
+      return;
+
+    }
+
+
+    let result = null;
+
+
+    if (autoMode) {
+
+      result =
+        searchAuto(
+          options,
           stake,
           target
         );
 
+    } else {
 
-      if (!selected) {
+      let requestedCount =
+        Number(
+          matchCountInput.value
+        );
 
-        message.textContent =
-          "Non è stato possibile creare la combinazione.";
 
-        message.classList.add(
-          "visible"
+      requestedCount =
+        Math.floor(
+          requestedCount
+        );
+
+
+      if (
+        !Number.isFinite(
+          requestedCount
+        )
+        ||
+        requestedCount < 1
+      ) {
+
+        showError(
+          "Inserisci il numero di incontri desiderato."
         );
 
         return;
@@ -1558,351 +1932,184 @@
       }
 
 
-      cards.innerHTML = "";
-
-
-      selected.forEach(
-        renderCard
-      );
-
-
-      const odd =
-        totalOdd(
-          selected
-        );
-
-
-      const potentialReturn =
-        stake * odd;
-
-
-      summaryStake.textContent =
-        euro(
-          stake
-        );
-
-
-      summaryOdd.textContent =
-        odd.toFixed(
-          2
-        );
-
-
-      summaryReturn.textContent =
-        euro(
-          potentialReturn
-        );
-
-
-      resultSubtitle.textContent =
-        `${selected.length} pronostici selezionati · indice medio BETLAB ${averageConfidence(selected).toFixed(0)}%`;
-
-
-      /*
-       * OBIETTIVO
-       */
-
       if (
-        target
-        &&
-        target > 0
+        requestedCount >
+        options.length
       ) {
 
-        const targetOdd =
-          target /
-          stake;
+        showError(
+          "Hai richiesto "
+          +
+          requestedCount
+          +
+          " incontri, ma BETLAB dispone attualmente di "
+          +
+          options.length
+          +
+          " incontri utilizzabili."
+        );
+
+        return;
+
+      }
 
 
-        const difference =
-          potentialReturn
-          -
-          target;
-
-
-        targetBadge.textContent =
-          `Obiettivo ${euro(target)}`;
-
-
-        if (
-          potentialReturn
-          >=
+      result =
+        searchFixedCount(
+          options,
+          requestedCount,
+          stake,
           target
-        ) {
+        );
 
-          targetInfo.innerHTML = `
-            Obiettivo richiesto:
-            <strong>${euro(target)}</strong>.
-            BETLAB ha trovato una combinazione da
-            <strong class="target-hit">
-              ${euro(potentialReturn)}
-            </strong>
-            con quota totale
-            <strong>${odd.toFixed(2)}</strong>.
-          `;
+    }
 
-        } else {
 
-          targetInfo.innerHTML = `
-            Per ottenere
-            <strong>${euro(target)}</strong>
-            con una puntata di
-            <strong>${euro(stake)}</strong>
-            servirebbe circa quota
-            <strong>${targetOdd.toFixed(2)}</strong>.
-            Con i pronostici attualmente disponibili,
-            la combinazione più vicina restituisce
-            <strong>${euro(potentialReturn)}</strong>.
-          `;
+    renderResult(
+      result,
+      stake,
+      target
+    );
 
-        }
+  }
+
+
+  autoButton.addEventListener(
+    "click",
+    () => {
+
+      autoMode =
+        !autoMode;
+
+
+      if (autoMode) {
+
+        autoButton.classList.remove(
+          "off"
+        );
+
+        autoButton.textContent =
+          "AUTO";
+
+        matchCountInput.disabled =
+          true;
+
+        matchHelp.textContent =
+          "AUTO: BETLAB decide quanti incontri utilizzare.";
 
       } else {
 
-        targetBadge.textContent =
-          "";
+        autoButton.classList.add(
+          "off"
+        );
+
+        autoButton.textContent =
+          "PERSONALIZZATO";
+
+        matchCountInput.disabled =
+          false;
+
+        matchCountInput.focus();
+
+        matchHelp.textContent =
+          "Scrivi direttamente quanti incontri vuoi utilizzare.";
+
+      }
+
+    }
+  );
 
 
-        targetInfo.innerHTML = `
-          La vincita è calcolata usando le quote
-          disponibili associate ai pronostici selezionati.
-          Le quote possono cambiare nel tempo.
-        `;
+  createButton.addEventListener(
+    "click",
+    createBet
+  );
+
+
+  async function loadData() {
+
+    try {
+
+      const response =
+        await fetch(
+          DATA_URL,
+          {
+            cache: "no-store"
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "HTTP "
+          +
+          response.status
+        );
 
       }
 
 
-      resultArea.classList.add(
-        "visible"
+      betlabData =
+        await response.json();
+
+
+      const options =
+        prepareOptions();
+
+
+      const candidateCount =
+        options.reduce(
+          (sum, option) =>
+            sum +
+            option.candidates.length,
+          0
+        );
+
+
+      availability.textContent =
+        options.length
+        +
+        (
+          options.length === 1
+            ? " incontro"
+            : " incontri"
+        )
+        +
+        " · "
+        +
+        candidateCount
+        +
+        " pronostici con quota utilizzabili";
+
+
+      if (!options.length) {
+
+        availability.textContent =
+          "Nessun pronostico disponibile.";
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        error
       );
 
+      availability.textContent =
+        "Errore caricamento dati BETLAB.";
 
-      resultArea.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-
-    }
-
-
-    /* ======================================================
-       LOAD DATA
-    ====================================================== */
-
-    async function loadData() {
-
-      try {
-
-        const response =
-          await fetch(
-            "data/betlab-analysis.json?v="
-            +
-            Date.now()
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Errore caricamento JSON"
-          );
-
-        }
-
-
-        const data =
-          await response.json();
-
-
-        const analysis =
-          Array.isArray(data)
-          ?
-          data
-          :
-          (
-            data.analysis
-            ||
-            data.matches
-            ||
-            []
-          );
-
-
-        availableMatches =
-          analysis
-          .filter(match => {
-
-            const prediction =
-              match.prediction
-              ||
-              {};
-
-            const odd =
-              Number(
-                prediction.odd
-              );
-
-
-            return (
-              prediction.available
-              ===
-              true
-
-              &&
-
-              prediction.oddAvailable
-              ===
-              true
-
-              &&
-
-              Number.isFinite(
-                odd
-              )
-
-              &&
-
-              odd > 1
-            );
-
-          })
-          .sort(
-            (a, b) => {
-
-              const confidenceDifference =
-                confidence(b)
-                -
-                confidence(a);
-
-              if (
-                Math.abs(
-                  confidenceDifference
-                )
-                >
-                0.001
-              ) {
-
-                return confidenceDifference;
-
-              }
-
-
-              return (
-                Number(
-                  a.timestamp || 0
-                )
-                -
-                Number(
-                  b.timestamp || 0
-                )
-              );
-
-            }
-          );
-
-
-        statusText.textContent =
-          "BETLAB pronto";
-
-
-        engineInfo.textContent =
-          `${availableMatches.length} pronostici con quota disponibili`;
-
-
-        if (
-          availableMatches.length
-          <
-          2
-        ) {
-
-          message.textContent =
-            "Al momento non ci sono abbastanza pronostici completi di quota.";
-
-          message.classList.add(
-            "visible"
-          );
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          error
-        );
-
-
-        statusText.textContent =
-          "Dati non disponibili";
-
-
-        engineInfo.textContent =
-          "Impossibile caricare i pronostici";
-
-
-        message.textContent =
-          "BETLAB non riesce a caricare i dati in questo momento.";
-
-        message.classList.add(
-          "visible"
-        );
-
-      }
+      showError(
+        "Non è stato possibile caricare betlab-analysis.json."
+      );
 
     }
 
-
-    /* ======================================================
-       EVENTS
-    ====================================================== */
-
-    createButton.addEventListener(
-      "click",
-      createBet
-    );
+  }
 
 
-    stakeInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key
-          ===
-          "Enter"
-        ) {
-
-          createBet();
-
-        }
-
-      }
-    );
-
-
-    targetInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key
-          ===
-          "Enter"
-        ) {
-
-          createBet();
-
-        }
-
-      }
-    );
-
-
-    /* ======================================================
-       START
-    ====================================================== */
-
-    loadData();
-
-  </script>
+  loadData();
+</script>
 
 </body>
 </html>
