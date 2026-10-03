@@ -2,7 +2,6 @@ name: Aggiorna feed BETLAB
 
 on:
   workflow_dispatch:
-
   schedule:
     - cron: "15 5 * * *"
     - cron: "15 11 * * *"
@@ -12,16 +11,14 @@ permissions:
   contents: write
 
 jobs:
-  update-betlab:
+  update:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Aggiorna BETLAB con pronostici e quote
+      - name: BETLAB Prediction Engine V7
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -34,123 +31,61 @@ jobs:
           import urllib.request
           import urllib.parse
 
-          from pathlib import Path
           from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
-          from collections import defaultdict
 
 
-          # ============================================================
-          # CONFIG
-          # ============================================================
+          API_KEY = os.environ["API_FOOTBALL_KEY"]
 
-          API_KEY = os.environ.get("API_FOOTBALL_KEY")
+          ROME = ZoneInfo("Europe/Rome")
 
-          if not API_KEY:
-              raise SystemExit(
-                  "ERRORE: API_FOOTBALL_KEY mancante."
+          TODAY = datetime.now(ROME).date()
+          TOMORROW = TODAY + timedelta(days=1)
+
+          DAYS = [
+              TODAY.isoformat(),
+              TOMORROW.isoformat()
+          ]
+
+          MAX_HISTORY = 10
+          MAX_SCORE_GOALS = 5
+
+          MIN_MARKET_INDEX = 55.0
+          MIN_EXACT_SCORE_PROBABILITY = 0.025
+
+
+          # ==========================================================
+          # UTILITA
+          # ==========================================================
+
+          def normalize(value):
+
+              value = str(value or "")
+
+              value = unicodedata.normalize(
+                  "NFKD",
+                  value
               )
 
-          DATA_DIR = Path("data")
-          FUTURE_DIR = DATA_DIR / "future"
-
-          DATA_DIR.mkdir(
-              exist_ok=True
-          )
-
-          FUTURE_DIR.mkdir(
-              parents=True,
-              exist_ok=True
-          )
-
-          HISTORY_FILE = (
-              DATA_DIR /
-              "betlab-history.json"
-          )
-
-          MATCHES_FILE = (
-              DATA_DIR /
-              "betlab-matches.json"
-          )
-
-          SHORTLIST_FILE = (
-              DATA_DIR /
-              "betlab-shortlist.json"
-          )
-
-          ANALYSIS_FILE = (
-              DATA_DIR /
-              "betlab-analysis.json"
-          )
-
-
-          # ============================================================
-          # API
-          # ============================================================
-
-          def api_get(
-              endpoint,
-              params
-          ):
-
-              query = urllib.parse.urlencode(
-                  params
+              value = "".join(
+                  c for c in value
+                  if not unicodedata.combining(c)
               )
 
-              url = (
-                  "https://v3.football.api-sports.io/"
-                  + endpoint
-                  + "?"
-                  + query
+              value = value.lower()
+
+              value = re.sub(
+                  r"[^a-z0-9]+",
+                  " ",
+                  value
               )
 
-              request = urllib.request.Request(
-                  url,
-                  headers={
-                      "x-apisports-key":
-                          API_KEY
-                  }
+              return " ".join(
+                  value.split()
               )
 
-              with urllib.request.urlopen(
-                  request,
-                  timeout=40
-              ) as response:
 
-                  data = json.loads(
-                      response
-                      .read()
-                      .decode("utf-8")
-                  )
-
-              errors = data.get(
-                  "errors"
-              )
-
-              if errors:
-                  raise RuntimeError(
-                      f"ERRORE API {endpoint}: {errors}"
-                  )
-
-              return data
-
-
-          # ============================================================
-          # NORMALIZZAZIONE
-          # ============================================================
-
-          CLUB_WORDS = {
-              "fc",
-              "cf",
-              "ac",
-              "sc",
-              "club",
-              "football",
-              "calcio"
-          }
-
-
-          TEAM_ALIASES = {
+          ALIASES = {
 
               "atletico mg":
                   "atletico mineiro",
@@ -179,10 +114,10 @@ jobs:
               "real sociedad b":
                   "real sociedad b",
 
-              "las palmas":
+              "ud las palmas":
                   "las palmas",
 
-              "ud las palmas":
+              "las palmas":
                   "las palmas",
 
               "valladolid":
@@ -206,25 +141,19 @@ jobs:
               "cd castellon":
                   "castellon",
 
-              "mallorca":
-                  "mallorca",
-
               "rcd mallorca":
                   "mallorca",
 
-              "inter milan":
-                  "inter",
+              "mallorca":
+                  "mallorca",
 
               "internazionale":
                   "inter",
 
-              "inter":
+              "inter milan":
                   "inter",
 
               "ac milan":
-                  "milan",
-
-              "milan":
                   "milan",
 
               "manchester united":
@@ -239,333 +168,141 @@ jobs:
               "man city":
                   "manchester city",
 
-              "wolverhampton":
-                  "wolves",
-
               "wolverhampton wanderers":
-                  "wolves",
-
-              "wolves":
                   "wolves",
 
               "paris saint germain":
                   "psg",
 
-              "paris saint-germain":
-                  "psg",
-
-              "psg":
+              "paris sg":
                   "psg",
 
               "bayern munich":
-                  "bayern munich",
+                  "bayern munchen",
 
               "bayern munchen":
-                  "bayern munich",
-
-              "fc bayern munchen":
-                  "bayern munich",
+                  "bayern munchen",
 
               "atletico madrid":
                   "atletico madrid",
 
               "atletico de madrid":
                   "atletico madrid"
+
           }
 
 
-          def basic_normalize(
-              value
-          ):
+          def canonical(value):
 
-              value = str(
-                  value or ""
-              )
+              key = normalize(value)
 
-              value = unicodedata.normalize(
-                  "NFKD",
-                  value
-              )
-
-              value = "".join(
-                  c
-                  for c in value
-                  if not unicodedata.combining(c)
-              )
-
-              value = value.lower()
-
-              value = value.replace(
-                  "&",
-                  " and "
-              )
-
-              value = re.sub(
-                  r"[^a-z0-9]+",
-                  " ",
-                  value
-              )
-
-              words = [
-                  word
-                  for word in value.split()
-                  if word not in CLUB_WORDS
-              ]
-
-              return " ".join(
-                  words
-              ).strip()
-
-
-          def canonical_team(
-              value
-          ):
-
-              key = basic_normalize(
-                  value
-              )
-
-              return TEAM_ALIASES.get(
+              return ALIASES.get(
                   key,
                   key
               )
 
 
-          # ============================================================
-          # LEAGUE PRIORITY
-          # ============================================================
+          def safe_float(value):
 
-          def league_priority(
-              country,
-              league
-          ):
+              try:
+                  return float(value)
 
-              country_key = basic_normalize(
-                  country
-              )
-
-              league_key = basic_normalize(
-                  league
-              )
+              except:
+                  return None
 
 
-              priority_5 = [
+          def clamp(value, low, high):
 
-                  ("italy", "serie a"),
-                  ("england", "premier league"),
-                  ("spain", "la liga"),
-                  ("germany", "bundesliga"),
-                  ("france", "ligue 1"),
-
-                  ("world", "uefa champions league"),
-                  ("world", "uefa europa league"),
-                  ("world", "uefa europa conference league")
-              ]
-
-
-              priority_4 = [
-
-                  ("italy", "serie b"),
-                  ("england", "championship"),
-                  ("spain", "segunda division"),
-                  ("germany", "2 bundesliga"),
-                  ("france", "ligue 2"),
-                  ("portugal", "primeira liga"),
-                  ("netherlands", "eredivisie"),
-                  ("belgium", "jupiler pro league"),
-                  ("turkey", "super lig")
-              ]
-
-
-              priority_3 = [
-
-                  ("brazil", "serie a"),
-                  ("argentina", "liga profesional argentina"),
-                  ("scotland", "premiership"),
-                  ("usa", "major league soccer"),
-                  ("mexico", "liga mx")
-              ]
-
-
-              priority_2 = [
-
-                  ("greece", "super league 1"),
-                  ("austria", "bundesliga"),
-                  ("switzerland", "super league"),
-                  ("denmark", "superliga"),
-                  ("norway", "eliteserien"),
-                  ("sweden", "allsvenskan")
-              ]
-
-
-              for c, l in priority_5:
-
-                  if (
-                      country_key == c
-                      and
-                      league_key == l
-                  ):
-                      return 5
-
-
-              for c, l in priority_4:
-
-                  if (
-                      country_key == c
-                      and
-                      league_key == l
-                  ):
-                      return 4
-
-
-              for c, l in priority_3:
-
-                  if (
-                      country_key == c
-                      and
-                      league_key == l
-                  ):
-                      return 3
-
-
-              for c, l in priority_2:
-
-                  if (
-                      country_key == c
-                      and
-                      league_key == l
-                  ):
-                      return 2
-
-
-              return 0
-
-
-          # ============================================================
-          # HISTORY
-          # ============================================================
-
-          if HISTORY_FILE.exists():
-
-              with HISTORY_FILE.open(
-                  "r",
-                  encoding="utf-8"
-              ) as f:
-
-                  history_data = json.load(
-                      f
+              return max(
+                  low,
+                  min(
+                      high,
+                      value
                   )
-
-              if isinstance(
-                  history_data,
-                  dict
-              ):
-
-                  history = (
-                      history_data.get(
-                          "matches"
-                      )
-                      or
-                      history_data.get(
-                          "history"
-                      )
-                      or
-                      []
-                  )
-
-              elif isinstance(
-                  history_data,
-                  list
-              ):
-
-                  history = history_data
-
-              else:
-
-                  history = []
-
-          else:
-
-              history = []
-
-
-          initial_history_count = len(
-              history
-          )
-
-
-          # ============================================================
-          # DATE
-          # ============================================================
-
-          rome = ZoneInfo(
-              "Europe/Rome"
-          )
-
-          now = datetime.now(
-              rome
-          )
-
-          today = now.date()
-
-          tomorrow = (
-              today
-              +
-              timedelta(days=1)
-          )
-
-
-          # ============================================================
-          # CARICA OGGI + DOMANI
-          # ============================================================
-
-          api_fixtures = []
-
-          days_loaded = []
-
-
-          for day in [
-              today,
-              tomorrow
-          ]:
-
-              day_string = (
-                  day.isoformat()
               )
 
-              data = api_get(
-                  "fixtures",
-                  {
-                      "date":
-                          day_string
+
+          # ==========================================================
+          # API
+          # ==========================================================
+
+          def api_get(endpoint, params):
+
+              query = urllib.parse.urlencode(
+                  params
+              )
+
+              url = (
+                  "https://v3.football.api-sports.io/"
+                  + endpoint
+                  + "?"
+                  + query
+              )
+
+              request = urllib.request.Request(
+                  url,
+                  headers={
+                      "x-apisports-key":
+                          API_KEY
                   }
               )
 
-              fixtures = (
-                  data.get(
-                      "response"
+              with urllib.request.urlopen(
+                  request,
+                  timeout=45
+              ) as response:
+
+                  payload = json.loads(
+                      response.read().decode(
+                          "utf-8"
+                      )
                   )
-                  or
-                  []
+
+              errors = payload.get(
+                  "errors"
               )
 
-              days_loaded.append(
-                  (
-                      day_string,
-                      len(fixtures)
+              if errors:
+                  raise RuntimeError(
+                      f"API ERROR {endpoint}: {errors}"
                   )
+
+              return payload
+
+
+          # ==========================================================
+          # FILE JSON
+          # ==========================================================
+
+          def load_json(path, default):
+
+              if not os.path.exists(path):
+                  return default
+
+              try:
+
+                  with open(
+                      path,
+                      "r",
+                      encoding="utf-8"
+                  ) as f:
+
+                      return json.load(f)
+
+              except:
+
+                  return default
+
+
+          def save_json(path, data):
+
+              os.makedirs(
+                  os.path.dirname(path),
+                  exist_ok=True
               )
 
-              api_fixtures.extend(
-                  fixtures
-              )
-
-              output_file = (
-                  FUTURE_DIR /
-                  f"{day_string}.json"
-              )
-
-              with output_file.open(
+              with open(
+                  path,
                   "w",
                   encoding="utf-8"
               ) as f:
@@ -578,201 +315,327 @@ jobs:
                   )
 
 
-          # ============================================================
-          # API FIXTURE UNIQUE
-          # ============================================================
+          # ==========================================================
+          # SCARICA OGGI + DOMANI
+          # ==========================================================
 
-          unique_api = {}
+          all_api_matches = []
 
-          for item in api_fixtures:
+          print("")
+          print("==============================================")
+          print("BETLAB MULTI-MARKET ENGINE V7")
+          print("==============================================")
+          print("")
 
-              fixture = (
-                  item.get(
-                      "fixture"
-                  )
-                  or
-                  {}
+
+          for day in DAYS:
+
+              payload = api_get(
+                  "fixtures",
+                  {
+                      "date": day
+                  }
               )
 
+              fixtures = (
+                  payload.get("response")
+                  or
+                  []
+              )
+
+              all_api_matches.extend(
+                  fixtures
+              )
+
+              future_path = (
+                  f"data/future/{day}.json"
+              )
+
+              save_json(
+                  future_path,
+                  payload
+              )
+
+              print(
+                  day,
+                  ":",
+                  len(fixtures),
+                  "partite"
+              )
+
+
+          # ==========================================================
+          # DEDUPE API
+          # ==========================================================
+
+          api_by_id = {}
+
+          for item in all_api_matches:
+
               fixture_id = (
-                  fixture.get(
-                      "id"
-                  )
+                  item.get("fixture", {})
+                  .get("id")
               )
 
               if fixture_id is not None:
 
-                  unique_api[
+                  api_by_id[
                       fixture_id
                   ] = item
 
 
-          api_fixtures = list(
-              unique_api.values()
+          all_api_matches = list(
+              api_by_id.values()
           )
 
 
-          # ============================================================
-          # AGGIUNGI RISULTATI API ALLO STORICO
-          # ============================================================
-
-          finished_statuses = {
-              "FT",
-              "AET",
-              "PEN"
-          }
+          print(
+              "Partite API uniche:",
+              len(all_api_matches)
+          )
 
 
-          existing_fixture_ids = set()
+          # ==========================================================
+          # STORICO
+          # ==========================================================
 
-          for item in history:
+          history_payload = load_json(
+              "data/betlab-history.json",
+              []
+          )
 
-              fixture_id = (
-                  item.get(
-                      "fixtureId"
-                  )
+
+          if isinstance(
+              history_payload,
+              dict
+          ):
+
+              history = (
+                  history_payload.get("matches")
                   or
-                  item.get(
-                      "fixture_id"
-                  )
+                  history_payload.get("history")
+                  or
+                  []
               )
 
-              if fixture_id:
+          else:
 
-                  existing_fixture_ids.add(
-                      str(fixture_id)
+              history = history_payload
+
+
+          print(
+              "Storico iniziale:",
+              len(history)
+          )
+
+
+          # ==========================================================
+          # FUNZIONI STORICO
+          # ==========================================================
+
+          def historical_team_name(
+              record,
+              side
+          ):
+
+              value = record.get(side)
+
+              if isinstance(value, dict):
+
+                  return value.get(
+                      "name"
+                  )
+
+              return value
+
+
+          def historical_goals(record):
+
+              home_goals = record.get(
+                  "homeGoals"
+              )
+
+              away_goals = record.get(
+                  "awayGoals"
+              )
+
+              if (
+                  home_goals is not None
+                  and
+                  away_goals is not None
+              ):
+
+                  return (
+                      home_goals,
+                      away_goals
                   )
 
 
-          new_history_results = 0
+              goal_data = (
+                  record.get("goals")
+                  or
+                  {}
+              )
+
+              return (
+                  goal_data.get("home"),
+                  goal_data.get("away")
+              )
 
 
-          for item in api_fixtures:
+          def logical_history_key(record):
+
+              date = str(
+                  record.get("date")
+                  or
+                  ""
+              )[:10]
+
+              home = historical_team_name(
+                  record,
+                  "home"
+              )
+
+              away = historical_team_name(
+                  record,
+                  "away"
+              )
+
+              return (
+                  date,
+                  canonical(home),
+                  canonical(away)
+              )
+
+
+          # ==========================================================
+          # AGGIUNGI RISULTATI COMPLETATI API
+          # ==========================================================
+
+          existing_keys = set()
+
+          for record in history:
+
+              key = logical_history_key(
+                  record
+              )
+
+              if (
+                  key[0]
+                  and
+                  key[1]
+                  and
+                  key[2]
+              ):
+
+                  existing_keys.add(
+                      key
+                  )
+
+
+          new_results = 0
+
+
+          for item in all_api_matches:
 
               fixture = (
-                  item.get(
-                      "fixture"
-                  )
+                  item.get("fixture")
                   or
                   {}
               )
 
               status = (
-                  fixture.get(
-                      "status"
-                  )
+                  fixture.get("status")
                   or
                   {}
-              )
-
-              short_status = (
-                  status.get(
-                      "short"
-                  )
-              )
-
-              if short_status not in finished_statuses:
-                  continue
+              ).get("short")
 
 
-              fixture_id = (
-                  fixture.get(
-                      "id"
-                  )
-              )
-
-              if (
-                  fixture_id
-                  and
-                  str(fixture_id)
-                  in existing_fixture_ids
-              ):
+              if status not in {
+                  "FT",
+                  "AET",
+                  "PEN"
+              }:
                   continue
 
 
               teams = (
-                  item.get(
-                      "teams"
-                  )
+                  item.get("teams")
                   or
                   {}
               )
 
               goals = (
-                  item.get(
-                      "goals"
-                  )
-                  or
-                  {}
-              )
-
-              league = (
-                  item.get(
-                      "league"
-                  )
+                  item.get("goals")
                   or
                   {}
               )
 
 
-              home_name = (
-                  (
-                      teams.get(
-                          "home"
-                      )
-                      or
-                      {}
-                  ).get(
-                      "name"
-                  )
-              )
+              home = (
+                  teams.get("home")
+                  or
+                  {}
+              ).get("name")
 
-              away_name = (
-                  (
-                      teams.get(
-                          "away"
-                      )
-                      or
-                      {}
-                  ).get(
-                      "name"
-                  )
-              )
+              away = (
+                  teams.get("away")
+                  or
+                  {}
+              ).get("name")
 
-              home_goals = (
-                  goals.get(
-                      "home"
-                  )
-              )
 
-              away_goals = (
-                  goals.get(
-                      "away"
-                  )
-              )
+              hg = goals.get("home")
+              ag = goals.get("away")
 
 
               if (
-                  not home_name
+                  not home
                   or
-                  not away_name
+                  not away
                   or
-                  home_goals is None
+                  hg is None
                   or
-                  away_goals is None
+                  ag is None
               ):
                   continue
 
 
+              date = str(
+                  fixture.get("date")
+                  or
+                  ""
+              )[:10]
+
+
+              key = (
+                  date,
+                  canonical(home),
+                  canonical(away)
+              )
+
+
+              if key in existing_keys:
+                  continue
+
+
+              league = (
+                  item.get("league")
+                  or
+                  {}
+              )
+
+
               history.append({
 
+                  "source":
+                      "api-football",
+
                   "fixtureId":
-                      fixture_id,
+                      fixture.get("id"),
 
                   "date":
-                      fixture.get(
-                          "date"
-                      ),
+                      date,
 
                   "timestamp":
                       fixture.get(
@@ -791,353 +654,366 @@ jobs:
                       ),
 
                   "home":
-                      home_name,
+                      home,
 
                   "away":
-                      away_name,
+                      away,
 
                   "homeGoals":
-                      home_goals,
+                      int(hg),
 
                   "awayGoals":
-                      away_goals,
-
-                  "source":
-                      "api-football"
+                      int(ag)
 
               })
 
 
-              if fixture_id:
-
-                  existing_fixture_ids.add(
-                      str(fixture_id)
-                  )
-
-
-              new_history_results += 1
-
-
-          # ============================================================
-          # DEDUPE LOGICO STORICO
-          # ============================================================
-
-          def history_date_key(
-              item
-          ):
-
-              raw = str(
-                  item.get(
-                      "date"
-                  )
-                  or
-                  ""
+              existing_keys.add(
+                  key
               )
 
-              return raw[:10]
+              new_results += 1
 
 
-          def history_home(
-              item
-          ):
+          # ==========================================================
+          # DEDUPE STORICO LOGICO
+          # ==========================================================
 
-              value = item.get(
-                  "home"
+          unique_history = {}
+
+          for record in history:
+
+              key = logical_history_key(
+                  record
               )
 
-              if isinstance(
-                  value,
-                  dict
-              ):
-
-                  return value.get(
-                      "name"
-                  )
-
-              return value
-
-
-          def history_away(
-              item
-          ):
-
-              value = item.get(
-                  "away"
-              )
-
-              if isinstance(
-                  value,
-                  dict
-              ):
-
-                  return value.get(
-                      "name"
-                  )
-
-              return value
-
-
-          def history_goals(
-              item
-          ):
-
-              home_goals = item.get(
-                  "homeGoals"
-              )
-
-              away_goals = item.get(
-                  "awayGoals"
-              )
-
-              if (
-                  home_goals is not None
-                  and
-                  away_goals is not None
-              ):
-
-                  return (
-                      home_goals,
-                      away_goals
-                  )
-
-
-              goals = (
-                  item.get(
-                      "goals"
-                  )
-                  or
-                  {}
-              )
-
-              return (
-                  goals.get(
-                      "home"
-                  ),
-                  goals.get(
-                      "away"
-                  )
-              )
-
-
-          logical_history = {}
-
-
-          for item in history:
-
-              home_name = history_home(
-                  item
-              )
-
-              away_name = history_away(
-                  item
-              )
-
-              home_goals, away_goals = (
-                  history_goals(
-                      item
-                  )
-              )
-
-
-              if (
-                  not home_name
-                  or
-                  not away_name
-                  or
-                  home_goals is None
-                  or
-                  away_goals is None
-              ):
+              if not all(key):
                   continue
 
 
-              key = (
-
-                  history_date_key(
-                      item
-                  ),
-
-                  canonical_team(
-                      home_name
-                  ),
-
-                  canonical_team(
-                      away_name
-                  )
-
-              )
-
-
-              old = logical_history.get(
+              old = unique_history.get(
                   key
               )
 
 
               if old is None:
 
-                  logical_history[
+                  unique_history[
                       key
-                  ] = item
+                  ] = record
 
-              else:
-
-                  old_source = (
-                      old.get(
-                          "source"
-                      )
-                      or
-                      ""
-                  )
-
-                  new_source = (
-                      item.get(
-                          "source"
-                      )
-                      or
-                      ""
-                  )
-
-                  if (
-                      new_source
-                      ==
-                      "api-football"
-                      and
-                      old_source
-                      !=
-                      "api-football"
-                  ):
-
-                      logical_history[
-                          key
-                      ] = item
+                  continue
 
 
-          history_unique = list(
-              logical_history.values()
-          )
-
-
-          # ============================================================
-          # TEAM HISTORY
-          # ============================================================
-
-          team_history = defaultdict(
-              list
-          )
-
-
-          for item in history_unique:
-
-              home_name = history_home(
-                  item
+              old_source = str(
+                  old.get("source")
+                  or
+                  ""
               )
 
-              away_name = history_away(
-                  item
-              )
-
-              home_goals, away_goals = (
-                  history_goals(
-                      item
-                  )
+              new_source = str(
+                  record.get("source")
+                  or
+                  ""
               )
 
 
               if (
-                  not home_name
-                  or
-                  not away_name
-                  or
-                  home_goals is None
-                  or
-                  away_goals is None
+                  new_source == "api-football"
+                  and
+                  old_source != "api-football"
               ):
-                  continue
+
+                  unique_history[
+                      key
+                  ] = record
 
 
-              date_key = history_date_key(
-                  item
-              )
+          history = list(
+              unique_history.values()
+          )
 
 
-              team_history[
-                  canonical_team(
-                      home_name
+          history.sort(
+              key=lambda record:
+                  str(
+                      record.get("date")
+                      or
+                      ""
                   )
-              ].append({
-
-                  "date":
-                      date_key,
-
-                  "gf":
-                      int(home_goals),
-
-                  "ga":
-                      int(away_goals),
-
-                  "home":
-                      True
-
-              })
+          )
 
 
-              team_history[
-                  canonical_team(
-                      away_name
+          save_json(
+              "data/betlab-history.json",
+              history
+          )
+
+
+          print(
+              "Nuovi risultati API:",
+              new_results
+          )
+
+          print(
+              "Storico totale:",
+              len(history)
+          )
+
+
+          # ==========================================================
+          # PRIORITA CAMPIONATI
+          # ==========================================================
+
+          def league_priority(
+              country,
+              league
+          ):
+
+              c = normalize(country)
+              l = normalize(league)
+
+
+              if (
+                  "champions league" in l
+                  or
+                  "europa league" in l
+                  or
+                  "conference league" in l
+              ):
+                  return 5
+
+
+              priority5 = [
+
+                  ("italy", "serie a"),
+                  ("england", "premier league"),
+                  ("spain", "la liga"),
+                  ("spain", "primera division"),
+                  ("germany", "bundesliga"),
+                  ("france", "ligue 1")
+
+              ]
+
+
+              for pc, pl in priority5:
+
+                  if (
+                      pc in c
+                      and
+                      pl in l
+                  ):
+                      return 5
+
+
+              priority4 = [
+
+                  ("italy", "serie b"),
+                  ("england", "championship"),
+                  ("spain", "segunda"),
+                  ("germany", "2 bundesliga"),
+                  ("france", "ligue 2"),
+                  ("portugal", "primeira"),
+                  ("netherlands", "eredivisie"),
+                  ("belgium", ""),
+                  ("turkey", "")
+
+              ]
+
+
+              for pc, pl in priority4:
+
+                  if (
+                      pc in c
+                      and
+                      (
+                          not pl
+                          or
+                          pl in l
+                      )
+                  ):
+                      return 4
+
+
+              priority3 = [
+
+                  ("brazil", "serie a"),
+                  ("argentina", ""),
+                  ("scotland", ""),
+                  ("usa", "major league soccer"),
+                  ("united states", "major league soccer"),
+                  ("mexico", "liga mx")
+
+              ]
+
+
+              for pc, pl in priority3:
+
+                  if (
+                      pc in c
+                      and
+                      (
+                          not pl
+                          or
+                          pl in l
+                      )
+                  ):
+                      return 3
+
+
+              priority2 = [
+
+                  "greece",
+                  "austria",
+                  "switzerland",
+                  "denmark",
+                  "norway",
+                  "sweden"
+
+              ]
+
+
+              for pc in priority2:
+
+                  if pc in c:
+                      return 2
+
+
+              return 0
+
+
+          # ==========================================================
+          # PARTITE STORICHE SQUADRA
+          # ==========================================================
+
+          def team_games(
+              team,
+              before_date,
+              limit=MAX_HISTORY
+          ):
+
+              key = canonical(team)
+
+              games = []
+
+
+              for record in history:
+
+                  date = str(
+                      record.get("date")
+                      or
+                      ""
+                  )[:10]
+
+
+                  if (
+                      not date
+                      or
+                      date >= before_date
+                  ):
+                      continue
+
+
+                  home = historical_team_name(
+                      record,
+                      "home"
                   )
-              ].append({
 
-                  "date":
-                      date_key,
-
-                  "gf":
-                      int(away_goals),
-
-                  "ga":
-                      int(home_goals),
-
-                  "home":
-                      False
-
-              })
+                  away = historical_team_name(
+                      record,
+                      "away"
+                  )
 
 
-          for key in team_history:
+                  hg, ag = historical_goals(
+                      record
+                  )
 
-              team_history[
-                  key
-              ].sort(
+
+                  if (
+                      not home
+                      or
+                      not away
+                      or
+                      hg is None
+                      or
+                      ag is None
+                  ):
+                      continue
+
+
+                  if canonical(home) == key:
+
+                      games.append({
+
+                          "date":
+                              date,
+
+                          "gf":
+                              int(hg),
+
+                          "ga":
+                              int(ag),
+
+                          "home":
+                              True
+
+                      })
+
+
+                  elif canonical(away) == key:
+
+                      games.append({
+
+                          "date":
+                              date,
+
+                          "gf":
+                              int(ag),
+
+                          "ga":
+                              int(hg),
+
+                          "home":
+                              False
+
+                      })
+
+
+              games.sort(
                   key=lambda x:
                       x["date"]
               )
 
 
-          # ============================================================
-          # FORM
-          # ============================================================
-
-          def calculate_form(
-              team_name,
-              target_date
-          ):
-
-              key = canonical_team(
-                  team_name
-              )
-
-              games = [
-                  game
-                  for game in team_history.get(
-                      key,
-                      []
-                  )
-                  if game["date"]
-                  <
-                  target_date
+              return games[
+                  -limit:
               ]
 
 
-              games = games[-5:]
+          # ==========================================================
+          # STATISTICHE
+          # ==========================================================
+
+          def team_stats(games):
+
+              played = len(games)
+
+              if played == 0:
+
+                  return {
+
+                      "played": 0,
+                      "wins": 0,
+                      "draws": 0,
+                      "losses": 0,
+                      "gf": 0,
+                      "ga": 0,
+                      "ppg": 0,
+                      "avgGF": 0,
+                      "avgGA": 0
+
+                  }
 
 
               wins = 0
@@ -1145,10 +1021,6 @@ jobs:
               losses = 0
               gf = 0
               ga = 0
-              points = 0
-
-
-              recent = []
 
 
               for game in games:
@@ -1158,42 +1030,19 @@ jobs:
 
 
                   if game["gf"] > game["ga"]:
-
                       wins += 1
-                      points += 3
-                      result = "V"
 
                   elif game["gf"] == game["ga"]:
-
                       draws += 1
-                      points += 1
-                      result = "N"
 
                   else:
-
                       losses += 1
-                      result = "P"
 
 
-                  recent.append({
-
-                      "date":
-                          game["date"],
-
-                      "gf":
-                          game["gf"],
-
-                      "ga":
-                          game["ga"],
-
-                      "result":
-                          result
-
-                  })
-
-
-              played = len(
-                  games
+              points = (
+                  wins * 3
+                  +
+                  draws
               )
 
 
@@ -1217,106 +1066,1335 @@ jobs:
                   "ga":
                       ga,
 
-                  "points":
-                      points,
-
                   "ppg":
                       round(
                           points / played,
-                          2
-                      )
-                      if played
-                      else 0,
+                          3
+                      ),
 
                   "avgGF":
                       round(
                           gf / played,
-                          2
-                      )
-                      if played
-                      else 0,
+                          3
+                      ),
 
                   "avgGA":
                       round(
                           ga / played,
-                          2
+                          3
                       )
-                      if played
-                      else 0,
 
-                  "recent":
-                      recent
               }
 
 
-          # ============================================================
-          # CANDIDATI
-          # ============================================================
+          # ==========================================================
+          # FREQUENZE EVENTI
+          # ==========================================================
 
-          future_statuses = {
-              "NS",
-              "TBD"
-          }
+          def event_frequency(
+              games,
+              predicate
+          ):
+
+              if not games:
+                  return 0.5
 
 
-          candidates = []
+              hits = sum(
+                  1
+                  for game in games
+                  if predicate(game)
+              )
 
 
-          for item in api_fixtures:
+              return (
+                  hits /
+                  len(games)
+              )
+
+
+          def adjusted_probability(
+              raw,
+              sample_size
+          ):
+
+              factor = min(
+                  sample_size / 10.0,
+                  1.0
+              )
+
+              return (
+                  0.50
+                  +
+                  (
+                      raw - 0.50
+                  )
+                  *
+                  factor
+              )
+
+
+          def combined_probability(
+              home_games,
+              away_games,
+              home_predicate,
+              away_predicate
+          ):
+
+              sample_size = (
+                  len(home_games)
+                  +
+                  len(away_games)
+              )
+
+
+              if sample_size == 0:
+                  return 0.5
+
+
+              home_freq = event_frequency(
+                  home_games,
+                  home_predicate
+              )
+
+              away_freq = event_frequency(
+                  away_games,
+                  away_predicate
+              )
+
+
+              raw = (
+                  home_freq
+                  +
+                  away_freq
+              ) / 2
+
+
+              return adjusted_probability(
+                  raw,
+                  sample_size
+              )
+
+
+          # ==========================================================
+          # POISSON RISULTATO ESATTO
+          # ==========================================================
+
+          def weighted_average(
+              games,
+              field
+          ):
+
+              if not games:
+                  return None
+
+
+              total = 0.0
+              weights = 0.0
+
+
+              for index, game in enumerate(
+                  games,
+                  start=1
+              ):
+
+                  weight = index
+
+                  total += (
+                      game[field]
+                      *
+                      weight
+                  )
+
+                  weights += weight
+
+
+              return (
+                  total /
+                  weights
+              )
+
+
+          def expected_goals(
+              home_games,
+              away_games
+          ):
+
+              home_attack = weighted_average(
+                  home_games,
+                  "gf"
+              )
+
+              home_defence = weighted_average(
+                  home_games,
+                  "ga"
+              )
+
+              away_attack = weighted_average(
+                  away_games,
+                  "gf"
+              )
+
+              away_defence = weighted_average(
+                  away_games,
+                  "ga"
+              )
+
+
+              if None in {
+                  home_attack,
+                  home_defence,
+                  away_attack,
+                  away_defence
+              }:
+
+                  return None, None
+
+
+              home_xg = (
+                  home_attack
+                  +
+                  away_defence
+              ) / 2
+
+
+              away_xg = (
+                  away_attack
+                  +
+                  home_defence
+              ) / 2
+
+
+              home_xg *= 1.08
+              away_xg *= 0.92
+
+
+              home_xg = clamp(
+                  home_xg,
+                  0.25,
+                  3.50
+              )
+
+              away_xg = clamp(
+                  away_xg,
+                  0.20,
+                  3.50
+              )
+
+
+              return (
+                  home_xg,
+                  away_xg
+              )
+
+
+          def poisson_probability(
+              goals,
+              expected
+          ):
+
+              return (
+                  math.exp(-expected)
+                  *
+                  expected ** goals
+                  /
+                  math.factorial(goals)
+              )
+
+
+          # ==========================================================
+          # CANDIDATI PARTITA
+          # ==========================================================
+
+          def create_candidate(
+              market,
+              selection,
+              probability,
+              source="frequency"
+          ):
+
+              probability = clamp(
+                  probability,
+                  0.01,
+                  0.99
+              )
+
+
+              return {
+
+                  "market":
+                      market,
+
+                  "selection":
+                      selection,
+
+                  "modelProbability":
+                      round(
+                          probability,
+                          5
+                      ),
+
+                  "index":
+                      round(
+                          probability * 100,
+                          1
+                      ),
+
+                  "model":
+                      source,
+
+                  "oddAvailable":
+                      False,
+
+                  "odd":
+                      None,
+
+                  "bookmaker":
+                      None,
+
+                  "apiMarket":
+                      None,
+
+                  "apiSelection":
+                      None,
+
+                  "value":
+                      None
+
+              }
+
+
+          def build_market_candidates(
+              home_games,
+              away_games
+          ):
+
+              candidates = []
+
+              sample_size = (
+                  len(home_games)
+                  +
+                  len(away_games)
+              )
+
+
+              if (
+                  len(home_games) == 0
+                  or
+                  len(away_games) == 0
+              ):
+
+                  return candidates
+
+
+              # ------------------------------------------------------
+              # 1 / X / 2
+              # ------------------------------------------------------
+
+              home_win = combined_probability(
+                  home_games,
+                  away_games,
+                  lambda g:
+                      g["gf"] > g["ga"],
+                  lambda g:
+                      g["gf"] < g["ga"]
+              )
+
+              draw = combined_probability(
+                  home_games,
+                  away_games,
+                  lambda g:
+                      g["gf"] == g["ga"],
+                  lambda g:
+                      g["gf"] == g["ga"]
+              )
+
+              away_win = combined_probability(
+                  home_games,
+                  away_games,
+                  lambda g:
+                      g["gf"] < g["ga"],
+                  lambda g:
+                      g["gf"] > g["ga"]
+              )
+
+
+              total_1x2 = (
+                  home_win
+                  +
+                  draw
+                  +
+                  away_win
+              )
+
+
+              if total_1x2 > 0:
+
+                  home_win /= total_1x2
+                  draw /= total_1x2
+                  away_win /= total_1x2
+
+
+              candidates.extend([
+
+                  create_candidate(
+                      "1X2",
+                      "1",
+                      home_win
+                  ),
+
+                  create_candidate(
+                      "1X2",
+                      "X",
+                      draw
+                  ),
+
+                  create_candidate(
+                      "1X2",
+                      "2",
+                      away_win
+                  )
+
+              ])
+
+
+              # ------------------------------------------------------
+              # DOPPIA CHANCE
+              # ------------------------------------------------------
+
+              candidates.extend([
+
+                  create_candidate(
+                      "Doppia Chance",
+                      "1X",
+                      clamp(
+                          home_win + draw,
+                          0,
+                          0.99
+                      )
+                  ),
+
+                  create_candidate(
+                      "Doppia Chance",
+                      "X2",
+                      clamp(
+                          draw + away_win,
+                          0,
+                          0.99
+                      )
+                  ),
+
+                  create_candidate(
+                      "Doppia Chance",
+                      "12",
+                      clamp(
+                          home_win + away_win,
+                          0,
+                          0.99
+                      )
+                  )
+
+              ])
+
+
+              # ------------------------------------------------------
+              # GOAL / NO GOAL
+              # ------------------------------------------------------
+
+              btts = combined_probability(
+                  home_games,
+                  away_games,
+                  lambda g:
+                      g["gf"] > 0
+                      and
+                      g["ga"] > 0,
+                  lambda g:
+                      g["gf"] > 0
+                      and
+                      g["ga"] > 0
+              )
+
+
+              candidates.extend([
+
+                  create_candidate(
+                      "Goal/No Goal",
+                      "GOAL",
+                      btts
+                  ),
+
+                  create_candidate(
+                      "Goal/No Goal",
+                      "NO GOAL",
+                      1 - btts
+                  )
+
+              ])
+
+
+              # ------------------------------------------------------
+              # OVER / UNDER
+              # ------------------------------------------------------
+
+              for line in [
+                  1.5,
+                  2.5,
+                  3.5
+              ]:
+
+                  over = combined_probability(
+                      home_games,
+                      away_games,
+                      lambda g, line=line:
+                          (
+                              g["gf"]
+                              +
+                              g["ga"]
+                          ) > line,
+                      lambda g, line=line:
+                          (
+                              g["gf"]
+                              +
+                              g["ga"]
+                          ) > line
+                  )
+
+
+                  candidates.extend([
+
+                      create_candidate(
+                          "Totale Gol",
+                          f"OVER {line}",
+                          over
+                      ),
+
+                      create_candidate(
+                          "Totale Gol",
+                          f"UNDER {line}",
+                          1 - over
+                      )
+
+                  ])
+
+
+              # ------------------------------------------------------
+              # PARI / DISPARI
+              # ------------------------------------------------------
+
+              even = combined_probability(
+                  home_games,
+                  away_games,
+                  lambda g:
+                      (
+                          g["gf"]
+                          +
+                          g["ga"]
+                      ) % 2 == 0,
+                  lambda g:
+                      (
+                          g["gf"]
+                          +
+                          g["ga"]
+                      ) % 2 == 0
+              )
+
+
+              candidates.extend([
+
+                  create_candidate(
+                      "Pari/Dispari",
+                      "PARI",
+                      even
+                  ),
+
+                  create_candidate(
+                      "Pari/Dispari",
+                      "DISPARI",
+                      1 - even
+                  )
+
+              ])
+
+
+              # ------------------------------------------------------
+              # SOMMA GOL
+              # ------------------------------------------------------
+
+              ranges = [
+
+                  (
+                      "0-1",
+                      lambda total:
+                          total <= 1
+                  ),
+
+                  (
+                      "2-3",
+                      lambda total:
+                          2 <= total <= 3
+                  ),
+
+                  (
+                      "4-5",
+                      lambda total:
+                          4 <= total <= 5
+                  ),
+
+                  (
+                      "6+",
+                      lambda total:
+                          total >= 6
+                  )
+
+              ]
+
+
+              for label, condition in ranges:
+
+                  probability = (
+                      combined_probability(
+                          home_games,
+                          away_games,
+                          lambda g, condition=condition:
+                              condition(
+                                  g["gf"]
+                                  +
+                                  g["ga"]
+                              ),
+                          lambda g, condition=condition:
+                              condition(
+                                  g["gf"]
+                                  +
+                                  g["ga"]
+                              )
+                      )
+                  )
+
+
+                  candidates.append(
+                      create_candidate(
+                          "Somma Gol",
+                          label,
+                          probability
+                      )
+                  )
+
+
+              # ------------------------------------------------------
+              # RISULTATI ESATTI
+              # ------------------------------------------------------
+
+              if (
+                  len(home_games) >= 3
+                  and
+                  len(away_games) >= 3
+              ):
+
+                  home_xg, away_xg = (
+                      expected_goals(
+                          home_games,
+                          away_games
+                      )
+                  )
+
+
+                  if (
+                      home_xg is not None
+                      and
+                      away_xg is not None
+                  ):
+
+                      for hg in range(
+                          MAX_SCORE_GOALS + 1
+                      ):
+
+                          for ag in range(
+                              MAX_SCORE_GOALS + 1
+                          ):
+
+                              probability = (
+
+                                  poisson_probability(
+                                      hg,
+                                      home_xg
+                                  )
+
+                                  *
+
+                                  poisson_probability(
+                                      ag,
+                                      away_xg
+                                  )
+
+                              )
+
+
+                              if (
+                                  probability
+                                  <
+                                  MIN_EXACT_SCORE_PROBABILITY
+                              ):
+                                  continue
+
+
+                              candidate = (
+                                  create_candidate(
+                                      "Risultato Esatto",
+                                      f"{hg}:{ag}",
+                                      probability,
+                                      "poisson"
+                                  )
+                              )
+
+
+                              candidate[
+                                  "expectedHomeGoals"
+                              ] = round(
+                                  home_xg,
+                                  3
+                              )
+
+                              candidate[
+                                  "expectedAwayGoals"
+                              ] = round(
+                                  away_xg,
+                                  3
+                              )
+
+
+                              candidates.append(
+                                  candidate
+                              )
+
+
+              # ------------------------------------------------------
+              # ORDINA
+              # ------------------------------------------------------
+
+              candidates.sort(
+                  key=lambda c:
+                      c["index"],
+                  reverse=True
+              )
+
+
+              return candidates
+
+
+          # ==========================================================
+          # MATCHER QUOTE STRETTO
+          # ==========================================================
+
+          def market_normalized(
+              value
+          ):
+
+              return normalize(value)
+
+
+          def forbidden_market(
+              market_name
+          ):
+
+              name = market_normalized(
+                  market_name
+              )
+
+
+              forbidden = [
+
+                  "first half",
+                  "second half",
+                  "1st half",
+                  "2nd half",
+                  "half time",
+                  "halftime",
+                  "yellow",
+                  "card",
+                  "booking",
+                  "corner",
+                  "player",
+                  "team total",
+                  "home team",
+                  "away team",
+                  "minute"
+
+              ]
+
+
+              return any(
+                  text in name
+                  for text in forbidden
+              )
+
+
+          def score_tuple(value):
+
+              match = re.fullmatch(
+                  r"\s*(\d+)\s*[:\-]\s*(\d+)\s*",
+                  str(value or "")
+              )
+
+
+              if not match:
+                  return None
+
+
+              return (
+                  int(match.group(1)),
+                  int(match.group(2))
+              )
+
+
+          def selection_matches(
+              candidate,
+              api_market,
+              api_value
+          ):
+
+              if forbidden_market(
+                  api_market
+              ):
+                  return False
+
+
+              market = candidate[
+                  "market"
+              ]
+
+              selection = candidate[
+                  "selection"
+              ]
+
+              m = market_normalized(
+                  api_market
+              )
+
+              v = normalize(
+                  api_value
+              )
+
+
+              # ------------------------------------------------------
+              # 1X2
+              # ------------------------------------------------------
+
+              if market == "1X2":
+
+                  if m not in {
+                      "match winner",
+                      "1x2"
+                  }:
+                      return False
+
+
+                  if selection == "1":
+
+                      return v in {
+                          "home",
+                          "1"
+                      }
+
+
+                  if selection == "X":
+
+                      return v in {
+                          "draw",
+                          "x"
+                      }
+
+
+                  if selection == "2":
+
+                      return v in {
+                          "away",
+                          "2"
+                      }
+
+
+              # ------------------------------------------------------
+              # DOUBLE CHANCE - ESATTO
+              # ------------------------------------------------------
+
+              if market == "Doppia Chance":
+
+                  if m != "double chance":
+                      return False
+
+
+                  accepted = {
+
+                      "1X": {
+                          "home draw",
+                          "1x"
+                      },
+
+                      "X2": {
+                          "draw away",
+                          "x2"
+                      },
+
+                      "12": {
+                          "home away",
+                          "12"
+                      }
+
+                  }
+
+
+                  return (
+                      v
+                      in
+                      accepted.get(
+                          selection,
+                          set()
+                      )
+                  )
+
+
+              # ------------------------------------------------------
+              # BTTS
+              # ------------------------------------------------------
+
+              if market == "Goal/No Goal":
+
+                  if m not in {
+                      "both teams score",
+                      "both teams to score"
+                  }:
+                      return False
+
+
+                  if selection == "GOAL":
+
+                      return v in {
+                          "yes",
+                          "goal"
+                      }
+
+
+                  if selection == "NO GOAL":
+
+                      return v in {
+                          "no",
+                          "no goal"
+                      }
+
+
+              # ------------------------------------------------------
+              # OVER / UNDER FULL TIME
+              # ------------------------------------------------------
+
+              if market == "Totale Gol":
+
+                  if m not in {
+                      "goals over under",
+                      "over under",
+                      "total goals"
+                  }:
+                      return False
+
+
+                  expected = normalize(
+                      selection
+                  )
+
+
+                  return (
+                      v == expected
+                  )
+
+
+              # ------------------------------------------------------
+              # PARI / DISPARI
+              # ------------------------------------------------------
+
+              if market == "Pari/Dispari":
+
+                  if m not in {
+                      "odd even",
+                      "goals odd even"
+                  }:
+                      return False
+
+
+                  if selection == "PARI":
+
+                      return v in {
+                          "even",
+                          "pari"
+                      }
+
+
+                  if selection == "DISPARI":
+
+                      return v in {
+                          "odd",
+                          "dispari"
+                      }
+
+
+              # ------------------------------------------------------
+              # SOMMA GOL
+              # ------------------------------------------------------
+
+              if market == "Somma Gol":
+
+                  allowed_markets = {
+                      "total goals",
+                      "goal bands",
+                      "goals range",
+                      "total goal range"
+                  }
+
+
+                  if m not in allowed_markets:
+                      return False
+
+
+                  expected = normalize(
+                      selection
+                  )
+
+
+                  return (
+                      v == expected
+                  )
+
+
+              # ------------------------------------------------------
+              # RISULTATO ESATTO FULL TIME
+              # ------------------------------------------------------
+
+              if market == "Risultato Esatto":
+
+                  if m not in {
+                      "exact score",
+                      "correct score",
+                      "full time correct score",
+                      "fulltime correct score"
+                  }:
+                      return False
+
+
+                  api_score = score_tuple(
+                      api_value
+                  )
+
+                  betlab_score = score_tuple(
+                      selection
+                  )
+
+
+                  return (
+                      api_score is not None
+                      and
+                      api_score == betlab_score
+                  )
+
+
+              return False
+
+
+          # ==========================================================
+          # RECUPERA QUOTE FIXTURE
+          # ==========================================================
+
+          odds_cache = {}
+
+
+          def get_fixture_odds(
+              fixture_id
+          ):
+
+              if fixture_id in odds_cache:
+
+                  return odds_cache[
+                      fixture_id
+                  ]
+
+
+              page = 1
+              blocks = []
+
+
+              while True:
+
+                  payload = api_get(
+                      "odds",
+                      {
+                          "fixture":
+                              fixture_id,
+
+                          "page":
+                              page
+                      }
+                  )
+
+
+                  blocks.extend(
+                      payload.get(
+                          "response"
+                      )
+                      or
+                      []
+                  )
+
+
+                  paging = (
+                      payload.get(
+                          "paging"
+                      )
+                      or
+                      {}
+                  )
+
+
+                  current = int(
+                      paging.get(
+                          "current"
+                      )
+                      or
+                      page
+                  )
+
+                  total = int(
+                      paging.get(
+                          "total"
+                      )
+                      or
+                      1
+                  )
+
+
+                  if current >= total:
+                      break
+
+
+                  page += 1
+
+
+              odds_cache[
+                  fixture_id
+              ] = blocks
+
+
+              return blocks
+
+
+          # ==========================================================
+          # ASSOCIA MIGLIORE QUOTA
+          # ==========================================================
+
+          def attach_best_odds(
+              fixture_id,
+              candidates
+          ):
+
+              blocks = get_fixture_odds(
+                  fixture_id
+              )
+
+
+              for candidate in candidates:
+
+                  best = None
+
+
+                  for block in blocks:
+
+                      bookmakers = (
+                          block.get(
+                              "bookmakers"
+                          )
+                          or
+                          []
+                      )
+
+
+                      for bookmaker in bookmakers:
+
+                          bookmaker_name = (
+                              bookmaker.get(
+                                  "name"
+                              )
+                              or
+                              "Bookmaker"
+                          )
+
+
+                          for bet in (
+                              bookmaker.get(
+                                  "bets"
+                              )
+                              or
+                              []
+                          ):
+
+                              market_name = (
+                                  bet.get(
+                                      "name"
+                                  )
+                                  or
+                                  ""
+                              )
+
+
+                              for value in (
+                                  bet.get(
+                                      "values"
+                                  )
+                                  or
+                                  []
+                              ):
+
+                                  api_value = (
+                                      value.get(
+                                          "value"
+                                      )
+                                  )
+
+
+                                  if not selection_matches(
+                                      candidate,
+                                      market_name,
+                                      api_value
+                                  ):
+                                      continue
+
+
+                                  odd = safe_float(
+                                      value.get(
+                                          "odd"
+                                      )
+                                  )
+
+
+                                  if (
+                                      odd is None
+                                      or
+                                      odd <= 1
+                                  ):
+                                      continue
+
+
+                                  if (
+                                      best is None
+                                      or
+                                      odd > best[
+                                          "odd"
+                                      ]
+                                  ):
+
+                                      best = {
+
+                                          "odd":
+                                              odd,
+
+                                          "bookmaker":
+                                              bookmaker_name,
+
+                                          "apiMarket":
+                                              market_name,
+
+                                          "apiSelection":
+                                              str(
+                                                  api_value
+                                              )
+
+                                      }
+
+
+                  if best is None:
+                      continue
+
+
+                  candidate[
+                      "oddAvailable"
+                  ] = True
+
+                  candidate[
+                      "odd"
+                  ] = round(
+                      best["odd"],
+                      3
+                  )
+
+                  candidate[
+                      "bookmaker"
+                  ] = best[
+                      "bookmaker"
+                  ]
+
+                  candidate[
+                      "apiMarket"
+                  ] = best[
+                      "apiMarket"
+                  ]
+
+                  candidate[
+                      "apiSelection"
+                  ] = best[
+                      "apiSelection"
+                  ]
+
+
+                  probability = candidate[
+                      "modelProbability"
+                  ]
+
+
+                  candidate[
+                      "value"
+                  ] = round(
+                      probability
+                      *
+                      best["odd"],
+                      3
+                  )
+
+
+              return candidates
+
+
+          # ==========================================================
+          # COSTRUISCI CANDIDATE PARTITE
+          # ==========================================================
+
+          candidate_matches = []
+
+
+          for item in all_api_matches:
 
               fixture = (
-                  item.get(
-                      "fixture"
-                  )
+                  item.get("fixture")
                   or
                   {}
               )
 
               status = (
-                  fixture.get(
-                      "status"
-                  )
+                  fixture.get("status")
                   or
                   {}
-              )
+              ).get("short")
 
-              if (
-                  status.get(
-                      "short"
-                  )
-                  not in future_statuses
-              ):
+
+              if status not in {
+                  "NS",
+                  "TBD"
+              }:
                   continue
 
 
               league = (
-                  item.get(
-                      "league"
-                  )
+                  item.get("league")
                   or
                   {}
               )
 
-              country = (
-                  league.get(
-                      "country"
-                  )
-                  or
-                  ""
-              )
-
-              league_name = (
-                  league.get(
-                      "name"
-                  )
-                  or
-                  ""
-              )
-
-
               priority = league_priority(
-                  country,
-                  league_name
+                  league.get("country"),
+                  league.get("name")
               )
 
 
@@ -1325,96 +2403,64 @@ jobs:
 
 
               teams = (
-                  item.get(
-                      "teams"
-                  )
+                  item.get("teams")
                   or
                   {}
               )
+
 
               home = (
-                  teams.get(
-                      "home"
-                  )
+                  teams.get("home")
                   or
                   {}
-              )
+              ).get("name")
 
               away = (
-                  teams.get(
-                      "away"
-                  )
+                  teams.get("away")
                   or
                   {}
-              )
+              ).get("name")
 
 
-              home_name = (
-                  home.get(
-                      "name"
-                  )
-              )
-
-              away_name = (
-                  away.get(
-                      "name"
-                  )
-              )
-
-
-              if (
-                  not home_name
-                  or
-                  not away_name
-              ):
+              if not home or not away:
                   continue
 
 
-              fixture_date = (
-                  fixture.get(
-                      "date"
-                  )
+              date = str(
+                  fixture.get("date")
                   or
                   ""
+              )[:10]
+
+
+              home_games = team_games(
+                  home,
+                  date
               )
 
-
-              target_date = (
-                  fixture_date[:10]
-              )
-
-
-              home_form = calculate_form(
-                  home_name,
-                  target_date
-              )
-
-              away_form = calculate_form(
-                  away_name,
-                  target_date
+              away_games = team_games(
+                  away,
+                  date
               )
 
 
               history_score = (
-                  home_form[
-                      "played"
-                  ]
+                  len(home_games)
                   +
-                  away_form[
-                      "played"
-                  ]
+                  len(away_games)
               )
 
 
-              candidates.append({
+              candidate_matches.append({
+
+                  "raw":
+                      item,
 
                   "fixtureId":
-                      fixture.get(
-                          "id"
-                      ),
+                      fixture.get("id"),
 
                   "date":
-                      fixture_date,
+                      date,
 
                   "timestamp":
                       fixture.get(
@@ -1423,1319 +2469,421 @@ jobs:
                       ),
 
                   "country":
-                      country,
+                      league.get(
+                          "country"
+                      ),
 
                   "league":
-                      league_name,
-
-                  "leagueId":
                       league.get(
-                          "id"
+                          "name"
                       ),
 
                   "priority":
                       priority,
 
+                  "home":
+                      home,
+
+                  "away":
+                      away,
+
+                  "homeGames":
+                      home_games,
+
+                  "awayGames":
+                      away_games,
+
+                  "historyScore":
+                      history_score
+
+              })
+
+
+          candidate_matches.sort(
+              key=lambda m: (
+
+                  -int(
+                      len(
+                          m["homeGames"]
+                      ) >= 5
+                      and
+                      len(
+                          m["awayGames"]
+                      ) >= 5
+                  ),
+
+                  -int(
+                      len(
+                          m["homeGames"]
+                      ) > 0
+                      and
+                      len(
+                          m["awayGames"]
+                      ) > 0
+                  ),
+
+                  -m[
+                      "historyScore"
+                  ],
+
+                  -m[
+                      "priority"
+                  ],
+
+                  m[
+                      "timestamp"
+                  ]
+
+              )
+          )
+
+
+          print(
+              "Candidate oggi + domani:",
+              len(candidate_matches)
+          )
+
+
+          # ==========================================================
+          # ANALISI + QUOTE
+          # ==========================================================
+
+          analysis = []
+
+          matches_with_candidates = 0
+          total_market_candidates = 0
+          total_candidates_with_odds = 0
+          exact_scores_with_odds = 0
+
+
+          # massimo 30 partite analizzate
+          for match in candidate_matches[:30]:
+
+              home_games = match[
+                  "homeGames"
+              ]
+
+              away_games = match[
+                  "awayGames"
+              ]
+
+
+              home_stats = team_stats(
+                  home_games
+              )
+
+              away_stats = team_stats(
+                  away_games
+              )
+
+
+              candidates = (
+                  build_market_candidates(
+                      home_games,
+                      away_games
+                  )
+              )
+
+
+              # scarta mercati ordinari sotto indice minimo
+              filtered = []
+
+
+              for candidate in candidates:
+
+                  if (
+                      candidate[
+                          "market"
+                      ]
+                      ==
+                      "Risultato Esatto"
+                  ):
+
+                      filtered.append(
+                          candidate
+                      )
+
+                  elif (
+                      candidate[
+                          "index"
+                      ]
+                      >=
+                      MIN_MARKET_INDEX
+                  ):
+
+                      filtered.append(
+                          candidate
+                      )
+
+
+              candidates = filtered
+
+
+              if candidates:
+
+                  try:
+
+                      candidates = attach_best_odds(
+                          match[
+                              "fixtureId"
+                          ],
+                          candidates
+                      )
+
+                  except Exception as exc:
+
+                      print(
+                          "ERRORE QUOTE",
+                          match["home"],
+                          "-",
+                          match["away"],
+                          ":",
+                          exc
+                      )
+
+
+              # solo candidati con quota
+              quoted_candidates = [
+
+                  c
+                  for c in candidates
+                  if c[
+                      "oddAvailable"
+                  ]
+
+              ]
+
+
+              quoted_candidates.sort(
+                  key=lambda c: (
+
+                      -c[
+                          "index"
+                      ],
+
+                      -(
+                          c[
+                              "value"
+                          ]
+                          or
+                          0
+                      )
+
+                  )
+              )
+
+
+              if quoted_candidates:
+
+                  matches_with_candidates += 1
+
+
+              total_market_candidates += len(
+                  candidates
+              )
+
+              total_candidates_with_odds += len(
+                  quoted_candidates
+              )
+
+
+              exact_scores_with_odds += sum(
+
+                  1
+                  for c in quoted_candidates
+                  if c[
+                      "market"
+                  ]
+                  ==
+                  "Risultato Esatto"
+
+              )
+
+
+              # compatibilità temporanea con vecchia homepage:
+              # primo candidato diventa prediction
+              if quoted_candidates:
+
+                  best = quoted_candidates[0]
+
+
+                  prediction = {
+
+                      "available":
+                          True,
+
+                      "selection":
+                          best[
+                              "selection"
+                          ],
+
+                      "market":
+                          best[
+                              "market"
+                          ],
+
+                      "confidence":
+                          best[
+                              "index"
+                          ],
+
+                      "oddAvailable":
+                          True,
+
+                      "odd":
+                          best[
+                              "odd"
+                          ],
+
+                      "bookmaker":
+                          best[
+                              "bookmaker"
+                          ],
+
+                      "apiMarket":
+                          best[
+                              "apiMarket"
+                          ],
+
+                      "apiSelection":
+                          best[
+                              "apiSelection"
+                          ]
+
+                  }
+
+              else:
+
+                  prediction = {
+
+                      "available":
+                          False,
+
+                      "selection":
+                          None,
+
+                      "market":
+                          None,
+
+                      "confidence":
+                          None,
+
+                      "oddAvailable":
+                          False,
+
+                      "odd":
+                          None,
+
+                      "bookmaker":
+                          None
+
+                  }
+
+
+              analysis.append({
+
+                  "fixtureId":
+                      match[
+                          "fixtureId"
+                      ],
+
+                  "date":
+                      match[
+                          "date"
+                      ],
+
+                  "timestamp":
+                      match[
+                          "timestamp"
+                      ],
+
+                  "country":
+                      match[
+                          "country"
+                      ],
+
+                  "league":
+                      match[
+                          "league"
+                      ],
+
+                  "priority":
+                      match[
+                          "priority"
+                      ],
+
                   "home": {
 
-                      "id":
-                          home.get(
-                              "id"
-                          ),
-
                       "name":
-                          home_name,
+                          match[
+                              "home"
+                          ],
 
                       "form":
-                          home_form
+                          home_stats
 
                   },
 
                   "away": {
 
-                      "id":
-                          away.get(
-                              "id"
-                          ),
-
                       "name":
-                          away_name,
+                          match[
+                              "away"
+                          ],
 
                       "form":
-                          away_form
+                          away_stats
 
                   },
 
                   "historyScore":
-                      history_score,
+                      match[
+                          "historyScore"
+                      ],
 
-                  "dataCoverage":
-                      round(
-                          history_score / 10,
-                          2
-                      ),
+                  "prediction":
+                      prediction,
 
-                  "prediction": {
-                      "available":
-                          False
-                  }
+                  "candidates":
+                      quoted_candidates
 
               })
 
 
-          # ============================================================
-          # SORT CANDIDATI
-          # ============================================================
+          # ==========================================================
+          # SALVA ANALISI
+          # ==========================================================
 
-          def candidate_rank(
-              match
-          ):
+          output = {
 
-              home_played = (
-                  match["home"]
-                  ["form"]
-                  ["played"]
-              )
+              "engine":
+                  "BETLAB V7 MULTI-MARKET",
 
-              away_played = (
-                  match["away"]
-                  ["form"]
-                  ["played"]
-              )
-
-
-              complete = (
-                  1
-                  if
-                  home_played >= 5
-                  and
-                  away_played >= 5
-                  else
-                  0
-              )
-
-
-              both = (
-                  1
-                  if
-                  home_played > 0
-                  and
-                  away_played > 0
-                  else
-                  0
-              )
-
-
-              return (
-
-                  -complete,
-                  -both,
-                  -match[
-                      "historyScore"
-                  ],
-                  -match[
-                      "priority"
-                  ],
-                  match[
-                      "timestamp"
-                  ]
-
-              )
-
-
-          candidates.sort(
-              key=candidate_rank
-          )
-
-
-          # ============================================================
-          # PREDICTION ENGINE
-          # ============================================================
-
-          def adjusted_confidence(
-              raw,
-              sample_size
-          ):
-
-              factor = min(
-                  sample_size / 10,
-                  1
-              )
-
-              adjusted = (
-                  0.50
-                  +
-                  (
-                      raw
-                      -
-                      0.50
-                  )
-                  *
-                  factor
-              )
-
-              return adjusted
-
-
-          def build_prediction(
-              match
-          ):
-
-              home_games = (
-                  match["home"]
-                  ["form"]
-                  ["recent"]
-              )
-
-              away_games = (
-                  match["away"]
-                  ["form"]
-                  ["recent"]
-              )
-
-
-              if (
-                  not home_games
-                  or
-                  not away_games
-              ):
-
-                  return {
-                      "available":
-                          False,
-
-                      "reason":
-                          "Storico insufficiente"
-                  }
-
-
-              sample = (
-                  len(home_games)
-                  +
-                  len(away_games)
-              )
-
-
-              markets = []
-
-
-              def add_market(
-                  market,
-                  prediction,
-                  raw
-              ):
-
-                  confidence = (
-                      adjusted_confidence(
-                          raw,
-                          sample
-                      )
-                  )
-
-                  markets.append({
-
-                      "market":
-                          market,
-
-                      "prediction":
-                          prediction,
-
-                      "confidence":
-                          confidence
-
-                  })
-
-
-              # --------------------------------------------------------
-              # 1X2 / DOUBLE CHANCE
-              # --------------------------------------------------------
-
-              home_positive = sum(
-
-                  1
-                  for game in home_games
-                  if game["result"]
-                  in ("V", "N")
-
-              )
-
-
-              away_positive = sum(
-
-                  1
-                  for game in away_games
-                  if game["result"]
-                  in ("V", "N")
-
-              )
-
-
-              home_win = sum(
-
-                  1
-                  for game in home_games
-                  if game["result"]
-                  ==
-                  "V"
-
-              )
-
-
-              away_win = sum(
-
-                  1
-                  for game in away_games
-                  if game["result"]
-                  ==
-                  "V"
-
-              )
-
-
-              home_draw = sum(
-
-                  1
-                  for game in home_games
-                  if game["result"]
-                  ==
-                  "N"
-
-              )
-
-
-              away_draw = sum(
-
-                  1
-                  for game in away_games
-                  if game["result"]
-                  ==
-                  "N"
-
-              )
-
-
-              home_loss = sum(
-
-                  1
-                  for game in home_games
-                  if game["result"]
-                  ==
-                  "P"
-
-              )
-
-
-              away_loss = sum(
-
-                  1
-                  for game in away_games
-                  if game["result"]
-                  ==
-                  "P"
-
-              )
-
-
-              raw_home = (
-                  (
-                      home_win
-                      +
-                      away_loss
-                  )
-                  /
-                  sample
-              )
-
-
-              raw_draw = (
-                  (
-                      home_draw
-                      +
-                      away_draw
-                  )
-                  /
-                  sample
-              )
-
-
-              raw_away = (
-                  (
-                      away_win
-                      +
-                      home_loss
-                  )
-                  /
-                  sample
-              )
-
-
-              add_market(
-                  "Esito Finale",
-                  "1",
-                  raw_home
-              )
-
-              add_market(
-                  "Esito Finale",
-                  "X",
-                  raw_draw
-              )
-
-              add_market(
-                  "Esito Finale",
-                  "2",
-                  raw_away
-              )
-
-
-              raw_1x = (
-                  (
-                      home_positive
-                      +
-                      (
-                          len(away_games)
-                          -
-                          away_win
-                      )
-                  )
-                  /
-                  sample
-              )
-
-
-              raw_x2 = (
-                  (
-                      away_positive
-                      +
-                      (
-                          len(home_games)
-                          -
-                          home_win
-                      )
-                  )
-                  /
-                  sample
-              )
-
-
-              raw_12 = (
-                  (
-                      (
-                          len(home_games)
-                          -
-                          home_draw
-                      )
-                      +
-                      (
-                          len(away_games)
-                          -
-                          away_draw
-                      )
-                  )
-                  /
-                  sample
-              )
-
-
-              add_market(
-                  "Doppia Chance",
-                  "1X",
-                  raw_1x
-              )
-
-              add_market(
-                  "Doppia Chance",
-                  "X2",
-                  raw_x2
-              )
-
-              add_market(
-                  "Doppia Chance",
-                  "12",
-                  raw_12
-              )
-
-
-              # --------------------------------------------------------
-              # GOAL / NO GOAL
-              # --------------------------------------------------------
-
-              all_games = (
-                  home_games
-                  +
-                  away_games
-              )
-
-
-              btts = sum(
-
-                  1
-                  for game in all_games
-                  if game["gf"] > 0
-                  and game["ga"] > 0
-
-              )
-
-
-              raw_goal = (
-                  btts
-                  /
-                  sample
-              )
-
-
-              add_market(
-                  "Goal / No Goal",
-                  "GOAL",
-                  raw_goal
-              )
-
-              add_market(
-                  "Goal / No Goal",
-                  "NO GOAL",
-                  1 - raw_goal
-              )
-
-
-              # --------------------------------------------------------
-              # OVER UNDER
-              # --------------------------------------------------------
-
-              for line in [
-                  1.5,
-                  2.5,
-                  3.5
-              ]:
-
-                  over_count = sum(
-
-                      1
-                      for game in all_games
-                      if (
-                          game["gf"]
-                          +
-                          game["ga"]
-                      )
-                      >
-                      line
-
-                  )
-
-
-                  raw_over = (
-                      over_count
-                      /
-                      sample
-                  )
-
-
-                  add_market(
-                      "Totale Gol",
-                      f"OVER {line}",
-                      raw_over
-                  )
-
-
-                  add_market(
-                      "Totale Gol",
-                      f"UNDER {line}",
-                      1 - raw_over
-                  )
-
-
-              # --------------------------------------------------------
-              # PARI / DISPARI
-              # --------------------------------------------------------
-
-              even_count = sum(
-
-                  1
-                  for game in all_games
-                  if (
-                      game["gf"]
-                      +
-                      game["ga"]
-                  )
-                  %
-                  2
-                  ==
-                  0
-
-              )
-
-
-              raw_even = (
-                  even_count
-                  /
-                  sample
-              )
-
-
-              add_market(
-                  "Pari / Dispari",
-                  "PARI",
-                  raw_even
-              )
-
-              add_market(
-                  "Pari / Dispari",
-                  "DISPARI",
-                  1 - raw_even
-              )
-
-
-              # --------------------------------------------------------
-              # SOMMA GOL
-              # --------------------------------------------------------
-
-              ranges = {
-                  "0-1": 0,
-                  "2-3": 0,
-                  "4-5": 0,
-                  "6+": 0
-              }
-
-
-              for game in all_games:
-
-                  total = (
-                      game["gf"]
-                      +
-                      game["ga"]
-                  )
-
-
-                  if total <= 1:
-
-                      ranges[
-                          "0-1"
-                      ] += 1
-
-                  elif total <= 3:
-
-                      ranges[
-                          "2-3"
-                      ] += 1
-
-                  elif total <= 5:
-
-                      ranges[
-                          "4-5"
-                      ] += 1
-
-                  else:
-
-                      ranges[
-                          "6+"
-                      ] += 1
-
-
-              for label, count in ranges.items():
-
-                  add_market(
-                      "Somma Gol",
-                      label,
-                      count / sample
-                  )
-
-
-              # --------------------------------------------------------
-              # MIGLIORE MERCATO
-              # --------------------------------------------------------
-
-              markets.sort(
-                  key=lambda item:
-                      item[
-                          "confidence"
-                      ],
-                  reverse=True
-              )
-
-
-              best = markets[0]
-
-
-              confidence_percent = round(
-                  best[
-                      "confidence"
-                  ]
-                  *
-                  100,
-                  1
-              )
-
-
-              if confidence_percent < 55:
-
-                  return {
-
-                      "available":
-                          False,
-
-                      "reason":
-                          "Indice insufficiente"
-
-                  }
-
-
-              return {
-
-                  "available":
-                      True,
-
-                  "market":
-                      best[
-                          "market"
-                      ],
-
-                  "prediction":
-                      best[
-                          "prediction"
-                      ],
-
-                  "confidence":
-                      confidence_percent,
-
-                  "sample":
-                      sample
-
-              }
-
-
-          # ============================================================
-          # QUOTE
-          # ============================================================
-
-          def odds_clean(
-              value
-          ):
-
-              return str(
-                  value or ""
-              ).strip().lower()
-
-
-          def odds_market_matches(
-              pick,
-              market
-          ):
-
-              p = odds_clean(
-                  pick
-              )
-
-              m = odds_clean(
-                  market
-              )
-
-
-              if (
-                  "first half" in m
-                  or
-                  "second half" in m
-                  or
-                  "1st half" in m
-                  or
-                  "2nd half" in m
-              ):
-
-                  return False
-
-
-              if p in (
-                  "1",
-                  "x",
-                  "2"
-              ):
-
-                  return m in (
-                      "match winner",
-                      "1x2"
-                  )
-
-
-              if p in (
-                  "1x",
-                  "x2",
-                  "12"
-              ):
-
-                  return (
-                      "double chance"
-                      in m
-                  )
-
-
-              if (
-                  p.startswith(
-                      "over "
-                  )
-                  or
-                  p.startswith(
-                      "under "
-                  )
-              ):
-
-                  return (
-                      "over/under"
-                      in m
-                      or
-                      "total goals"
-                      in m
-                  )
-
-
-              if p in (
-                  "goal",
-                  "no goal",
-                  "gg",
-                  "ng"
-              ):
-
-                  return (
-                      "both teams score"
-                      in m
-                      or
-                      "both teams to score"
-                      in m
-                  )
-
-
-              if p in (
-                  "pari",
-                  "dispari",
-                  "odd",
-                  "even"
-              ):
-
-                  return (
-                      "odd/even"
-                      in m
-                      or
-                      "odd even"
-                      in m
-                  )
-
-
-              return False
-
-
-          def odds_selection_matches(
-              pick,
-              value
-          ):
-
-              p = odds_clean(
-                  pick
-              )
-
-              v = odds_clean(
-                  value
-              )
-
-
-              if p == "1":
-
-                  return v in (
-                      "home",
-                      "1"
-                  )
-
-
-              if p == "x":
-
-                  return v in (
-                      "draw",
-                      "x"
-                  )
-
-
-              if p == "2":
-
-                  return v in (
-                      "away",
-                      "2"
-                  )
-
-
-              compact = v.replace(
-                  " ",
-                  ""
-              )
-
-
-              if p == "1x":
-
-                  return compact in (
-                      "1x",
-                      "home/draw",
-                      "homedraw",
-                      "homeordraw"
-                  )
-
-
-              if p == "x2":
-
-                  return compact in (
-                      "x2",
-                      "draw/away",
-                      "drawaway",
-                      "draworaway"
-                  )
-
-
-              if p == "12":
-
-                  return compact in (
-                      "12",
-                      "home/away",
-                      "homeaway",
-                      "homeoraway"
-                  )
-
-
-              if (
-                  p.startswith(
-                      "over "
-                  )
-                  or
-                  p.startswith(
-                      "under "
-                  )
-              ):
-
-                  return p == v
-
-
-              if p in (
-                  "goal",
-                  "gg"
-              ):
-
-                  return v in (
-                      "yes",
-                      "goal",
-                      "gg"
-                  )
-
-
-              if p in (
-                  "no goal",
-                  "ng"
-              ):
-
-                  return v in (
-                      "no",
-                      "no goal",
-                      "ng"
-                  )
-
-
-              if p in (
-                  "pari",
-                  "even"
-              ):
-
-                  return v in (
-                      "even",
-                      "pari"
-                  )
-
-
-              if p in (
-                  "dispari",
-                  "odd"
-              ):
-
-                  return v in (
-                      "odd",
-                      "dispari"
-                  )
-
-
-              return False
-
-
-          def find_quote(
-              fixture_id,
-              prediction
-          ):
-
-              try:
-
-                  data = api_get(
-                      "odds",
-                      {
-                          "fixture":
-                              fixture_id
-                      }
-                  )
-
-              except Exception as error:
-
-                  print(
-                      "Errore quote fixture",
-                      fixture_id,
-                      ":",
-                      error
-                  )
-
-                  return None
-
-
-              response = (
-                  data.get(
-                      "response"
-                  )
-                  or
-                  []
-              )
-
-
-              pick = (
-                  prediction.get(
-                      "prediction"
-                  )
-              )
-
-
-              found = []
-
-
-              for block in response:
-
-                  for bookmaker in (
-                      block.get(
-                          "bookmakers"
-                      )
-                      or
-                      []
-                  ):
-
-                      bookmaker_name = (
-                          bookmaker.get(
-                              "name"
-                          )
-                          or
-                          "Bookmaker"
-                      )
-
-
-                      for bet in (
-                          bookmaker.get(
-                              "bets"
-                          )
-                          or
-                          []
-                      ):
-
-                          market_name = (
-                              bet.get(
-                                  "name"
-                              )
-                              or
-                              ""
-                          )
-
-
-                          if not odds_market_matches(
-                              pick,
-                              market_name
-                          ):
-                              continue
-
-
-                          for value in (
-                              bet.get(
-                                  "values"
-                              )
-                              or
-                              []
-                          ):
-
-                              selection = (
-                                  value.get(
-                                      "value"
-                                  )
-                              )
-
-                              odd = (
-                                  value.get(
-                                      "odd"
-                                  )
-                              )
-
-
-                              if not odds_selection_matches(
-                                  pick,
-                                  selection
-                              ):
-                                  continue
-
-
-                              try:
-
-                                  odd_number = float(
-                                      odd
-                                  )
-
-                              except:
-
-                                  continue
-
-
-                              found.append({
-
-                                  "odd":
-                                      odd_number,
-
-                                  "bookmaker":
-                                      bookmaker_name,
-
-                                  "apiMarket":
-                                      market_name,
-
-                                  "apiSelection":
-                                      selection
-
-                              })
-
-
-              if not found:
-                  return None
-
-
-              return max(
-                  found,
-                  key=lambda item:
-                      item[
-                          "odd"
-                      ]
-              )
-
-
-          # ============================================================
-          # ANALIZZA
-          # ============================================================
-
-          shortlist = (
-              candidates[:50]
-          )
-
-
-          analysis = []
-
-
-          for match in shortlist[:30]:
-
-              prediction = build_prediction(
-                  match
-              )
-
-
-              match[
-                  "prediction"
-              ] = prediction
-
-
-              if (
-                  prediction.get(
-                      "available"
-                  )
-                  is True
-              ):
-
-                  quote = find_quote(
-                      match[
-                          "fixtureId"
-                      ],
-                      prediction
-                  )
-
-
-                  if quote:
-
-                      prediction[
-                          "oddAvailable"
-                      ] = True
-
-                      prediction[
-                          "odd"
-                      ] = quote[
-                          "odd"
-                      ]
-
-                      prediction[
-                          "bookmaker"
-                      ] = quote[
-                          "bookmaker"
-                      ]
-
-                      prediction[
-                          "apiMarket"
-                      ] = quote[
-                          "apiMarket"
-                      ]
-
-                      prediction[
-                          "apiSelection"
-                      ] = quote[
-                          "apiSelection"
-                      ]
-
-                  else:
-
-                      prediction[
-                          "oddAvailable"
-                      ] = False
-
-                      prediction[
-                          "odd"
-                      ] = None
-
-              else:
-
-                  prediction[
-                      "oddAvailable"
-                  ] = False
-
-                  prediction[
-                      "odd"
-                  ] = None
-
-
-              analysis.append(
-                  match
-              )
-
-
-          # ============================================================
-          # ORDINA PRONOSTICI UTILIZZABILI PRIMA
-          # ============================================================
-
-          def analysis_rank(
-              match
-          ):
-
-              prediction = (
-                  match.get(
-                      "prediction"
-                  )
-                  or
-                  {}
-              )
-
-
-              prediction_available = (
-                  1
-                  if prediction.get(
-                      "available"
-                  )
-                  else
-                  0
-              )
-
-
-              odd_available = (
-                  1
-                  if prediction.get(
-                      "oddAvailable"
-                  )
-                  else
-                  0
-              )
-
-
-              confidence = float(
-                  prediction.get(
-                      "confidence"
-                  )
-                  or
-                  0
-              )
-
-
-              return (
-
-                  -odd_available,
-                  -prediction_available,
-                  -confidence,
-                  -match[
-                      "historyScore"
-                  ],
-                  -match[
-                      "priority"
-                  ],
-                  match[
-                      "timestamp"
-                  ]
-
-              )
-
-
-          analysis.sort(
-              key=analysis_rank
-          )
-
-
-          # ============================================================
-          # SALVA FILE
-          # ============================================================
-
-          history_output = {
-
-              "updatedAt":
+              "generatedAt":
                   datetime.now(
-                      rome
-                  ).isoformat(),
-
-              "matches":
-                  history
-
-          }
-
-
-          matches_output = {
-
-              "updatedAt":
-                  datetime.now(
-                      rome
+                      ROME
                   ).isoformat(),
 
               "days":
-                  [
-                      today.isoformat(),
-                      tomorrow.isoformat()
-                  ],
+                  DAYS,
 
-              "matches":
-                  candidates
+              "historyCount":
+                  len(history),
 
-          }
+              "matchesAnalyzed":
+                  len(analysis),
 
+              "matchesWithCandidates":
+                  matches_with_candidates,
 
-          shortlist_output = {
+              "marketCandidates":
+                  total_market_candidates,
 
-              "updatedAt":
-                  datetime.now(
-                      rome
-                  ).isoformat(),
+              "candidatesWithOdds":
+                  total_candidates_with_odds,
 
-              "matches":
-                  shortlist
-
-          }
-
-
-          analysis_output = {
-
-              "updatedAt":
-                  datetime.now(
-                      rome
-                  ).isoformat(),
-
-              "engine":
-                  "BETLAB Prediction + Odds V1",
+              "exactScoresWithOdds":
+                  exact_scores_with_odds,
 
               "analysis":
                   analysis
@@ -2743,138 +2891,76 @@ jobs:
           }
 
 
-          with HISTORY_FILE.open(
-              "w",
-              encoding="utf-8"
-          ) as f:
-
-              json.dump(
-                  history_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
+          save_json(
+              "data/betlab-analysis.json",
+              output
+          )
 
 
-          with MATCHES_FILE.open(
-              "w",
-              encoding="utf-8"
-          ) as f:
+          # shortlist semplice
+          shortlist = [
 
-              json.dump(
-                  matches_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
+              {
+                  "fixtureId":
+                      m[
+                          "fixtureId"
+                      ],
+
+                  "date":
+                      m[
+                          "date"
+                      ],
+
+                  "country":
+                      m[
+                          "country"
+                      ],
+
+                  "league":
+                      m[
+                          "league"
+                      ],
+
+                  "home":
+                      m[
+                          "home"
+                      ],
+
+                  "away":
+                      m[
+                          "away"
+                      ],
+
+                  "priority":
+                      m[
+                          "priority"
+                      ],
+
+                  "historyScore":
+                      m[
+                          "historyScore"
+                      ]
+              }
+
+              for m in candidate_matches[:50]
+
+          ]
 
 
-          with SHORTLIST_FILE.open(
-              "w",
-              encoding="utf-8"
-          ) as f:
-
-              json.dump(
-                  shortlist_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
+          save_json(
+              "data/betlab-shortlist.json",
+              shortlist
+          )
 
 
-          with ANALYSIS_FILE.open(
-              "w",
-              encoding="utf-8"
-          ) as f:
-
-              json.dump(
-                  analysis_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
-
-
-          # ============================================================
+          # ==========================================================
           # LOG
-          # ============================================================
-
-          available_predictions = [
-
-              match
-              for match in analysis
-              if (
-                  match.get(
-                      "prediction",
-                      {}
-                  ).get(
-                      "available"
-                  )
-              )
-
-          ]
-
-
-          available_odds = [
-
-              match
-              for match in analysis
-              if (
-                  match.get(
-                      "prediction",
-                      {}
-                  ).get(
-                      "oddAvailable"
-                  )
-              )
-
-          ]
-
+          # ==========================================================
 
           print("")
-          print(
-              "=============================================="
-          )
-
-          print(
-              "BETLAB PREDICTION + ODDS ENGINE"
-          )
-
-          print(
-              "=============================================="
-          )
-
-          print("")
-
-
-          print(
-              "Giorni caricati:",
-              len(days_loaded)
-          )
-
-
-          for day, count in days_loaded:
-
-              print(
-                  f"{day}: {count} partite"
-              )
-
-
-          print("")
-          print(
-              "Partite API uniche:",
-              len(api_fixtures)
-          )
-
-          print(
-              "Storico iniziale:",
-              initial_history_count
-          )
-
-          print(
-              "Nuovi risultati API:",
-              new_history_results
-          )
+          print("==============================================")
+          print("RISULTATO BETLAB V7")
+          print("==============================================")
 
           print(
               "Storico totale:",
@@ -2882,103 +2968,126 @@ jobs:
           )
 
           print(
-              "Storico unico analisi:",
-              len(history_unique)
+              "Partite analizzate:",
+              len(analysis)
           )
 
           print(
-              "Candidate oggi + domani:",
-              len(candidates)
+              "Partite con candidati:",
+              matches_with_candidates
           )
 
           print(
-              "Pronostici disponibili:",
-              len(available_predictions)
+              "Candidati mercato generati:",
+              total_market_candidates
           )
 
           print(
-              "Pronostici con quota:",
-              len(available_odds)
+              "Candidati con quota:",
+              total_candidates_with_odds
           )
 
+          print(
+              "Risultati esatti con quota:",
+              exact_scores_with_odds
+          )
+
+
+          print("")
+          print("TOP CANDIDATI PER PARTITA")
           print("")
 
 
           for index, match in enumerate(
-              available_predictions,
+              analysis,
               start=1
           ):
 
-              prediction = (
-                  match[
-                      "prediction"
-                  ]
-              )
+              candidates = match.get(
+                  "candidates"
+              ) or []
 
 
               print(
                   f'{index}. '
-                  f'{match["home"]["name"]} - '
+                  f'{match["home"]["name"]}'
+                  f' - '
                   f'{match["away"]["name"]}'
               )
 
-              print(
-                  "   PRONOSTICO:",
-                  prediction.get(
-                      "prediction"
+
+              if not candidates:
+
+                  print(
+                      "   NESSUN CANDIDATO CON QUOTA"
                   )
-              )
 
-              print(
-                  "   MERCATO:",
-                  prediction.get(
-                      "market"
+                  continue
+
+
+              for candidate in candidates[:8]:
+
+                  print(
+                      "   "
+                      +
+                      candidate[
+                          "market"
+                      ]
+                      +
+                      " | "
+                      +
+                      candidate[
+                          "selection"
+                      ]
+                      +
+                      " | INDICE "
+                      +
+                      str(
+                          candidate[
+                              "index"
+                          ]
+                      )
+                      +
+                      "%"
+                      +
+                      " | @ "
+                      +
+                      str(
+                          candidate[
+                              "odd"
+                          ]
+                      )
+                      +
+                      " | "
+                      +
+                      str(
+                          candidate[
+                              "bookmaker"
+                          ]
+                      )
                   )
-              )
-
-              print(
-                  "   INDICE:",
-                  prediction.get(
-                      "confidence"
-                  )
-              )
-
-              print(
-                  "   QUOTA:",
-                  prediction.get(
-                      "odd"
-                  )
-              )
-
-              print(
-                  "   BOOKMAKER:",
-                  prediction.get(
-                      "bookmaker"
-                  )
-              )
-
-              print("")
 
 
-          print(
-              "BETLAB PREDICTION + ODDS ENGINE OK"
-          )
+          print("")
+          print("==============================================")
+          print("BETLAB MULTI-MARKET ENGINE V7 OK")
+          print("==============================================")
 
           PY
 
-      - name: Salva aggiornamento
+      - name: Commit aggiornamenti BETLAB
         run: |
-          git config user.name "BETLAB Bot"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/
 
           if git diff --cached --quiet; then
-            echo "Nessuna modifica da salvare."
+            echo "Nessuna modifica da salvare"
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB pronostici e quote"
+          git commit -m "Aggiorna BETLAB V7 multi-market"
 
           git pull --rebase origin main
 
