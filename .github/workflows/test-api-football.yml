@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Scarica repository
         uses: actions/checkout@v4
+
 
       - name: Scarica oggi e domani API-Football
         env:
@@ -31,13 +33,14 @@ jobs:
           TOMORROW=$(TZ=Europe/Rome date -d "+1 day" +%Y-%m-%d)
 
           echo "================================="
-          echo "BETLAB DATA ENGINE V5.1"
+          echo "BETLAB DATA ENGINE V6"
           echo "Oggi: $TODAY"
           echo "Domani: $TOMORROW"
           echo "================================="
 
           for DAY in "$TODAY" "$TOMORROW"
           do
+
             echo "Scarico $DAY..."
 
             curl --fail --silent --show-error \
@@ -45,9 +48,11 @@ jobs:
               --url "https://v3.football.api-sports.io/fixtures?date=$DAY" \
               --header "x-apisports-key: $API_FOOTBALL_KEY" \
               -o "data/future/$DAY.json"
+
           done
 
-      - name: Costruisci BETLAB V5.1
+
+      - name: Costruisci BETLAB V6
         run: |
           python3 - <<'PY'
 
@@ -67,7 +72,7 @@ jobs:
 
 
           # =====================================================
-          # CAMPIONATI
+          # CAMPIONATI BETLAB
           # =====================================================
 
           PRIORITY = {
@@ -110,7 +115,7 @@ jobs:
 
 
           # =====================================================
-          # NOMI SQUADRE
+          # NORMALIZZAZIONE NOMI
           # =====================================================
 
           def basic_normalize(name):
@@ -124,12 +129,17 @@ jobs:
               )
 
               name = "".join(
-                  c for c in name
+                  c
+                  for c in name
                   if not unicodedata.combining(c)
               )
 
               name = name.lower()
-              name = name.replace("&", " and ")
+
+              name = name.replace(
+                  "&",
+                  " and "
+              )
 
               name = re.sub(
                   r"[^a-z0-9]+",
@@ -145,6 +155,8 @@ jobs:
 
 
           ALIASES = {
+
+              # BRASILE
 
               "atletico mg":
                   "atletico mineiro",
@@ -167,6 +179,9 @@ jobs:
               "bragantino":
                   "bragantino",
 
+
+              # ITALIA
+
               "internazionale":
                   "inter",
 
@@ -181,6 +196,9 @@ jobs:
 
               "ac milan":
                   "milan",
+
+
+              # INGHILTERRA
 
               "man utd":
                   "manchester united",
@@ -200,17 +218,26 @@ jobs:
               "wolverhampton":
                   "wolverhampton wanderers",
 
+
+              # FRANCIA
+
               "psg":
                   "paris saint germain",
 
               "paris sg":
                   "paris saint germain",
 
+
+              # GERMANIA
+
               "bayern munich":
                   "bayern munchen",
 
               "bayern munchen":
                   "bayern munchen",
+
+
+              # SPAGNA
 
               "atletico madrid":
                   "atletico de madrid",
@@ -261,13 +288,15 @@ jobs:
           all_api_matches = []
 
           files = sorted(
-              glob.glob("data/future/*.json")
+              glob.glob(
+                  "data/future/*.json"
+              )
           )
 
 
           print()
           print("=================================")
-          print("BETLAB ANALYSIS ENGINE V5.1")
+          print("BETLAB ANALYSIS ENGINE V6")
           print("=================================")
 
           print(
@@ -277,6 +306,7 @@ jobs:
 
 
           if not files:
+
               raise SystemExit(
                   "Nessun file API trovato."
               )
@@ -323,7 +353,7 @@ jobs:
 
 
           # =====================================================
-          # DEDUPLICA FIXTURE
+          # DEDUPLICA FIXTURE API
           # =====================================================
 
           unique_api = {}
@@ -357,7 +387,7 @@ jobs:
 
 
           # =====================================================
-          # STORICO
+          # CARICA STORICO
           # =====================================================
 
           if os.path.exists(HISTORY):
@@ -398,14 +428,23 @@ jobs:
 
           api_fixture_ids = {
 
-              str(match.get("fixtureId"))
+              str(
+                  match.get(
+                      "fixtureId"
+                  )
+              )
 
               for match in history
 
               if (
                   match.get("source")
                   != "OpenFootball"
-                  and match.get("fixtureId")
+
+                  and
+
+                  match.get(
+                      "fixtureId"
+                  )
                   is not None
               )
           }
@@ -432,7 +471,10 @@ jobs:
                   continue
 
 
-              fixture_id = fixture.get("id")
+              fixture_id = fixture.get(
+                  "id"
+              )
+
 
               if fixture_id is None:
                   continue
@@ -455,7 +497,8 @@ jobs:
 
               if (
                   goals.get("home") is None
-                  or goals.get("away") is None
+                  or
+                  goals.get("away") is None
               ):
                   continue
 
@@ -485,54 +528,80 @@ jobs:
                       "API-Football",
 
                   "date":
-                      fixture.get("date"),
+                      fixture.get(
+                          "date"
+                      ),
 
                   "timestamp":
-                      fixture.get("timestamp"),
+                      fixture.get(
+                          "timestamp"
+                      ),
 
                   "status":
                       status,
 
                   "country":
-                      league.get("country"),
+                      league.get(
+                          "country"
+                      ),
 
                   "league":
-                      league.get("name"),
+                      league.get(
+                          "name"
+                      ),
 
                   "leagueId":
-                      league.get("id"),
+                      league.get(
+                          "id"
+                      ),
 
                   "season":
-                      league.get("season"),
+                      league.get(
+                          "season"
+                      ),
 
                   "round":
-                      league.get("round"),
+                      league.get(
+                          "round"
+                      ),
 
                   "home": {
 
                       "id":
-                          home.get("id"),
+                          home.get(
+                              "id"
+                          ),
 
                       "name":
-                          home.get("name")
+                          home.get(
+                              "name"
+                          )
                   },
 
                   "away": {
 
                       "id":
-                          away.get("id"),
+                          away.get(
+                              "id"
+                          ),
 
                       "name":
-                          away.get("name")
+                          away.get(
+                              "name"
+                          )
                   },
 
                   "goals": {
 
                       "home":
-                          goals.get("home"),
+                          goals.get(
+                              "home"
+                          ),
 
                       "away":
-                          goals.get("away")
+                          goals.get(
+                              "away"
+                          )
                   }
 
               })
@@ -546,13 +615,101 @@ jobs:
 
 
           # =====================================================
-          # INDICE STORICO
+          # CREA VISTA STORICO SENZA DUPLICATI LOGICI
+          # =====================================================
+
+          logical_history = {}
+
+
+          for match in history:
+
+              date_key = str(
+                  match.get(
+                      "date",
+                      ""
+                  )
+              )[:10]
+
+              home_key = canonical_team(
+                  match
+                  .get("home", {})
+                  .get("name")
+              )
+
+              away_key = canonical_team(
+                  match
+                  .get("away", {})
+                  .get("name")
+              )
+
+
+              if (
+                  not date_key
+                  or
+                  not home_key
+                  or
+                  not away_key
+              ):
+                  continue
+
+
+              key = (
+                  date_key,
+                  home_key,
+                  away_key
+              )
+
+
+              existing = logical_history.get(
+                  key
+              )
+
+
+              if existing is None:
+
+                  logical_history[
+                      key
+                  ] = match
+
+              else:
+
+                  # Se abbiamo sia OpenFootball sia API-Football,
+                  # per l'analisi preferiamo API-Football.
+
+                  if (
+                      existing.get("source")
+                      == "OpenFootball"
+
+                      and
+
+                      match.get("source")
+                      == "API-Football"
+                  ):
+
+                      logical_history[
+                          key
+                      ] = match
+
+
+          analysis_history = list(
+              logical_history.values()
+          )
+
+
+          print(
+              "Storico unico per analisi:",
+              len(analysis_history)
+          )
+
+
+          # =====================================================
+          # INDICE STORICO PER SQUADRA
           # =====================================================
 
           team_history = {}
 
 
-          for match in history:
+          for match in analysis_history:
 
               home_key = canonical_team(
                   match
@@ -584,7 +741,7 @@ jobs:
 
 
           # =====================================================
-          # FORMA
+          # FORMA ULTIME 5
           # =====================================================
 
           def calculate_form(
@@ -605,6 +762,7 @@ jobs:
                   target_date or ""
               )[:10]
 
+
               valid = []
 
 
@@ -624,7 +782,8 @@ jobs:
 
                   if (
                       target_day
-                      and match_day >= target_day
+                      and
+                      match_day >= target_day
                   ):
                       continue
 
@@ -637,12 +796,15 @@ jobs:
 
                   if (
                       goals.get("home") is None
-                      or goals.get("away") is None
+                      or
+                      goals.get("away") is None
                   ):
                       continue
 
 
-                  valid.append(match)
+                  valid.append(
+                      match
+                  )
 
 
               valid.sort(
@@ -668,6 +830,7 @@ jobs:
               goals_against = 0
 
               points = 0
+
               recent = []
 
 
@@ -685,6 +848,7 @@ jobs:
                       .get("name")
                   )
 
+
                   home_key = canonical_team(
                       home_name
                   )
@@ -692,6 +856,7 @@ jobs:
                   away_key = canonical_team(
                       away_name
                   )
+
 
                   home_goals = (
                       match
@@ -731,18 +896,23 @@ jobs:
                   if gf > ga:
 
                       result = "W"
+
                       wins += 1
                       points += 3
+
 
                   elif gf == ga:
 
                       result = "D"
+
                       draws += 1
                       points += 1
+
 
                   else:
 
                       result = "L"
+
                       losses += 1
 
 
@@ -753,7 +923,9 @@ jobs:
                   recent.append({
 
                       "date":
-                          match.get("date"),
+                          match.get(
+                              "date"
+                          ),
 
                       "opponent":
                           opponent,
@@ -775,10 +947,13 @@ jobs:
                               "source",
                               "unknown"
                           )
+
                   })
 
 
-              played = len(recent)
+              played = len(
+                  recent
+              )
 
 
               return {
@@ -839,11 +1014,800 @@ jobs:
 
                   "recent":
                       recent
+
               }
 
 
           # =====================================================
-          # CANDIDATE OGGI + DOMANI
+          # PREDICTION ENGINE V1
+          # =====================================================
+
+          def analyse_prediction(
+              home_form,
+              away_form
+          ):
+
+              home_recent = home_form.get(
+                  "recent",
+                  []
+              )
+
+              away_recent = away_form.get(
+                  "recent",
+                  []
+              )
+
+
+              home_count = len(
+                  home_recent
+              )
+
+              away_count = len(
+                  away_recent
+              )
+
+
+              sample_size = (
+                  home_count
+                  +
+                  away_count
+              )
+
+
+              # Per confrontare le due squadre
+              # vogliamo almeno un dato per entrambe.
+
+              if (
+                  home_count == 0
+                  or
+                  away_count == 0
+              ):
+
+                  return {
+
+                      "available":
+                          False,
+
+                      "reason":
+                          "Storico insufficiente",
+
+                      "sampleSize":
+                          sample_size
+
+                  }
+
+
+              # =================================================
+              # FUNZIONI STATISTICHE
+              # =================================================
+
+              def team_rate(
+                  games,
+                  condition
+              ):
+
+                  if not games:
+                      return 0.0
+
+                  hits = sum(
+                      1
+                      for game in games
+                      if condition(game)
+                  )
+
+                  return (
+                      hits
+                      /
+                      len(games)
+                  )
+
+
+              def combined_rate(
+                  condition
+              ):
+
+                  games = (
+                      home_recent
+                      +
+                      away_recent
+                  )
+
+                  if not games:
+                      return 0.0
+
+                  hits = sum(
+                      1
+                      for game in games
+                      if condition(game)
+                  )
+
+                  return (
+                      hits
+                      /
+                      len(games)
+                  )
+
+
+              # =================================================
+              # FORMA RISULTATO
+              # =================================================
+
+              home_win = team_rate(
+                  home_recent,
+                  lambda g:
+                      g.get("result")
+                      == "W"
+              )
+
+
+              home_draw = team_rate(
+                  home_recent,
+                  lambda g:
+                      g.get("result")
+                      == "D"
+              )
+
+
+              home_loss = team_rate(
+                  home_recent,
+                  lambda g:
+                      g.get("result")
+                      == "L"
+              )
+
+
+              away_win = team_rate(
+                  away_recent,
+                  lambda g:
+                      g.get("result")
+                      == "W"
+              )
+
+
+              away_draw = team_rate(
+                  away_recent,
+                  lambda g:
+                      g.get("result")
+                      == "D"
+              )
+
+
+              away_loss = team_rate(
+                  away_recent,
+                  lambda g:
+                      g.get("result")
+                      == "L"
+              )
+
+
+              # =================================================
+              # 1 X 2
+              # =================================================
+
+              score_1 = (
+                  home_win
+                  +
+                  away_loss
+              ) / 2
+
+
+              score_x = (
+                  home_draw
+                  +
+                  away_draw
+              ) / 2
+
+
+              score_2 = (
+                  away_win
+                  +
+                  home_loss
+              ) / 2
+
+
+              # =================================================
+              # DOPPIA CHANCE
+              # =================================================
+
+              score_1x = (
+                  (
+                      1 - home_loss
+                  )
+                  +
+                  (
+                      1 - away_win
+                  )
+              ) / 2
+
+
+              score_x2 = (
+                  (
+                      1 - away_loss
+                  )
+                  +
+                  (
+                      1 - home_win
+                  )
+              ) / 2
+
+
+              score_12 = (
+                  (
+                      1 - home_draw
+                  )
+                  +
+                  (
+                      1 - away_draw
+                  )
+              ) / 2
+
+
+              # =================================================
+              # GOAL / NO GOAL
+              # =================================================
+
+              score_goal = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          ) > 0
+                          and
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          ) > 0
+                      )
+              )
+
+
+              score_nogoal = (
+                  1
+                  -
+                  score_goal
+              )
+
+
+              # =================================================
+              # OVER / UNDER
+              # =================================================
+
+              score_over_15 = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      ) >= 2
+              )
+
+
+              score_under_15 = (
+                  1
+                  -
+                  score_over_15
+              )
+
+
+              score_over_25 = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      ) >= 3
+              )
+
+
+              score_under_25 = (
+                  1
+                  -
+                  score_over_25
+              )
+
+
+              score_over_35 = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      ) >= 4
+              )
+
+
+              score_under_35 = (
+                  1
+                  -
+                  score_over_35
+              )
+
+
+              # =================================================
+              # PARI / DISPARI
+              # =================================================
+
+              score_even = combined_rate(
+                  lambda g:
+                      (
+                          (
+                              g.get(
+                                  "goalsFor",
+                                  0
+                              )
+                              +
+                              g.get(
+                                  "goalsAgainst",
+                                  0
+                              )
+                          )
+                          % 2
+                      ) == 0
+              )
+
+
+              score_odd = (
+                  1
+                  -
+                  score_even
+              )
+
+
+              # =================================================
+              # SOMMA GOL
+              #
+              # Fasce non sovrapposte.
+              # =================================================
+
+              score_goals_01 = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      ) <= 1
+              )
+
+
+              score_goals_23 = combined_rate(
+                  lambda g:
+                      2
+                      <=
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      )
+                      <=
+                      3
+              )
+
+
+              score_goals_45 = combined_rate(
+                  lambda g:
+                      4
+                      <=
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      )
+                      <=
+                      5
+              )
+
+
+              score_goals_6plus = combined_rate(
+                  lambda g:
+                      (
+                          g.get(
+                              "goalsFor",
+                              0
+                          )
+                          +
+                          g.get(
+                              "goalsAgainst",
+                              0
+                          )
+                      ) >= 6
+              )
+
+
+              # =================================================
+              # LISTA MERCATI
+              # =================================================
+
+              markets = [
+
+                  {
+                      "market":
+                          "1X2",
+
+                      "prediction":
+                          "1",
+
+                      "rawScore":
+                          score_1
+                  },
+
+                  {
+                      "market":
+                          "1X2",
+
+                      "prediction":
+                          "X",
+
+                      "rawScore":
+                          score_x
+                  },
+
+                  {
+                      "market":
+                          "1X2",
+
+                      "prediction":
+                          "2",
+
+                      "rawScore":
+                          score_2
+                  },
+
+
+                  {
+                      "market":
+                          "Doppia Chance",
+
+                      "prediction":
+                          "1X",
+
+                      "rawScore":
+                          score_1x
+                  },
+
+                  {
+                      "market":
+                          "Doppia Chance",
+
+                      "prediction":
+                          "X2",
+
+                      "rawScore":
+                          score_x2
+                  },
+
+                  {
+                      "market":
+                          "Doppia Chance",
+
+                      "prediction":
+                          "12",
+
+                      "rawScore":
+                          score_12
+                  },
+
+
+                  {
+                      "market":
+                          "Goal/No Goal",
+
+                      "prediction":
+                          "GOAL",
+
+                      "rawScore":
+                          score_goal
+                  },
+
+                  {
+                      "market":
+                          "Goal/No Goal",
+
+                      "prediction":
+                          "NO GOAL",
+
+                      "rawScore":
+                          score_nogoal
+                  },
+
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "OVER 1.5",
+
+                      "rawScore":
+                          score_over_15
+                  },
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "UNDER 1.5",
+
+                      "rawScore":
+                          score_under_15
+                  },
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "OVER 2.5",
+
+                      "rawScore":
+                          score_over_25
+                  },
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "UNDER 2.5",
+
+                      "rawScore":
+                          score_under_25
+                  },
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "OVER 3.5",
+
+                      "rawScore":
+                          score_over_35
+                  },
+
+                  {
+                      "market":
+                          "Totale Gol",
+
+                      "prediction":
+                          "UNDER 3.5",
+
+                      "rawScore":
+                          score_under_35
+                  },
+
+
+                  {
+                      "market":
+                          "Pari/Dispari",
+
+                      "prediction":
+                          "PARI",
+
+                      "rawScore":
+                          score_even
+                  },
+
+                  {
+                      "market":
+                          "Pari/Dispari",
+
+                      "prediction":
+                          "DISPARI",
+
+                      "rawScore":
+                          score_odd
+                  },
+
+
+                  {
+                      "market":
+                          "Somma Gol",
+
+                      "prediction":
+                          "0-1 GOL",
+
+                      "rawScore":
+                          score_goals_01
+                  },
+
+                  {
+                      "market":
+                          "Somma Gol",
+
+                      "prediction":
+                          "2-3 GOL",
+
+                      "rawScore":
+                          score_goals_23
+                  },
+
+                  {
+                      "market":
+                          "Somma Gol",
+
+                      "prediction":
+                          "4-5 GOL",
+
+                      "rawScore":
+                          score_goals_45
+                  },
+
+                  {
+                      "market":
+                          "Somma Gol",
+
+                      "prediction":
+                          "6+ GOL",
+
+                      "rawScore":
+                          score_goals_6plus
+                  }
+
+              ]
+
+
+              # =================================================
+              # CORREZIONE CAMPIONE
+              #
+              # 10 partite = campione massimo V1.
+              # Con meno dati il valore viene riportato verso 50%.
+              # =================================================
+
+              sample_factor = min(
+                  sample_size / 10,
+                  1.0
+              )
+
+
+              for market in markets:
+
+                  raw = market[
+                      "rawScore"
+                  ]
+
+
+                  adjusted = (
+                      0.50
+                      +
+                      (
+                          raw - 0.50
+                      )
+                      *
+                      sample_factor
+                  )
+
+
+                  market[
+                      "rawScore"
+                  ] = round(
+                      raw,
+                      4
+                  )
+
+
+                  market[
+                      "confidence"
+                  ] = round(
+                      adjusted * 100,
+                      1
+                  )
+
+
+              # =================================================
+              # SCELTA UNICA
+              # =================================================
+
+              markets.sort(
+                  key=lambda x:
+                      x["confidence"],
+                  reverse=True
+              )
+
+
+              best = markets[0]
+
+
+              if (
+                  best["confidence"]
+                  < 55
+              ):
+
+                  return {
+
+                      "available":
+                          False,
+
+                      "reason":
+                          "Segnale statistico insufficiente",
+
+                      "sampleSize":
+                          sample_size,
+
+                      "bestCandidate": {
+
+                          "market":
+                              best["market"],
+
+                          "prediction":
+                              best["prediction"],
+
+                          "confidence":
+                              best["confidence"]
+                      }
+
+                  }
+
+
+              return {
+
+                  "available":
+                      True,
+
+                  "market":
+                      best["market"],
+
+                  "prediction":
+                      best["prediction"],
+
+                  # È un indice BETLAB V1,
+                  # non una probabilità calibrata.
+
+                  "confidence":
+                      best["confidence"],
+
+                  "rawFrequency":
+                      round(
+                          best["rawScore"]
+                          * 100,
+                          1
+                      ),
+
+                  "sampleSize":
+                      sample_size
+
+              }
+
+
+          # =====================================================
+          # CREA CANDIDATE OGGI + DOMANI
           # =====================================================
 
           candidates = []
@@ -856,6 +1820,7 @@ jobs:
                   {}
               )
 
+
               status = (
                   fixture
                   .get("status", {})
@@ -867,6 +1832,7 @@ jobs:
                   "NS",
                   "TBD"
               }:
+
                   continue
 
 
@@ -875,10 +1841,12 @@ jobs:
                   {}
               )
 
+
               country = league.get(
                   "country",
                   ""
               )
+
 
               league_name = league.get(
                   "name",
@@ -903,10 +1871,12 @@ jobs:
                   {}
               )
 
+
               home = teams.get(
                   "home",
                   {}
               )
+
 
               away = teams.get(
                   "away",
@@ -916,8 +1886,10 @@ jobs:
 
               if (
                   not home.get("name")
-                  or not away.get("name")
+                  or
+                  not away.get("name")
               ):
+
                   continue
 
 
@@ -925,6 +1897,7 @@ jobs:
                   home["name"],
                   fixture.get("date")
               )
+
 
               away_form = calculate_form(
                   away["name"],
@@ -939,16 +1912,46 @@ jobs:
               )
 
 
+              prediction = analyse_prediction(
+                  home_form,
+                  away_form
+              )
+
+
+              prediction_available = (
+                  prediction.get(
+                      "available",
+                      False
+                  )
+              )
+
+
+              prediction_confidence = (
+                  prediction.get(
+                      "confidence",
+                      0
+                  )
+                  if prediction_available
+                  else 0
+              )
+
+
               candidates.append({
 
                   "fixtureId":
-                      fixture.get("id"),
+                      fixture.get(
+                          "id"
+                      ),
 
                   "date":
-                      fixture.get("date"),
+                      fixture.get(
+                          "date"
+                      ),
 
                   "timestamp":
-                      fixture.get("timestamp"),
+                      fixture.get(
+                          "timestamp"
+                      ),
 
                   "status":
                       status,
@@ -960,13 +1963,19 @@ jobs:
                       league_name,
 
                   "leagueId":
-                      league.get("id"),
+                      league.get(
+                          "id"
+                      ),
 
                   "season":
-                      league.get("season"),
+                      league.get(
+                          "season"
+                      ),
 
                   "round":
-                      league.get("round"),
+                      league.get(
+                          "round"
+                      ),
 
                   "priority":
                       priority,
@@ -980,79 +1989,136 @@ jobs:
                           2
                       ),
 
+                  "prediction":
+                      prediction,
+
                   "home": {
 
                       "id":
-                          home.get("id"),
+                          home.get(
+                              "id"
+                          ),
 
                       "name":
-                          home.get("name"),
+                          home.get(
+                              "name"
+                          ),
 
                       "logo":
-                          home.get("logo"),
+                          home.get(
+                              "logo"
+                          ),
 
                       "form":
                           home_form
+
                   },
 
                   "away": {
 
                       "id":
-                          away.get("id"),
+                          away.get(
+                              "id"
+                          ),
 
                       "name":
-                          away.get("name"),
+                          away.get(
+                              "name"
+                          ),
 
                       "logo":
-                          away.get("logo"),
+                          away.get(
+                              "logo"
+                          ),
 
                       "form":
                           away_form
-                  }
+
+                  },
+
+                  "_predictionAvailable":
+                      prediction_available,
+
+                  "_predictionConfidence":
+                      prediction_confidence
 
               })
 
 
           # =====================================================
-          # CLASSIFICA QUALITÀ
+          # CLASSIFICA BETLAB
+          #
+          # 1. Pronostico disponibile
+          # 2. Confidenza statistica
+          # 3. Storico completo
+          # 4. Quantità storico
+          # 5. Priorità campionato
+          # 6. Data
           # =====================================================
 
           def candidate_rank(match):
 
-              hp = (
+              home_played = (
                   match["home"]
                   ["form"]
                   ["played"]
               )
 
-              ap = (
+
+              away_played = (
                   match["away"]
                   ["form"]
                   ["played"]
               )
 
 
-              both = (
+              prediction_available = (
                   1
-                  if hp > 0 and ap > 0
+                  if match[
+                      "_predictionAvailable"
+                  ]
                   else 0
               )
 
 
+              confidence = match[
+                  "_predictionConfidence"
+              ]
+
+
               complete = (
                   1
-                  if hp == 5 and ap == 5
+                  if (
+                      home_played == 5
+                      and
+                      away_played == 5
+                  )
+                  else 0
+              )
+
+
+              both_have_data = (
+                  1
+                  if (
+                      home_played > 0
+                      and
+                      away_played > 0
+                  )
                   else 0
               )
 
 
               return (
 
+                  -prediction_available,
+                  -confidence,
                   -complete,
-                  -both,
+                  -both_have_data,
                   -match["historyScore"],
                   -match["priority"],
-                  match.get("timestamp") or 0
+                  match.get(
+                      "timestamp"
+                  ) or 0
 
               )
 
@@ -1062,53 +2128,120 @@ jobs:
           )
 
 
+          # Rimuove i campi tecnici temporanei.
+
+          for match in candidates:
+
+              match.pop(
+                  "_predictionAvailable",
+                  None
+              )
+
+              match.pop(
+                  "_predictionConfidence",
+                  None
+              )
+
+
+          # =====================================================
+          # OUTPUT CANDIDATE
+          # =====================================================
+
           shortlist = candidates[:50]
 
-          # Diamo alla homepage molte più possibilità.
           analysis = candidates[:30]
 
 
           # =====================================================
-          # LOG
+          # LOG PRONOSTICI
           # =====================================================
 
           print()
-          print("MIGLIORI PARTITE DISPONIBILI")
+          print("=================================")
+          print("PRONOSTICI BETLAB V1")
+          print("=================================")
           print()
 
 
-          for i, match in enumerate(
-              analysis[:15],
+          for index, match in enumerate(
+              analysis[:20],
               start=1
           ):
 
-              home = match["home"]
-              away = match["away"]
+              home_name = (
+                  match["home"]
+                  ["name"]
+              )
 
-              day = str(
-                  match["date"]
-              )[:10]
+              away_name = (
+                  match["away"]
+                  ["name"]
+              )
 
-
-              print(
-                  f'{i}. {day} | '
-                  f'{home["name"]} - '
-                  f'{away["name"]}'
+              prediction = match.get(
+                  "prediction",
+                  {}
               )
 
 
               print(
-                  f'   Storico: '
-                  f'{home["form"]["played"]}'
-                  f'+'
-                  f'{away["form"]["played"]}'
-                  f' | priorità '
-                  f'{match["priority"]}'
+                  f"{index}. "
+                  f"{home_name} - "
+                  f"{away_name}"
               )
+
+
+              if prediction.get(
+                  "available"
+              ):
+
+                  print(
+                      "   PRONOSTICO:",
+                      prediction.get(
+                          "prediction"
+                      )
+                  )
+
+                  print(
+                      "   MERCATO:",
+                      prediction.get(
+                          "market"
+                      )
+                  )
+
+                  print(
+                      "   INDICE BETLAB:",
+                      str(
+                          prediction.get(
+                              "confidence"
+                          )
+                      )
+                      + "%"
+                  )
+
+                  print(
+                      "   CAMPIONE:",
+                      prediction.get(
+                          "sampleSize"
+                      )
+                  )
+
+
+              else:
+
+                  print(
+                      "   NESSUN PRONOSTICO:",
+                      prediction.get(
+                          "reason"
+                      )
+                  )
+
+
+              print()
 
 
           # =====================================================
-          # OUTPUT
+          # SALVATAGGIO
           # =====================================================
 
           generated_at = datetime.now(
@@ -1142,6 +2275,7 @@ jobs:
 
               "matches":
                   history
+
           }
 
 
@@ -1151,7 +2285,10 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB DATA ENGINE V5.1",
+                  "BETLAB DATA ENGINE V6",
+
+              "predictionEngine":
+                  "BETLAB PREDICTION V1",
 
               "windowDays":
                   2,
@@ -1161,6 +2298,7 @@ jobs:
 
               "matches":
                   candidates
+
           }
 
 
@@ -1170,7 +2308,10 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB SHORTLIST V5.1",
+                  "BETLAB SHORTLIST V6",
+
+              "predictionEngine":
+                  "BETLAB PREDICTION V1",
 
               "windowDays":
                   2,
@@ -1180,6 +2321,7 @@ jobs:
 
               "candidates":
                   shortlist
+
           }
 
 
@@ -1189,13 +2331,21 @@ jobs:
                   generated_at,
 
               "engine":
-                  "BETLAB ANALYSIS ENGINE V5.1",
+                  "BETLAB ANALYSIS ENGINE V6",
+
+              "predictionEngine":
+                  "BETLAB PREDICTION V1",
 
               "windowDays":
                   2,
 
               "historyMatches":
                   len(history),
+
+              "analysisHistoryMatches":
+                  len(
+                      analysis_history
+                  ),
 
               "availableCandidates":
                   len(candidates),
@@ -1205,6 +2355,7 @@ jobs:
 
               "analysis":
                   analysis
+
           }
 
 
@@ -1247,8 +2398,27 @@ jobs:
 
 
           # =====================================================
-          # RISULTATO
+          # RISULTATO FINALE
           # =====================================================
+
+          predictions_available = sum(
+
+              1
+
+              for match in candidates
+
+              if (
+                  match
+                  .get(
+                      "prediction",
+                      {}
+                  )
+                  .get(
+                      "available"
+                  )
+              )
+          )
+
 
           full_coverage = sum(
 
@@ -1257,9 +2427,15 @@ jobs:
               for match in candidates
 
               if (
-                  match["home"]["form"]["played"] == 5
+                  match["home"]
+                  ["form"]
+                  ["played"] == 5
+
                   and
-                  match["away"]["form"]["played"] == 5
+
+                  match["away"]
+                  ["form"]
+                  ["played"] == 5
               )
           )
 
@@ -1271,21 +2447,34 @@ jobs:
               for match in candidates
 
               if (
-                  match["home"]["form"]["played"] > 0
+                  match["home"]
+                  ["form"]
+                  ["played"] > 0
+
                   and
-                  match["away"]["form"]["played"] > 0
+
+                  match["away"]
+                  ["form"]
+                  ["played"] > 0
               )
           )
 
 
           print()
           print("=================================")
-          print("RISULTATO BETLAB V5.1")
+          print("RISULTATO BETLAB V6")
           print("=================================")
 
           print(
               "Storico totale:",
               len(history)
+          )
+
+          print(
+              "Storico unico analisi:",
+              len(
+                  analysis_history
+              )
           )
 
           print(
@@ -1309,16 +2498,22 @@ jobs:
           )
 
           print(
-              "Partite inviate alla homepage:",
+              "Pronostici disponibili:",
+              predictions_available
+          )
+
+          print(
+              "Partite inviate homepage:",
               len(analysis)
           )
 
           print()
           print(
-              "BETLAB ANALYSIS ENGINE V5.1 OK"
+              "BETLAB PREDICTION ENGINE V1 OK"
           )
 
           PY
+
 
       - name: Salva dati BETLAB
         run: |
@@ -1332,11 +2527,15 @@ jobs:
 
           if git diff --cached --quiet
           then
+
             echo "Nessun aggiornamento."
+
           else
-            git commit -m "Aggiorna BETLAB V5.1"
+
+            git commit -m "BETLAB V6 - Prediction Engine V1"
 
             git pull --rebase origin main
 
             git push origin main
+
           fi
