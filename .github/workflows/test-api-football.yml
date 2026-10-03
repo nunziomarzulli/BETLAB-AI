@@ -16,12 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # =========================================================
+      # 1. REPOSITORY
+      # =========================================================
+
       - name: Scarica repository
         uses: actions/checkout@v4
 
+
       # =========================================================
-      # 1. SCARICA TUTTE LE PARTITE DEL GIORNO
-      # Una sola richiesta API
+      # 2. PARTITE DEL GIORNO
       # =========================================================
 
       - name: Scarica partite API-Football
@@ -30,6 +35,7 @@ jobs:
 
         run: |
           mkdir -p data
+
           TODAY=$(TZ=Europe/Rome date +%Y-%m-%d)
 
           echo "================================="
@@ -43,16 +49,22 @@ jobs:
             --header "x-apisports-key: $API_FOOTBALL_KEY" \
             -o data/api-football-raw.json
 
+
       # =========================================================
-      # 2. AGGIORNA ARCHIVIO + CREA SHORTLIST + ANALISI
+      # 3. MOTORE BETLAB
       # =========================================================
 
-      - name: Costruisci database BETLAB
+      - name: Analizza partite BETLAB
         run: |
           python3 - <<'PY'
+
           import json
           import os
+          import re
+          import unicodedata
+
           from datetime import datetime, timezone
+
 
           RAW = "data/api-football-raw.json"
           HISTORY = "data/betlab-history.json"
@@ -60,44 +72,41 @@ jobs:
           SHORTLIST = "data/betlab-shortlist.json"
           ANALYSIS = "data/betlab-analysis.json"
 
-          # -----------------------------------------------------
-          # CAMPIONATI BETLAB
-          # -----------------------------------------------------
+
+          # =====================================================
+          # CAMPIONATI
+          # =====================================================
 
           priority = {
-              # TOP 5
+
               ("Italy", "Serie A"): 3,
               ("England", "Premier League"): 3,
               ("Spain", "La Liga"): 3,
               ("Germany", "Bundesliga"): 3,
               ("France", "Ligue 1"): 3,
 
-              # UEFA
               ("World", "UEFA Champions League"): 3,
               ("World", "UEFA Europa League"): 3,
               ("World", "UEFA Europa Conference League"): 3,
 
-              # SECONDE DIVISIONI
               ("Italy", "Serie B"): 2,
               ("England", "Championship"): 2,
               ("Spain", "Segunda División"): 2,
               ("Germany", "2. Bundesliga"): 2,
               ("France", "Ligue 2"): 2,
 
-              # EUROPA
               ("Portugal", "Primeira Liga"): 2,
               ("Netherlands", "Eredivisie"): 2,
               ("Belgium", "Jupiler Pro League"): 2,
               ("Turkey", "Süper Lig"): 2,
               ("Scotland", "Premiership"): 2,
 
-              # AMERICHE
               ("Brazil", "Serie A"): 2,
               ("Argentina", "Liga Profesional Argentina"): 2,
+
               ("USA", "Major League Soccer"): 2,
               ("Mexico", "Liga MX"): 2,
 
-              # ALTRI
               ("Greece", "Super League 1"): 1,
               ("Austria", "Bundesliga"): 1,
               ("Switzerland", "Super League"): 1,
@@ -106,50 +115,163 @@ jobs:
               ("Sweden", "Allsvenskan"): 1
           }
 
-          # -----------------------------------------------------
-          # CARICA RISPOSTA API
-          # -----------------------------------------------------
 
-          with open(RAW, encoding="utf-8") as f:
+          # =====================================================
+          # NORMALIZZAZIONE NOMI
+          # =====================================================
+
+          def normalize_team(name):
+
+              if not name:
+                  return ""
+
+              name = unicodedata.normalize(
+                  "NFKD",
+                  name
+              )
+
+              name = "".join(
+                  char
+                  for char in name
+                  if not unicodedata.combining(char)
+              )
+
+              name = name.lower()
+
+              replacements = {
+                  "&": " and ",
+                  "utd": "united",
+                  "man utd": "manchester united",
+                  "man city": "manchester city",
+                  "inter milan": "inter",
+                  "internazionale": "inter",
+                  "psg": "paris saint germain"
+              }
+
+              for old, new in replacements.items():
+                  name = name.replace(
+                      old,
+                      new
+                  )
+
+              # Rimuoviamo suffissi molto comuni
+              # che cambiano fra provider.
+
+              tokens_to_remove = [
+                  "fc",
+                  "cf",
+                  "afc",
+                  "ac",
+                  "sc",
+                  "calcio",
+                  "football club"
+              ]
+
+              for token in tokens_to_remove:
+
+                  name = re.sub(
+                      r"\b" +
+                      re.escape(token) +
+                      r"\b",
+                      " ",
+                      name
+                  )
+
+              name = re.sub(
+                  r"[^a-z0-9]+",
+                  " ",
+                  name
+              )
+
+              name = re.sub(
+                  r"\s+",
+                  " ",
+                  name
+              ).strip()
+
+              return name
+
+
+          # =====================================================
+          # CARICA API
+          # =====================================================
+
+          with open(
+              RAW,
+              encoding="utf-8"
+          ) as f:
+
               api_data = json.load(f)
 
           if api_data.get("errors"):
+
               print("ERRORE API:")
               print(api_data["errors"])
+
               raise SystemExit(1)
 
-          api_matches = api_data.get("response", [])
+          api_matches = api_data.get(
+              "response",
+              []
+          )
 
-          print("Partite ricevute API:", len(api_matches))
 
-          # -----------------------------------------------------
-          # CARICA STORICO ESISTENTE
-          # -----------------------------------------------------
+          # =====================================================
+          # CARICA STORICO
+          # =====================================================
 
           if os.path.exists(HISTORY):
-              try:
-                  with open(HISTORY, encoding="utf-8") as f:
-                      history_data = json.load(f)
 
-                  history = history_data.get("matches", [])
+              with open(
+                  HISTORY,
+                  encoding="utf-8"
+              ) as f:
 
-              except Exception:
-                  history = []
+                  history_data = json.load(f)
+
+              history = history_data.get(
+                  "matches",
+                  []
+              )
+
           else:
+
               history = []
 
-          print("Partite già presenti nello storico:", len(history))
 
-          # Indicizzazione per fixture ID
-          history_by_id = {
-              str(x["fixtureId"]): x
-              for x in history
-              if x.get("fixtureId") is not None
+          print()
+          print("=================================")
+          print("BETLAB ANALYSIS ENGINE")
+          print("=================================")
+
+          print(
+              "Partite API:",
+              len(api_matches)
+          )
+
+          print(
+              "Storico disponibile:",
+              len(history)
+          )
+
+
+          # =====================================================
+          # AGGIORNA LO STORICO CON I RISULTATI DI OGGI
+          # =====================================================
+
+          history_api_ids = {
+
+              str(match.get("fixtureId"))
+
+              for match in history
+
+              if (
+                  match.get("source")
+                  != "OpenFootball"
+                  and match.get("fixtureId")
+                  is not None
+              )
           }
-
-          # -----------------------------------------------------
-          # AGGIORNA STORICO
-          # -----------------------------------------------------
 
           completed_statuses = {
               "FT",
@@ -157,18 +279,14 @@ jobs:
               "PEN"
           }
 
-          new_completed = 0
+          added_today = 0
 
           for match in api_matches:
-              fixture = match.get("fixture", {})
-              league = match.get("league", {})
-              teams = match.get("teams", {})
-              goals = match.get("goals", {})
 
-              fixture_id = fixture.get("id")
-
-              if fixture_id is None:
-                  continue
+              fixture = match.get(
+                  "fixture",
+                  {}
+              )
 
               status = (
                   fixture
@@ -176,15 +294,36 @@ jobs:
                   .get("short")
               )
 
-              # Nello storico salviamo solo partite terminate
               if status not in completed_statuses:
                   continue
 
-              home = teams.get("home", {})
-              away = teams.get("away", {})
+              fixture_id = fixture.get("id")
 
-              if not home.get("id") or not away.get("id"):
+              if fixture_id is None:
                   continue
+
+              if str(fixture_id) in history_api_ids:
+                  continue
+
+              teams = match.get(
+                  "teams",
+                  {}
+              )
+
+              home = teams.get(
+                  "home",
+                  {}
+              )
+
+              away = teams.get(
+                  "away",
+                  {}
+              )
+
+              goals = match.get(
+                  "goals",
+                  {}
+              )
 
               if goals.get("home") is None:
                   continue
@@ -192,89 +331,160 @@ jobs:
               if goals.get("away") is None:
                   continue
 
-              item = {
-                  "fixtureId": fixture_id,
-                  "date": fixture.get("date"),
-                  "timestamp": fixture.get("timestamp"),
-                  "status": status,
+              league = match.get(
+                  "league",
+                  {}
+              )
 
-                  "country": league.get("country"),
-                  "league": league.get("name"),
-                  "leagueId": league.get("id"),
-                  "season": league.get("season"),
-                  "round": league.get("round"),
+              history.append({
+
+                  "fixtureId":
+                      fixture_id,
+
+                  "source":
+                      "API-Football",
+
+                  "date":
+                      fixture.get("date"),
+
+                  "timestamp":
+                      fixture.get("timestamp"),
+
+                  "status":
+                      status,
+
+                  "country":
+                      league.get("country"),
+
+                  "league":
+                      league.get("name"),
+
+                  "leagueId":
+                      league.get("id"),
+
+                  "season":
+                      league.get("season"),
+
+                  "round":
+                      league.get("round"),
 
                   "home": {
-                      "id": home.get("id"),
-                      "name": home.get("name")
+
+                      "id":
+                          home.get("id"),
+
+                      "name":
+                          home.get("name")
                   },
 
                   "away": {
-                      "id": away.get("id"),
-                      "name": away.get("name")
+
+                      "id":
+                          away.get("id"),
+
+                      "name":
+                          away.get("name")
                   },
 
                   "goals": {
-                      "home": goals.get("home"),
-                      "away": goals.get("away")
+
+                      "home":
+                          goals.get("home"),
+
+                      "away":
+                          goals.get("away")
                   }
-              }
 
-              key = str(fixture_id)
+              })
 
-              if key not in history_by_id:
-                  new_completed += 1
-
-              history_by_id[key] = item
-
-          history = list(history_by_id.values())
-
-          history.sort(
-              key=lambda x: x.get("timestamp") or 0
-          )
-
-          history_output = {
-              "updatedAt":
-                  datetime.now(timezone.utc).isoformat(),
-
-              "total":
-                  len(history),
-
-              "matches":
-                  history
-          }
-
-          with open(
-              HISTORY,
-              "w",
-              encoding="utf-8"
-          ) as f:
-              json.dump(
-                  history_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
+              history_api_ids.add(
+                  str(fixture_id)
               )
 
-          print("Nuovi risultati aggiunti:", new_completed)
-          print("Totale storico BETLAB:", len(history))
+              added_today += 1
 
-          # -----------------------------------------------------
-          # PARTITE FUTURE IDONEE DI OGGI
-          # -----------------------------------------------------
+
+          # =====================================================
+          # PREPARA INDICE STORICO PER NOME
+          # =====================================================
+
+          team_history = {}
+
+          for match in history:
+
+              home_name = (
+                  match
+                  .get("home", {})
+                  .get("name")
+              )
+
+              away_name = (
+                  match
+                  .get("away", {})
+                  .get("name")
+              )
+
+              home_key = normalize_team(
+                  home_name
+              )
+
+              away_key = normalize_team(
+                  away_name
+              )
+
+              if home_key:
+
+                  team_history.setdefault(
+                      home_key,
+                      []
+                  ).append(match)
+
+              if away_key:
+
+                  team_history.setdefault(
+                      away_key,
+                      []
+                  ).append(match)
+
+
+          # =====================================================
+          # CREA PARTITE IDONEE
+          # =====================================================
 
           future = []
 
           for match in api_matches:
-              fixture = match.get("fixture", {})
-              league = match.get("league", {})
-              teams = match.get("teams", {})
 
-              country = league.get("country", "")
-              league_name = league.get("name", "")
+              fixture = match.get(
+                  "fixture",
+                  {}
+              )
+
+              league = match.get(
+                  "league",
+                  {}
+              )
+
+              teams = match.get(
+                  "teams",
+                  {}
+              )
+
+              country = league.get(
+                  "country",
+                  ""
+              )
+
+              league_name = league.get(
+                  "name",
+                  ""
+              )
 
               level = priority.get(
-                  (country, league_name)
+                  (
+                      country,
+                      league_name
+                  )
               )
 
               if level is None:
@@ -286,41 +496,86 @@ jobs:
                   .get("short")
               )
 
-              if status not in ("NS", "TBD"):
+              if status not in (
+                  "NS",
+                  "TBD"
+              ):
                   continue
 
-              home = teams.get("home", {})
-              away = teams.get("away", {})
+              home = teams.get(
+                  "home",
+                  {}
+              )
 
-              if not home.get("id") or not away.get("id"):
+              away = teams.get(
+                  "away",
+                  {}
+              )
+
+              if not home.get("name"):
+                  continue
+
+              if not away.get("name"):
                   continue
 
               future.append({
-                  "fixtureId": fixture.get("id"),
-                  "date": fixture.get("date"),
-                  "timestamp": fixture.get("timestamp"),
-                  "status": status,
 
-                  "country": country,
-                  "league": league_name,
-                  "leagueId": league.get("id"),
-                  "season": league.get("season"),
-                  "round": league.get("round"),
+                  "fixtureId":
+                      fixture.get("id"),
 
-                  "priority": level,
+                  "date":
+                      fixture.get("date"),
+
+                  "timestamp":
+                      fixture.get("timestamp"),
+
+                  "status":
+                      status,
+
+                  "country":
+                      country,
+
+                  "league":
+                      league_name,
+
+                  "leagueId":
+                      league.get("id"),
+
+                  "season":
+                      league.get("season"),
+
+                  "round":
+                      league.get("round"),
+
+                  "priority":
+                      level,
 
                   "home": {
-                      "id": home.get("id"),
-                      "name": home.get("name"),
-                      "logo": home.get("logo")
+
+                      "id":
+                          home.get("id"),
+
+                      "name":
+                          home.get("name"),
+
+                      "logo":
+                          home.get("logo")
                   },
 
                   "away": {
-                      "id": away.get("id"),
-                      "name": away.get("name"),
-                      "logo": away.get("logo")
+
+                      "id":
+                          away.get("id"),
+
+                      "name":
+                          away.get("name"),
+
+                      "logo":
+                          away.get("logo")
                   }
+
               })
+
 
           future.sort(
               key=lambda x: (
@@ -329,38 +584,418 @@ jobs:
               )
           )
 
-          matches_output = {
-              "generatedAt":
-                  datetime.now(timezone.utc).isoformat(),
 
-              "source": "API-Football",
+          # =====================================================
+          # CALCOLO FORMA
+          # =====================================================
 
-              "total": len(future),
+          def calculate_form(
+              team_name,
+              target_date
+          ):
 
-              "matches": future
-          }
-
-          with open(
-              MATCHES,
-              "w",
-              encoding="utf-8"
-          ) as f:
-              json.dump(
-                  matches_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
+              team_key = normalize_team(
+                  team_name
               )
 
-          # -----------------------------------------------------
-          # SHORTLIST
-          # -----------------------------------------------------
+              games = team_history.get(
+                  team_key,
+                  []
+              )
+
+              valid_games = []
+
+              target_day = str(
+                  target_date or ""
+              )[:10]
+
+              for match in games:
+
+                  match_day = str(
+                      match.get(
+                          "date",
+                          ""
+                      )
+                  )[:10]
+
+                  if not match_day:
+                      continue
+
+                  if (
+                      target_day
+                      and match_day >= target_day
+                  ):
+                      continue
+
+                  valid_games.append(
+                      match
+                  )
+
+
+              valid_games.sort(
+                  key=lambda x:
+                      str(
+                          x.get(
+                              "date",
+                              ""
+                          )
+                      ),
+                  reverse=True
+              )
+
+              valid_games = valid_games[:5]
+
+
+              wins = 0
+              draws = 0
+              losses = 0
+
+              goals_for = 0
+              goals_against = 0
+
+              points = 0
+
+              recent = []
+
+
+              for match in valid_games:
+
+                  home_name = (
+                      match
+                      .get("home", {})
+                      .get("name")
+                  )
+
+                  away_name = (
+                      match
+                      .get("away", {})
+                      .get("name")
+                  )
+
+                  home_key = normalize_team(
+                      home_name
+                  )
+
+                  away_key = normalize_team(
+                      away_name
+                  )
+
+                  goals = match.get(
+                      "goals",
+                      {}
+                  )
+
+                  home_goals = goals.get(
+                      "home"
+                  )
+
+                  away_goals = goals.get(
+                      "away"
+                  )
+
+                  if (
+                      home_goals is None
+                      or away_goals is None
+                  ):
+                      continue
+
+
+                  if team_key == home_key:
+
+                      gf = home_goals
+                      ga = away_goals
+
+                      opponent = away_name
+                      venue = "HOME"
+
+                  elif team_key == away_key:
+
+                      gf = away_goals
+                      ga = home_goals
+
+                      opponent = home_name
+                      venue = "AWAY"
+
+                  else:
+
+                      continue
+
+
+                  if gf > ga:
+
+                      result = "W"
+
+                      wins += 1
+                      points += 3
+
+                  elif gf == ga:
+
+                      result = "D"
+
+                      draws += 1
+                      points += 1
+
+                  else:
+
+                      result = "L"
+
+                      losses += 1
+
+
+                  goals_for += gf
+                  goals_against += ga
+
+
+                  recent.append({
+
+                      "date":
+                          match.get("date"),
+
+                      "opponent":
+                          opponent,
+
+                      "venue":
+                          venue,
+
+                      "goalsFor":
+                          gf,
+
+                      "goalsAgainst":
+                          ga,
+
+                      "result":
+                          result,
+
+                      "source":
+                          match.get(
+                              "source",
+                              "API-Football"
+                          )
+                  })
+
+
+              played = len(recent)
+
+
+              return {
+
+                  "teamKey":
+                      team_key,
+
+                  "played":
+                      played,
+
+                  "wins":
+                      wins,
+
+                  "draws":
+                      draws,
+
+                  "losses":
+                      losses,
+
+                  "goalsFor":
+                      goals_for,
+
+                  "goalsAgainst":
+                      goals_against,
+
+                  "points":
+                      points,
+
+                  "pointsPerGame":
+                      (
+                          round(
+                              points / played,
+                              2
+                          )
+                          if played
+                          else None
+                      ),
+
+                  "avgGoalsFor":
+                      (
+                          round(
+                              goals_for / played,
+                              2
+                          )
+                          if played
+                          else None
+                      ),
+
+                  "avgGoalsAgainst":
+                      (
+                          round(
+                              goals_against / played,
+                              2
+                          )
+                          if played
+                          else None
+                      ),
+
+                  "recent":
+                      recent
+              }
+
+
+          # =====================================================
+          # ANALISI PRIME 5
+          # =====================================================
+
+          analysis = []
+
+          print()
+          print("PARTITE DA ANALIZZARE")
+          print()
+
+
+          for candidate in future[:5]:
+
+              home = candidate["home"]
+              away = candidate["away"]
+
+              home_form = calculate_form(
+                  home["name"],
+                  candidate["date"]
+              )
+
+              away_form = calculate_form(
+                  away["name"],
+                  candidate["date"]
+              )
+
+
+              analysis.append({
+
+                  "fixtureId":
+                      candidate["fixtureId"],
+
+                  "date":
+                      candidate["date"],
+
+                  "country":
+                      candidate["country"],
+
+                  "league":
+                      candidate["league"],
+
+                  "home": {
+
+                      "id":
+                          home.get("id"),
+
+                      "name":
+                          home["name"],
+
+                      "form":
+                          home_form
+                  },
+
+                  "away": {
+
+                      "id":
+                          away.get("id"),
+
+                      "name":
+                          away["name"],
+
+                      "form":
+                          away_form
+                  }
+
+              })
+
+
+              print(
+                  f'{home["name"]} - '
+                  f'{away["name"]}'
+              )
+
+              print(
+                  f'  {home["name"]}: '
+                  f'{home_form["wins"]}V '
+                  f'{home_form["draws"]}N '
+                  f'{home_form["losses"]}P | '
+                  f'{home_form["goalsFor"]}-'
+                  f'{home_form["goalsAgainst"]} | '
+                  f'{home_form["played"]} gare'
+              )
+
+              print(
+                  f'  {away["name"]}: '
+                  f'{away_form["wins"]}V '
+                  f'{away_form["draws"]}N '
+                  f'{away_form["losses"]}P | '
+                  f'{away_form["goalsFor"]}-'
+                  f'{away_form["goalsAgainst"]} | '
+                  f'{away_form["played"]} gare'
+              )
+
+              print()
+
+
+          # =====================================================
+          # SALVA FILE
+          # =====================================================
+
+          history.sort(
+              key=lambda x:
+                  str(
+                      x.get(
+                          "date",
+                          ""
+                      )
+                  )
+          )
+
+
+          history_output = {
+
+              "updatedAt":
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
+
+              "total":
+                  len(history),
+
+              "sources": [
+                  "API-Football",
+                  "OpenFootball"
+              ],
+
+              "matches":
+                  history
+          }
+
+
+          matches_output = {
+
+              "generatedAt":
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
+
+              "source":
+                  "API-Football",
+
+              "total":
+                  len(future),
+
+              "matches":
+                  future
+          }
+
 
           shortlist = future[:30]
 
+
           shortlist_output = {
+
               "generatedAt":
-                  datetime.now(timezone.utc).isoformat(),
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
 
               "total":
                   len(shortlist),
@@ -369,202 +1004,16 @@ jobs:
                   shortlist
           }
 
-          with open(
-              SHORTLIST,
-              "w",
-              encoding="utf-8"
-          ) as f:
-              json.dump(
-                  shortlist_output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
-
-          # -----------------------------------------------------
-          # FORMA DAL NOSTRO ARCHIVIO
-          # -----------------------------------------------------
-
-          def calculate_form(team_id, before_timestamp):
-              games = []
-
-              for match in history:
-                  timestamp = match.get("timestamp") or 0
-
-                  if before_timestamp and timestamp >= before_timestamp:
-                      continue
-
-                  home_id = (
-                      match
-                      .get("home", {})
-                      .get("id")
-                  )
-
-                  away_id = (
-                      match
-                      .get("away", {})
-                      .get("id")
-                  )
-
-                  if team_id not in (home_id, away_id):
-                      continue
-
-                  games.append(match)
-
-              games.sort(
-                  key=lambda x: x.get("timestamp") or 0,
-                  reverse=True
-              )
-
-              games = games[:5]
-
-              wins = 0
-              draws = 0
-              losses = 0
-              goals_for = 0
-              goals_against = 0
-              points = 0
-              recent = []
-
-              for match in games:
-                  home = match["home"]
-                  away = match["away"]
-                  goals = match["goals"]
-
-                  if team_id == home["id"]:
-                      gf = goals["home"]
-                      ga = goals["away"]
-                      opponent = away["name"]
-                      venue = "HOME"
-                  else:
-                      gf = goals["away"]
-                      ga = goals["home"]
-                      opponent = home["name"]
-                      venue = "AWAY"
-
-                  if gf > ga:
-                      result = "W"
-                      wins += 1
-                      points += 3
-
-                  elif gf == ga:
-                      result = "D"
-                      draws += 1
-                      points += 1
-
-                  else:
-                      result = "L"
-                      losses += 1
-
-                  goals_for += gf
-                  goals_against += ga
-
-                  recent.append({
-                      "date": match.get("date"),
-                      "opponent": opponent,
-                      "venue": venue,
-                      "goalsFor": gf,
-                      "goalsAgainst": ga,
-                      "result": result
-                  })
-
-              played = len(games)
-
-              return {
-                  "played": played,
-                  "wins": wins,
-                  "draws": draws,
-                  "losses": losses,
-                  "goalsFor": goals_for,
-                  "goalsAgainst": goals_against,
-                  "points": points,
-
-                  "pointsPerGame":
-                      round(points / played, 2)
-                      if played else None,
-
-                  "avgGoalsFor":
-                      round(goals_for / played, 2)
-                      if played else None,
-
-                  "avgGoalsAgainst":
-                      round(goals_against / played, 2)
-                      if played else None,
-
-                  "recent": recent
-              }
-
-          # -----------------------------------------------------
-          # ANALIZZA PRIME 5 CANDIDATE
-          # -----------------------------------------------------
-
-          analysis = []
-
-          print()
-          print("=================================")
-          print("BETLAB HISTORY ENGINE")
-          print("=================================")
-          print()
-
-          for candidate in shortlist[:5]:
-              home = candidate["home"]
-              away = candidate["away"]
-
-              timestamp = candidate.get("timestamp") or 0
-
-              home_form = calculate_form(
-                  home["id"],
-                  timestamp
-              )
-
-              away_form = calculate_form(
-                  away["id"],
-                  timestamp
-              )
-
-              analysis.append({
-                  "fixtureId": candidate["fixtureId"],
-                  "date": candidate["date"],
-                  "country": candidate["country"],
-                  "league": candidate["league"],
-
-                  "home": {
-                      "id": home["id"],
-                      "name": home["name"],
-                      "form": home_form
-                  },
-
-                  "away": {
-                      "id": away["id"],
-                      "name": away["name"],
-                      "form": away_form
-                  }
-              })
-
-              print(
-                  f'{home["name"]}: '
-                  f'{home_form["wins"]}V '
-                  f'{home_form["draws"]}N '
-                  f'{home_form["losses"]}P '
-                  f'({home_form["played"]} gare)'
-              )
-
-              print(
-                  f'{away["name"]}: '
-                  f'{away_form["wins"]}V '
-                  f'{away_form["draws"]}N '
-                  f'{away_form["losses"]}P '
-                  f'({away_form["played"]} gare)'
-              )
-
-              print()
 
           analysis_output = {
+
               "generatedAt":
-                  datetime.now(timezone.utc).isoformat(),
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
 
               "engine":
-                  "BETLAB HISTORY ENGINE",
+                  "BETLAB ANALYSIS ENGINE V3",
 
               "historyMatches":
                   len(history),
@@ -576,11 +1025,55 @@ jobs:
                   analysis
           }
 
+
+          with open(
+              HISTORY,
+              "w",
+              encoding="utf-8"
+          ) as f:
+
+              json.dump(
+                  history_output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+
+          with open(
+              MATCHES,
+              "w",
+              encoding="utf-8"
+          ) as f:
+
+              json.dump(
+                  matches_output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+
+          with open(
+              SHORTLIST,
+              "w",
+              encoding="utf-8"
+          ) as f:
+
+              json.dump(
+                  shortlist_output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+
           with open(
               ANALYSIS,
               "w",
               encoding="utf-8"
           ) as f:
+
               json.dump(
                   analysis_output,
                   f,
@@ -588,22 +1081,77 @@ jobs:
                   indent=2
               )
 
+
+          # =====================================================
+          # RISULTATO
+          # =====================================================
+
+          teams_with_data = 0
+          teams_without_data = 0
+
+          for item in analysis:
+
+              for side in (
+                  "home",
+                  "away"
+              ):
+
+                  played = (
+                      item[side]
+                      ["form"]
+                      ["played"]
+                  )
+
+                  if played > 0:
+                      teams_with_data += 1
+                  else:
+                      teams_without_data += 1
+
+
           print("=================================")
-          print("RISULTATO BETLAB")
+          print("RISULTATO BETLAB V3")
           print("=================================")
-          print("Partite API:", len(api_matches))
-          print("Storico:", len(history))
-          print("Nuovi risultati:", new_completed)
-          print("Partite idonee oggi:", len(future))
-          print("Shortlist:", len(shortlist))
-          print("Partite analizzate:", len(analysis))
+
+          print(
+              "Storico totale:",
+              len(history)
+          )
+
+          print(
+              "Nuovi risultati API:",
+              added_today
+          )
+
+          print(
+              "Partite idonee oggi:",
+              len(future)
+          )
+
+          print(
+              "Partite analizzate:",
+              len(analysis)
+          )
+
+          print(
+              "Squadre con storico:",
+              teams_with_data
+          )
+
+          print(
+              "Squadre senza storico:",
+              teams_without_data
+          )
+
           print()
-          print("BETLAB HISTORY ENGINE OK")
+          print(
+              "BETLAB ANALYSIS ENGINE V3 OK"
+          )
 
           PY
 
+
       # =========================================================
-      # 3. SALVA DATABASE
+      # 4. SALVA
       # =========================================================
 
       - name: Salva dati BETLAB
@@ -620,7 +1168,7 @@ jobs:
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna database BETLAB"
+            git commit -m "Aggiorna analisi BETLAB V3"
 
             git pull --rebase origin main
 
