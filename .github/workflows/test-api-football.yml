@@ -16,18 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # =========================================================
-      # 1. REPOSITORY
-      # =========================================================
-
       - name: Scarica repository
         uses: actions/checkout@v4
-
-
-      # =========================================================
-      # 2. PARTITE DEL GIORNO
-      # =========================================================
 
       - name: Scarica partite API-Football
         env:
@@ -39,7 +29,7 @@ jobs:
           TODAY=$(TZ=Europe/Rome date +%Y-%m-%d)
 
           echo "================================="
-          echo "BETLAB DATA ENGINE"
+          echo "BETLAB DATA ENGINE V4"
           echo "Data: $TODAY"
           echo "================================="
 
@@ -49,12 +39,7 @@ jobs:
             --header "x-apisports-key: $API_FOOTBALL_KEY" \
             -o data/api-football-raw.json
 
-
-      # =========================================================
-      # 3. MOTORE BETLAB
-      # =========================================================
-
-      - name: Analizza partite BETLAB
+      - name: Analizza partite BETLAB V4
         run: |
           python3 - <<'PY'
 
@@ -74,10 +59,10 @@ jobs:
 
 
           # =====================================================
-          # CAMPIONATI
+          # CAMPIONATI BETLAB
           # =====================================================
 
-          priority = {
+          PRIORITY = {
 
               ("Italy", "Serie A"): 3,
               ("England", "Premier League"): 3,
@@ -117,65 +102,30 @@ jobs:
 
 
           # =====================================================
-          # NORMALIZZAZIONE NOMI
+          # NORMALIZZAZIONE BASE
           # =====================================================
 
-          def normalize_team(name):
+          def basic_normalize(name):
 
               if not name:
                   return ""
 
               name = unicodedata.normalize(
                   "NFKD",
-                  name
+                  str(name)
               )
 
               name = "".join(
-                  char
-                  for char in name
-                  if not unicodedata.combining(char)
+                  c for c in name
+                  if not unicodedata.combining(c)
               )
 
               name = name.lower()
 
-              replacements = {
-                  "&": " and ",
-                  "utd": "united",
-                  "man utd": "manchester united",
-                  "man city": "manchester city",
-                  "inter milan": "inter",
-                  "internazionale": "inter",
-                  "psg": "paris saint germain"
-              }
-
-              for old, new in replacements.items():
-                  name = name.replace(
-                      old,
-                      new
-                  )
-
-              # Rimuoviamo suffissi molto comuni
-              # che cambiano fra provider.
-
-              tokens_to_remove = [
-                  "fc",
-                  "cf",
-                  "afc",
-                  "ac",
-                  "sc",
-                  "calcio",
-                  "football club"
-              ]
-
-              for token in tokens_to_remove:
-
-                  name = re.sub(
-                      r"\b" +
-                      re.escape(token) +
-                      r"\b",
-                      " ",
-                      name
-                  )
+              name = name.replace(
+                  "&",
+                  " and "
+              )
 
               name = re.sub(
                   r"[^a-z0-9]+",
@@ -193,6 +143,157 @@ jobs:
 
 
           # =====================================================
+          # ALIAS
+          #
+          # Tutti i provider vengono trasformati nello stesso
+          # nome canonico.
+          # =====================================================
+
+          ALIASES = {
+
+              # BRASILE
+
+              "atletico mg":
+                  "atletico mineiro",
+
+              "atletico mineiro":
+                  "atletico mineiro",
+
+              "ca mineiro":
+                  "atletico mineiro",
+
+              "clube atletico mineiro":
+                  "atletico mineiro",
+
+              "rb bragantino":
+                  "bragantino",
+
+              "red bull bragantino":
+                  "bragantino",
+
+              "bragantino":
+                  "bragantino",
+
+              # ITALIA
+
+              "internazionale":
+                  "inter",
+
+              "inter milan":
+                  "inter",
+
+              "fc internazionale":
+                  "inter",
+
+              "internazionale milano":
+                  "inter",
+
+              "ac milan":
+                  "milan",
+
+              "milan":
+                  "milan",
+
+              # INGHILTERRA
+
+              "man utd":
+                  "manchester united",
+
+              "manchester utd":
+                  "manchester united",
+
+              "man united":
+                  "manchester united",
+
+              "man city":
+                  "manchester city",
+
+              "wolves":
+                  "wolverhampton wanderers",
+
+              "wolverhampton":
+                  "wolverhampton wanderers",
+
+              # FRANCIA
+
+              "psg":
+                  "paris saint germain",
+
+              "paris sg":
+                  "paris saint germain",
+
+              "paris saint germain":
+                  "paris saint germain",
+
+              # GERMANIA
+
+              "bayern munich":
+                  "bayern munchen",
+
+              "bayern munchen":
+                  "bayern munchen",
+
+              # SPAGNA
+
+              "atletico madrid":
+                  "atletico de madrid",
+
+              "atletico de madrid":
+                  "atletico de madrid"
+          }
+
+
+          # =====================================================
+          # PAROLE SOCIETARIE
+          # =====================================================
+
+          CLUB_WORDS = {
+              "fc",
+              "cf",
+              "afc",
+              "ac",
+              "sc",
+              "club",
+              "football",
+              "calcio"
+          }
+
+
+          def canonical_team(name):
+
+              name = basic_normalize(
+                  name
+              )
+
+              if not name:
+                  return ""
+
+              # Alias esatto prima della pulizia
+
+              if name in ALIASES:
+                  return ALIASES[name]
+
+              words = name.split()
+
+              cleaned = [
+                  word
+                  for word in words
+                  if word not in CLUB_WORDS
+              ]
+
+              cleaned_name = " ".join(
+                  cleaned
+              ).strip()
+
+              # Alias dopo pulizia
+
+              if cleaned_name in ALIASES:
+                  return ALIASES[cleaned_name]
+
+              return cleaned_name
+
+
+          # =====================================================
           # CARICA API
           # =====================================================
 
@@ -203,12 +304,14 @@ jobs:
 
               api_data = json.load(f)
 
+
           if api_data.get("errors"):
 
               print("ERRORE API:")
               print(api_data["errors"])
 
               raise SystemExit(1)
+
 
           api_matches = api_data.get(
               "response",
@@ -241,7 +344,7 @@ jobs:
 
           print()
           print("=================================")
-          print("BETLAB ANALYSIS ENGINE")
+          print("BETLAB ANALYSIS ENGINE V4")
           print("=================================")
 
           print(
@@ -256,10 +359,17 @@ jobs:
 
 
           # =====================================================
-          # AGGIORNA LO STORICO CON I RISULTATI DI OGGI
+          # AGGIUNGE RISULTATI API DI OGGI
           # =====================================================
 
-          history_api_ids = {
+          completed_statuses = {
+              "FT",
+              "AET",
+              "PEN"
+          }
+
+
+          api_fixture_ids = {
 
               str(match.get("fixtureId"))
 
@@ -273,13 +383,9 @@ jobs:
               )
           }
 
-          completed_statuses = {
-              "FT",
-              "AET",
-              "PEN"
-          }
 
           added_today = 0
+
 
           for match in api_matches:
 
@@ -297,13 +403,18 @@ jobs:
               if status not in completed_statuses:
                   continue
 
-              fixture_id = fixture.get("id")
+
+              fixture_id = fixture.get(
+                  "id"
+              )
 
               if fixture_id is None:
                   continue
 
-              if str(fixture_id) in history_api_ids:
+
+              if str(fixture_id) in api_fixture_ids:
                   continue
+
 
               teams = match.get(
                   "teams",
@@ -331,10 +442,12 @@ jobs:
               if goals.get("away") is None:
                   continue
 
+
               league = match.get(
                   "league",
                   {}
               )
+
 
               history.append({
 
@@ -397,7 +510,8 @@ jobs:
 
               })
 
-              history_api_ids.add(
+
+              api_fixture_ids.add(
                   str(fixture_id)
               )
 
@@ -405,10 +519,11 @@ jobs:
 
 
           # =====================================================
-          # PREPARA INDICE STORICO PER NOME
+          # INDICE STORICO CANONICO
           # =====================================================
 
           team_history = {}
+
 
           for match in history:
 
@@ -424,13 +539,15 @@ jobs:
                   .get("name")
               )
 
-              home_key = normalize_team(
+
+              home_key = canonical_team(
                   home_name
               )
 
-              away_key = normalize_team(
+              away_key = canonical_team(
                   away_name
               )
+
 
               if home_key:
 
@@ -438,6 +555,7 @@ jobs:
                       home_key,
                       []
                   ).append(match)
+
 
               if away_key:
 
@@ -448,10 +566,11 @@ jobs:
 
 
           # =====================================================
-          # CREA PARTITE IDONEE
+          # PARTITE FUTURE IDONEE
           # =====================================================
 
           future = []
+
 
           for match in api_matches:
 
@@ -470,6 +589,7 @@ jobs:
                   {}
               )
 
+
               country = league.get(
                   "country",
                   ""
@@ -480,15 +600,18 @@ jobs:
                   ""
               )
 
-              level = priority.get(
+
+              level = PRIORITY.get(
                   (
                       country,
                       league_name
                   )
               )
 
+
               if level is None:
                   continue
+
 
               status = (
                   fixture
@@ -496,11 +619,13 @@ jobs:
                   .get("short")
               )
 
-              if status not in (
+
+              if status not in {
                   "NS",
                   "TBD"
-              ):
+              }:
                   continue
+
 
               home = teams.get(
                   "home",
@@ -512,11 +637,13 @@ jobs:
                   {}
               )
 
+
               if not home.get("name"):
                   continue
 
               if not away.get("name"):
                   continue
+
 
               future.append({
 
@@ -586,7 +713,7 @@ jobs:
 
 
           # =====================================================
-          # CALCOLO FORMA
+          # FORMA ULTIME 5
           # =====================================================
 
           def calculate_form(
@@ -594,20 +721,24 @@ jobs:
               target_date
           ):
 
-              team_key = normalize_team(
+              team_key = canonical_team(
                   team_name
               )
+
 
               games = team_history.get(
                   team_key,
                   []
               )
 
-              valid_games = []
 
               target_day = str(
                   target_date or ""
               )[:10]
+
+
+              valid_games = []
+
 
               for match in games:
 
@@ -618,14 +749,17 @@ jobs:
                       )
                   )[:10]
 
+
                   if not match_day:
                       continue
+
 
                   if (
                       target_day
                       and match_day >= target_day
                   ):
                       continue
+
 
                   valid_games.append(
                       match
@@ -642,6 +776,7 @@ jobs:
                       ),
                   reverse=True
               )
+
 
               valid_games = valid_games[:5]
 
@@ -672,18 +807,21 @@ jobs:
                       .get("name")
                   )
 
-                  home_key = normalize_team(
+
+                  home_key = canonical_team(
                       home_name
                   )
 
-                  away_key = normalize_team(
+                  away_key = canonical_team(
                       away_name
                   )
+
 
                   goals = match.get(
                       "goals",
                       {}
                   )
+
 
                   home_goals = goals.get(
                       "home"
@@ -692,6 +830,7 @@ jobs:
                   away_goals = goals.get(
                       "away"
                   )
+
 
                   if (
                       home_goals is None
@@ -708,6 +847,7 @@ jobs:
                       opponent = away_name
                       venue = "HOME"
 
+
                   elif team_key == away_key:
 
                       gf = away_goals
@@ -715,6 +855,7 @@ jobs:
 
                       opponent = home_name
                       venue = "AWAY"
+
 
                   else:
 
@@ -728,12 +869,14 @@ jobs:
                       wins += 1
                       points += 3
 
+
                   elif gf == ga:
 
                       result = "D"
 
                       draws += 1
                       points += 1
+
 
                   else:
 
@@ -779,7 +922,7 @@ jobs:
 
               return {
 
-                  "teamKey":
+                  "canonicalName":
                       team_key,
 
                   "played":
@@ -839,10 +982,11 @@ jobs:
 
 
           # =====================================================
-          # ANALISI PRIME 5
+          # ANALISI
           # =====================================================
 
           analysis = []
+
 
           print()
           print("PARTITE DA ANALIZZARE")
@@ -854,10 +998,12 @@ jobs:
               home = candidate["home"]
               away = candidate["away"]
 
+
               home_form = calculate_form(
                   home["name"],
                   candidate["date"]
               )
+
 
               away_form = calculate_form(
                   away["name"],
@@ -911,6 +1057,7 @@ jobs:
                   f'{away["name"]}'
               )
 
+
               print(
                   f'  {home["name"]}: '
                   f'{home_form["wins"]}V '
@@ -920,6 +1067,7 @@ jobs:
                   f'{home_form["goalsAgainst"]} | '
                   f'{home_form["played"]} gare'
               )
+
 
               print(
                   f'  {away["name"]}: '
@@ -931,11 +1079,19 @@ jobs:
                   f'{away_form["played"]} gare'
               )
 
+
+              print(
+                  "  MATCH KEY:",
+                  home_form["canonicalName"],
+                  "<->",
+                  away_form["canonicalName"]
+              )
+
               print()
 
 
           # =====================================================
-          # SALVA FILE
+          # SALVA STORICO
           # =====================================================
 
           history.sort(
@@ -969,6 +1125,10 @@ jobs:
           }
 
 
+          # =====================================================
+          # FILE PARTITE
+          # =====================================================
+
           matches_output = {
 
               "generatedAt":
@@ -986,6 +1146,10 @@ jobs:
                   future
           }
 
+
+          # =====================================================
+          # SHORTLIST
+          # =====================================================
 
           shortlist = future[:30]
 
@@ -1005,6 +1169,10 @@ jobs:
           }
 
 
+          # =====================================================
+          # ANALISI
+          # =====================================================
+
           analysis_output = {
 
               "generatedAt":
@@ -1013,7 +1181,7 @@ jobs:
                   ).isoformat(),
 
               "engine":
-                  "BETLAB ANALYSIS ENGINE V3",
+                  "BETLAB ANALYSIS ENGINE V4",
 
               "historyMatches":
                   len(history),
@@ -1025,6 +1193,10 @@ jobs:
                   analysis
           }
 
+
+          # =====================================================
+          # SCRITTURA FILE
+          # =====================================================
 
           with open(
               HISTORY,
@@ -1083,11 +1255,12 @@ jobs:
 
 
           # =====================================================
-          # RISULTATO
+          # CONTROLLO COPERTURA
           # =====================================================
 
           teams_with_data = 0
           teams_without_data = 0
+
 
           for item in analysis:
 
@@ -1102,57 +1275,65 @@ jobs:
                       ["played"]
                   )
 
+
                   if played > 0:
                       teams_with_data += 1
+
                   else:
                       teams_without_data += 1
 
 
+          # =====================================================
+          # RISULTATO
+          # =====================================================
+
           print("=================================")
-          print("RISULTATO BETLAB V3")
+          print("RISULTATO BETLAB V4")
           print("=================================")
+
 
           print(
               "Storico totale:",
               len(history)
           )
 
+
           print(
               "Nuovi risultati API:",
               added_today
           )
+
 
           print(
               "Partite idonee oggi:",
               len(future)
           )
 
+
           print(
               "Partite analizzate:",
               len(analysis)
           )
+
 
           print(
               "Squadre con storico:",
               teams_with_data
           )
 
+
           print(
               "Squadre senza storico:",
               teams_without_data
           )
 
+
           print()
           print(
-              "BETLAB ANALYSIS ENGINE V3 OK"
+              "BETLAB ANALYSIS ENGINE V4 OK"
           )
 
           PY
-
-
-      # =========================================================
-      # 4. SALVA
-      # =========================================================
 
       - name: Salva dati BETLAB
         run: |
@@ -1168,7 +1349,7 @@ jobs:
           then
             echo "Nessun aggiornamento."
           else
-            git commit -m "Aggiorna analisi BETLAB V3"
+            git commit -m "Aggiorna analisi BETLAB V4"
 
             git pull --rebase origin main
 
