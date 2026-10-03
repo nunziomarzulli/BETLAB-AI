@@ -1,68 +1,384 @@
-name: Test API Football
+name: Aggiorna feed BETLAB
 
 on:
   workflow_dispatch:
 
+  schedule:
+    - cron: "15 5 * * *"
+    - cron: "15 11 * * *"
+    - cron: "15 16 * * *"
+
+permissions:
+  contents: write
+
 jobs:
-  test-api:
+
+  update-feed:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test collegamento API-Football
+
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+
+      - name: Scarica partite API-Football
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
 
         run: |
+
+          mkdir -p data
+
           TODAY=$(date -u +%Y-%m-%d)
 
           echo "================================="
-          echo "BETLAB AI - TEST API FOOTBALL"
-          echo "================================="
+          echo "BETLAB DATA ENGINE"
           echo "Data: $TODAY"
-          echo ""
+          echo "================================="
 
           curl --fail --silent --show-error \
             --request GET \
             --url "https://v3.football.api-sports.io/fixtures?date=$TODAY" \
             --header "x-apisports-key: $API_FOOTBALL_KEY" \
-            -o response.json
+            -o data/api-football-raw.json
+
+
+      - name: Costruisci feed BETLAB
+        run: |
 
           python3 - <<'PY'
-          import json
 
-          with open("response.json", encoding="utf-8") as f:
+          import json
+          from datetime import datetime
+
+
+          INPUT = "data/api-football-raw.json"
+          OUTPUT = "data/betlab-matches.json"
+
+
+          with open(INPUT, encoding="utf-8") as f:
               data = json.load(f)
 
-          errors = data.get("errors")
 
-          if errors:
+          if data.get("errors"):
               print("ERRORE API:")
-              print(errors)
+              print(data["errors"])
               raise SystemExit(1)
+
 
           matches = data.get("response", [])
 
-          print("Partite trovate:", len(matches))
-          print()
 
-          leagues = {}
+          # ==========================================
+          # CAMPIONATI PRINCIPALI BETLAB
+          # ==========================================
+
+          allowed = {
+
+              # ITALIA
+              ("Italy", "Serie A"),
+              ("Italy", "Serie B"),
+
+              # INGHILTERRA
+              ("England", "Premier League"),
+              ("England", "Championship"),
+              ("England", "League One"),
+              ("England", "League Two"),
+              ("England", "FA Cup"),
+              ("England", "League Cup"),
+
+              # SPAGNA
+              ("Spain", "La Liga"),
+              ("Spain", "Segunda División"),
+              ("Spain", "Copa del Rey"),
+
+              # GERMANIA
+              ("Germany", "Bundesliga"),
+              ("Germany", "2. Bundesliga"),
+              ("Germany", "DFB Pokal"),
+
+              # FRANCIA
+              ("France", "Ligue 1"),
+              ("France", "Ligue 2"),
+              ("France", "Coupe de France"),
+
+              # PORTOGALLO
+              ("Portugal", "Primeira Liga"),
+              ("Portugal", "Segunda Liga"),
+              ("Portugal", "Taça de Portugal"),
+
+              # OLANDA
+              ("Netherlands", "Eredivisie"),
+              ("Netherlands", "Eerste Divisie"),
+
+              # BELGIO
+              ("Belgium", "Jupiler Pro League"),
+
+              # SCOZIA
+              ("Scotland", "Premiership"),
+              ("Scotland", "Championship"),
+
+              # TURCHIA
+              ("Turkey", "Süper Lig"),
+
+              # GRECIA
+              ("Greece", "Super League 1"),
+
+              # AUSTRIA
+              ("Austria", "Bundesliga"),
+
+              # SVIZZERA
+              ("Switzerland", "Super League"),
+
+              # DANIMARCA
+              ("Denmark", "Superliga"),
+
+              # NORVEGIA
+              ("Norway", "Eliteserien"),
+
+              # SVEZIA
+              ("Sweden", "Allsvenskan"),
+
+              # BRASILE
+              ("Brazil", "Serie A"),
+              ("Brazil", "Serie B"),
+
+              # ARGENTINA
+              ("Argentina", "Liga Profesional Argentina"),
+
+              # USA
+              ("USA", "Major League Soccer"),
+
+              # MESSICO
+              ("Mexico", "Liga MX"),
+
+              # EUROPA / MONDO
+              ("World", "UEFA Champions League"),
+              ("World", "UEFA Europa League"),
+              ("World", "UEFA Europa Conference League"),
+              ("World", "UEFA Nations League"),
+              ("World", "World Cup"),
+              ("World", "Euro Championship"),
+              ("World", "CONMEBOL Libertadores"),
+              ("World", "CONMEBOL Sudamericana")
+
+          }
+
+
+          filtered = []
+
 
           for match in matches:
+
               league = match.get("league", {})
-              country = league.get("country", "Internazionale")
-              name = league.get("name", "Sconosciuto")
 
-              key = f"{country} | {name}"
-              leagues[key] = leagues.get(key, 0) + 1
+              country = league.get("country", "")
+              league_name = league.get("name", "")
 
-          print("Campionati trovati:")
+
+              if (country, league_name) not in allowed:
+                  continue
+
+
+              fixture = match.get("fixture", {})
+              teams = match.get("teams", {})
+
+
+              home = teams.get("home", {})
+              away = teams.get("away", {})
+
+
+              item = {
+
+                  "fixtureId":
+                      fixture.get("id"),
+
+                  "date":
+                      fixture.get("date"),
+
+                  "timestamp":
+                      fixture.get("timestamp"),
+
+                  "status":
+                      fixture.get(
+                          "status",
+                          {}
+                      ).get("short"),
+
+                  "country":
+                      country,
+
+                  "league":
+                      league_name,
+
+                  "leagueId":
+                      league.get("id"),
+
+                  "season":
+                      league.get("season"),
+
+                  "round":
+                      league.get("round"),
+
+                  "home": {
+
+                      "id":
+                          home.get("id"),
+
+                      "name":
+                          home.get("name"),
+
+                      "logo":
+                          home.get("logo")
+
+                  },
+
+                  "away": {
+
+                      "id":
+                          away.get("id"),
+
+                      "name":
+                          away.get("name"),
+
+                      "logo":
+                          away.get("logo")
+
+                  }
+
+              }
+
+
+              filtered.append(item)
+
+
+          filtered.sort(
+              key=lambda x:
+                  x.get("timestamp") or 0
+          )
+
+
+          output = {
+
+              "generatedAt":
+                  datetime.utcnow().isoformat()
+                  + "Z",
+
+              "source":
+                  "API-Football",
+
+              "total":
+                  len(filtered),
+
+              "matches":
+                  filtered
+
+          }
+
+
+          with open(
+              OUTPUT,
+              "w",
+              encoding="utf-8"
+          ) as f:
+
+              json.dump(
+                  output,
+                  f,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+
+          print()
+          print(
+              "Partite ricevute:",
+              len(matches)
+          )
+
+          print(
+              "Partite BETLAB:",
+              len(filtered)
+          )
+
           print()
 
-          for league, count in sorted(leagues.items()):
-              print(f"- {league}: {count}")
+
+          competitions = {}
+
+
+          for match in filtered:
+
+              key = (
+                  match["country"]
+                  + " | "
+                  + match["league"]
+              )
+
+              competitions[key] = (
+                  competitions.get(
+                      key,
+                      0
+                  )
+                  + 1
+              )
+
+
+          print(
+              "Competizioni BETLAB:"
+          )
+
+
+          for name, count in sorted(
+              competitions.items()
+          ):
+
+              print(
+                  f"- {name}: {count}"
+              )
+
 
           print()
-          print("=================================")
-          print("BETLAB API-FOOTBALL OK")
-          print("=================================")
+          print(
+              "BETLAB FEED OK"
+          )
+
           PY
+
+
+      - name: Salva feed BETLAB
+        run: |
+
+          git config \
+            user.name \
+            "BETLAB AI Bot"
+
+          git config \
+            user.email \
+            "actions@github.com"
+
+
+          git add \
+            data/betlab-matches.json
+
+
+          if git diff \
+            --cached \
+            --quiet
+
+          then
+
+            echo \
+              "Nessun aggiornamento."
+
+          else
+
+            git commit \
+              -m \
+              "Aggiorna feed BETLAB"
+
+            git push
+
+          fi
