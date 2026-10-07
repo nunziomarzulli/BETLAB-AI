@@ -1,119 +1,17 @@
 {
   "engine": "BETLAB V7 MULTI-MARKET",
-  "generatedAt": "2026-10-07T19:50:16.619734+02:00",
+  "generatedAt": "2026-10-07T23:15:57.051275+02:00",
   "days": [
     "2026-10-07",
     "2026-10-08"
   ],
-  "historyCount": 6636,
-  "matchesAnalyzed": 42,
+  "historyCount": 6690,
+  "matchesAnalyzed": 31,
   "matchesWithCandidates": 2,
-  "marketCandidates": 82,
-  "candidatesWithOdds": 9,
+  "marketCandidates": 78,
+  "candidatesWithOdds": 11,
   "exactScoresWithOdds": 0,
   "analysis": [
-    {
-      "fixtureId": 1571140,
-      "date": "2026-10-07",
-      "timestamp": 1791397800,
-      "country": "Spain",
-      "league": "Primera División RFEF - Group 2",
-      "priority": 5,
-      "home": {
-        "name": "FC Cartagena",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 4,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 4.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Real Murcia",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": true,
-        "selection": "12",
-        "market": "Doppia Chance",
-        "confidence": 71.4,
-        "oddAvailable": true,
-        "odd": 1.36,
-        "bookmaker": "William Hill",
-        "apiMarket": "Double Chance",
-        "apiSelection": "Home/Away"
-      },
-      "candidates": [
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.36,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 0.971
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.64286,
-          "index": 64.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.5,
-          "bookmaker": "Betfair",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 0.964
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.64286,
-          "index": 64.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.4,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 0.9
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.4,
-          "bookmaker": "Bet365",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 0.84
-        }
-      ]
-    },
     {
       "fixtureId": 1640679,
       "date": "2026-10-08",
@@ -548,15 +446,96 @@
       },
       "historyScore": 2,
       "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
+        "available": true,
+        "selection": "1X",
+        "market": "Doppia Chance",
+        "confidence": 71.4,
+        "oddAvailable": true,
+        "odd": 1.5,
+        "bookmaker": "William Hill",
+        "apiMarket": "Double Chance",
+        "apiSelection": "Home/Draw"
       },
-      "candidates": []
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.5,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 1.071
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.29,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.921
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 2.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.57,
+          "bookmaker": "Bet365",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 2.5",
+          "value": 0.942
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "GOAL",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.44,
+          "bookmaker": "William Hill",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "Yes",
+          "value": 0.864
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.15,
+          "bookmaker": "1xBet",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 0.69
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.57143,
+          "index": 57.1,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.62,
+          "bookmaker": "Betfair",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 0.926
+        }
+      ]
     },
     {
       "fixtureId": 1547007,
@@ -1076,100 +1055,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1579824,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Belgium",
-      "league": "First Amateur Division",
-      "priority": 4,
-      "home": {
-        "name": "Standard Liège II",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Albert Quévy-Mons",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1612073,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Argentina",
-      "league": "Reserve League",
-      "priority": 3,
-      "home": {
-        "name": "Aldosivi Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Tigre Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1612074,
       "date": "2026-10-07",
       "timestamp": 1791396000,
@@ -1192,194 +1077,6 @@
       },
       "away": {
         "name": "San Lorenzo Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1612079,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Argentina",
-      "league": "Reserve League",
-      "priority": 3,
-      "home": {
-        "name": "Deportivo Riestra Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Independiente Riva. Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1612080,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Argentina",
-      "league": "Reserve League",
-      "priority": 3,
-      "home": {
-        "name": "Estudiantes Rio Cuarto 2",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Platense Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1612081,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Argentina",
-      "league": "Reserve League",
-      "priority": 3,
-      "home": {
-        "name": "Ferro 2",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Independiente Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1612083,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Argentina",
-      "league": "Reserve League",
-      "priority": 3,
-      "home": {
-        "name": "Gimnasia Mendoza 2",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Instituto Res.",
         "form": {
           "played": 0,
           "wins": 0,
@@ -1897,194 +1594,6 @@
       },
       "away": {
         "name": "Colón Res.",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1642725,
-      "date": "2026-10-07",
-      "timestamp": 1791378000,
-      "country": "Greece",
-      "league": "Gamma Ethniki - Group 10",
-      "priority": 2,
-      "home": {
-        "name": "Panakrotiriakos",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Episkopi",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1642727,
-      "date": "2026-10-07",
-      "timestamp": 1791378000,
-      "country": "Greece",
-      "league": "Gamma Ethniki - Group 10",
-      "priority": 2,
-      "home": {
-        "name": "Rethymniakos",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Chersonissos",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1609683,
-      "date": "2026-10-07",
-      "timestamp": 1791395100,
-      "country": "Switzerland",
-      "league": "1. Liga Classic - Group 3",
-      "priority": 2,
-      "home": {
-        "name": "Freienbach",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Eschen / Mauren",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1609685,
-      "date": "2026-10-07",
-      "timestamp": 1791396000,
-      "country": "Switzerland",
-      "league": "1. Liga Classic - Group 3",
-      "priority": 2,
-      "home": {
-        "name": "Kosova",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Dietikon",
         "form": {
           "played": 0,
           "wins": 0,
