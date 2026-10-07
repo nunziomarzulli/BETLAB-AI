@@ -745,7 +745,24 @@
       .archive-grid { grid-template-columns:1fr; }
     }
 
-  </style>
+  
+    .delete-pending-ticket {
+      width: 100%;
+      margin-top: 10px;
+      padding: 9px 12px;
+      border: 1px solid #d7dde2;
+      border-radius: 8px;
+      background: #fff;
+      color: #b42318;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .delete-pending-ticket:hover {
+      background: #fff4f2;
+    }
+
+</style>
 </head>
 
 <body>
@@ -1952,6 +1969,7 @@
     currentStake = stake;
     currentTarget = target;
     betForm.classList.remove("open");
+    saveBetButton.style.display = "block";
 
     cards.innerHTML = "";
 
@@ -2340,7 +2358,20 @@
         <strong>Biglietto #${safeText(bet.number)} · IN ATTESA</strong>
         <div class="mini">${bet.picks.map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}`).join("<br>")}</div>
         <div class="mini"><b>Quota Sisal ${oddText(bet.sisalOdd)}</b> · ${money(bet.stake)} → ${money(bet.potentialReturn)}</div>
+        <button class="delete-pending-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA GIOCATA</button>
       </div>`).join("") : '<div class="empty-slip">Nessuna giocata in corso.</div>';
+
+    pendingBetsList.querySelectorAll(".delete-pending-ticket").forEach(button => {
+      button.addEventListener("click", async () => {
+        const id = button.dataset.betId;
+        if (currentUser) {
+          await deleteDoc(doc(db, "users", currentUser.uid, "bets", id));
+        } else {
+          await writeSavedBets(loadSavedBets().filter(b => b.id !== id));
+          renderSavedBets();
+        }
+      });
+    });
 
     savedBetsList.innerHTML = "";
     if (!archived.length) {
@@ -2496,6 +2527,11 @@
     await writeSavedBets(bets);
 
     betForm.classList.remove("open");
+    saveBetButton.style.display = "none";
+    currentResult = null;
+    sisalOddInput.value = "";
+    realStakeInput.value = "";
+    realReturnInput.value = "";
     if (!currentUser) renderSavedBets();
 
     document
