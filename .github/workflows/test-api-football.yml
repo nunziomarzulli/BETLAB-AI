@@ -330,12 +330,31 @@ jobs:
 
           for day in DAYS:
 
-              payload = api_get(
-                  "fixtures",
-                  {
-                      "date": day
-                  }
-              )
+              try:
+                  payload = api_get(
+                      "fixtures",
+                      {
+                          "date": day
+                      }
+                  )
+
+              except RuntimeError as exc:
+                  error_text = str(exc)
+
+                  if (
+                      day == TOMORROW.isoformat()
+                      and
+                      "Free plans do not have access to this date"
+                      in error_text
+                  ):
+                      print(
+                          day,
+                          ": saltato - data non ancora disponibile",
+                          "nel piano Free API-Football"
+                      )
+                      continue
+
+                  raise
 
               fixtures = (
                   payload.get("response")
