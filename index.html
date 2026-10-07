@@ -419,6 +419,178 @@
       vertical-align: middle;
     }
 
+
+    .save-bet-button {
+      width: 100%;
+      height: 58px;
+      margin-top: 14px;
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      background: #091525;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .save-bet-button:hover {
+      background: rgba(73,223,145,.08);
+    }
+
+    .bet-form {
+      display: none;
+      margin-top: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .bet-form.open { display: block; }
+
+    .bet-form h3, .saved-bets h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+    }
+
+    .bet-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .form-actions button {
+      flex: 1;
+      height: 50px;
+      border-radius: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .confirm-button {
+      border: 0;
+      background: var(--green);
+      color: #03140d;
+    }
+
+    .cancel-button {
+      border: 1px solid var(--border);
+      background: #091525;
+      color: var(--text);
+    }
+
+    .saved-bets {
+      margin-top: 48px;
+    }
+
+    .saved-bets-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .saved-count {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .ticket {
+      margin-bottom: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .ticket-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .ticket-title {
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .ticket-date {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .ticket-status {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(73,223,145,.12);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 950;
+    }
+
+    .ticket-pick {
+      padding: 11px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .ticket-pick:first-of-type { border-top: 0; }
+
+    .ticket-teams {
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .ticket-selection {
+      margin-top: 4px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .ticket-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ticket-stat-label {
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 900;
+    }
+
+    .ticket-stat-value {
+      margin-top: 4px;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .delete-ticket {
+      width: 100%;
+      height: 42px;
+      margin-top: 14px;
+      border: 1px solid rgba(255,107,107,.35);
+      border-radius: 10px;
+      background: rgba(255,107,107,.06);
+      color: #ff9b9b;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
     @media (max-width: 700px) {
       .page {
         width: min(100% - 22px, 920px);
@@ -456,6 +628,14 @@
 
       .target-label {
         text-align: left;
+      }
+
+      .bet-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ticket-stats {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
@@ -706,6 +886,50 @@
 
       </div>
 
+      <button id="saveBetButton" class="save-bet-button" type="button">
+        REGISTRA GIOCATA EFFETTUATA
+      </button>
+
+      <div id="betForm" class="bet-form">
+        <h3>Registra giocata Sisal</h3>
+
+        <div class="bet-form-grid">
+          <div class="field">
+            <label for="sisalOdd">QUOTA TOTALE SISAL</label>
+            <input id="sisalOdd" type="number" min="1.01" step="0.01" placeholder="es. 2.05">
+          </div>
+
+          <div class="field">
+            <label for="realStake">IMPORTO GIOCATO</label>
+            <div class="input-wrap">
+              <input id="realStake" type="number" min="0.01" step="0.50" placeholder="es. 5">
+              <span class="euro">€</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="realReturn">VINCITA POTENZIALE</label>
+            <div class="input-wrap">
+              <input id="realReturn" type="number" min="0.01" step="0.01" placeholder="es. 10.25">
+              <span class="euro">€</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button id="confirmBetButton" class="confirm-button" type="button">SALVA GIOCATA</button>
+          <button id="cancelBetButton" class="cancel-button" type="button">ANNULLA</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="saved-bets">
+      <div class="saved-bets-head">
+        <h2>Le mie giocate</h2>
+        <div id="savedCount" class="saved-count">0 giocate</div>
+      </div>
+      <div id="savedBetsList"></div>
     </section>
 
   </main>
@@ -721,6 +945,12 @@
   let betlabData = null;
 
   let autoMode = true;
+
+  let currentResult = null;
+  let currentStake = null;
+  let currentTarget = null;
+
+  const BETS_STORAGE_KEY = "betlab_saved_bets_v1";
 
 
   const stakeInput =
@@ -752,6 +982,33 @@
 
   const cards =
     document.getElementById("cards");
+
+  const saveBetButton =
+    document.getElementById("saveBetButton");
+
+  const betForm =
+    document.getElementById("betForm");
+
+  const sisalOddInput =
+    document.getElementById("sisalOdd");
+
+  const realStakeInput =
+    document.getElementById("realStake");
+
+  const realReturnInput =
+    document.getElementById("realReturn");
+
+  const confirmBetButton =
+    document.getElementById("confirmBetButton");
+
+  const cancelBetButton =
+    document.getElementById("cancelBetButton");
+
+  const savedBetsList =
+    document.getElementById("savedBetsList");
+
+  const savedCount =
+    document.getElementById("savedCount");
 
 
   function safeText(value) {
@@ -1540,6 +1797,11 @@
     }
 
 
+    currentResult = result;
+    currentStake = stake;
+    currentTarget = target;
+    betForm.classList.remove("open");
+
     cards.innerHTML = "";
 
 
@@ -1820,6 +2082,248 @@
   }
 
 
+
+  function loadSavedBets() {
+    try {
+      const raw = localStorage.getItem(BETS_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+
+  function writeSavedBets(bets) {
+    localStorage.setItem(
+      BETS_STORAGE_KEY,
+      JSON.stringify(bets)
+    );
+  }
+
+
+  function renderSavedBets() {
+    const bets = loadSavedBets();
+
+    savedCount.textContent =
+      bets.length +
+      (bets.length === 1 ? " giocata" : " giocate");
+
+    savedBetsList.innerHTML = "";
+
+    if (!bets.length) {
+      savedBetsList.innerHTML =
+        '<div class="availability">Non hai ancora registrato giocate effettuate.</div>';
+      return;
+    }
+
+    for (const bet of bets) {
+      const ticket = document.createElement("article");
+      ticket.className = "ticket";
+
+      const picksHtml = bet.picks.map(pick => `
+        <div class="ticket-pick">
+          <div class="ticket-teams">
+            ${safeText(pick.home)} – ${safeText(pick.away)}
+          </div>
+          <div class="ticket-selection">
+            ${safeText(pick.selection)} · ${safeText(pick.market)}
+            · Indice ${Number(pick.index).toFixed(1)}%
+          </div>
+        </div>
+      `).join("");
+
+      ticket.innerHTML = `
+        <div class="ticket-head">
+          <div>
+            <div class="ticket-title">
+              Biglietto #${safeText(bet.number)}
+            </div>
+            <div class="ticket-date">
+              ${safeText(bet.createdAtLabel)}
+            </div>
+          </div>
+          <div class="ticket-status">
+            ${safeText(bet.status)}
+          </div>
+        </div>
+
+        ${picksHtml}
+
+        <div class="ticket-stats">
+          <div>
+            <div class="ticket-stat-label">PUNTATA</div>
+            <div class="ticket-stat-value">${money(bet.stake)}</div>
+          </div>
+          <div>
+            <div class="ticket-stat-label">QUOTA SISAL</div>
+            <div class="ticket-stat-value">${oddText(bet.sisalOdd)}</div>
+          </div>
+          <div>
+            <div class="ticket-stat-label">VINCITA POT.</div>
+            <div class="ticket-stat-value">${money(bet.potentialReturn)}</div>
+          </div>
+          <div>
+            <div class="ticket-stat-label">INCONTRI</div>
+            <div class="ticket-stat-value">${bet.picks.length}</div>
+          </div>
+        </div>
+
+        <button
+          class="delete-ticket"
+          type="button"
+          data-bet-id="${safeText(bet.id)}"
+        >
+          ELIMINA GIOCATA
+        </button>
+      `;
+
+      savedBetsList.appendChild(ticket);
+    }
+
+    savedBetsList
+      .querySelectorAll(".delete-ticket")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          const id = button.dataset.betId;
+          const updated =
+            loadSavedBets().filter(bet => bet.id !== id);
+          writeSavedBets(updated);
+          renderSavedBets();
+        });
+      });
+  }
+
+
+  function openBetForm() {
+    if (!currentResult || !currentResult.picks?.length) {
+      showError("Prima crea una giocata BETLAB.");
+      return;
+    }
+
+    clearError();
+
+    const metrics =
+      combinationScore(
+        currentResult.picks,
+        currentStake,
+        currentTarget
+      );
+
+    realStakeInput.value =
+      Number(currentStake).toFixed(2);
+
+    sisalOddInput.value =
+      Number(metrics.totalOdd).toFixed(2);
+
+    realReturnInput.value =
+      Number(metrics.potential).toFixed(2);
+
+    betForm.classList.add("open");
+    betForm.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
+
+  function saveRealBet() {
+    clearError();
+
+    if (!currentResult || !currentResult.picks?.length) {
+      showError("Prima crea una giocata BETLAB.");
+      return;
+    }
+
+    const sisalOdd = Number(sisalOddInput.value);
+    const realStake = Number(realStakeInput.value);
+    const potentialReturn = Number(realReturnInput.value);
+
+    if (!Number.isFinite(sisalOdd) || sisalOdd <= 1) {
+      showError("Inserisci la quota totale reale trovata su Sisal.");
+      return;
+    }
+
+    if (!Number.isFinite(realStake) || realStake <= 0) {
+      showError("Inserisci l'importo realmente giocato.");
+      return;
+    }
+
+    if (!Number.isFinite(potentialReturn) || potentialReturn <= 0) {
+      showError("Inserisci la vincita potenziale reale.");
+      return;
+    }
+
+    const bets = loadSavedBets();
+    const now = new Date();
+
+    const bet = {
+      id:
+        String(Date.now()) +
+        "-" +
+        Math.random().toString(36).slice(2, 8),
+
+      number: bets.length + 1,
+
+      createdAt: now.toISOString(),
+
+      createdAtLabel:
+        now.toLocaleString("it-IT"),
+
+      status: "IN ATTESA",
+
+      stake: realStake,
+
+      sisalOdd,
+
+      potentialReturn,
+
+      picks: currentResult.picks.map(pick => ({
+        fixtureId:
+          pick.match.fixtureId ??
+          pick.match.fixture_id ??
+          pick.match.id ??
+          null,
+
+        date: pick.match.date ?? "",
+
+        country: pick.match.country ?? "",
+
+        league: pick.match.league ?? "",
+
+        home: pick.match.home?.name ?? "",
+
+        away: pick.match.away?.name ?? "",
+
+        selection: pick.candidate.selection ?? "",
+
+        market: pick.candidate.market ?? "",
+
+        index: Number(pick.candidate.index) || 0,
+
+        betlabOdd: Number(pick.candidate.odd) || null,
+
+        betlabBookmaker:
+          pick.candidate.bookmaker ?? ""
+      }))
+    };
+
+    bets.unshift(bet);
+    writeSavedBets(bets);
+
+    betForm.classList.remove("open");
+    renderSavedBets();
+
+    document
+      .querySelector(".saved-bets")
+      .scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+  }
+
+
   function createBet() {
 
     clearError();
@@ -2020,6 +2524,24 @@
   );
 
 
+  saveBetButton.addEventListener(
+    "click",
+    openBetForm
+  );
+
+  confirmBetButton.addEventListener(
+    "click",
+    saveRealBet
+  );
+
+  cancelBetButton.addEventListener(
+    "click",
+    () => {
+      betForm.classList.remove("open");
+    }
+  );
+
+
   createButton.addEventListener(
     "click",
     createBet
@@ -2108,6 +2630,7 @@
   }
 
 
+  renderSavedBets();
   loadData();
 </script>
 
