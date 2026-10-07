@@ -681,6 +681,70 @@
         grid-template-columns: 1fr 1fr;
       }
     }
+
+
+    /* BETLAB 2.0 — layout tipo bookmaker */
+    .page { width:min(1380px, calc(100% - 32px)); }
+    .main-grid { display:grid; grid-template-columns:minmax(0, 1fr) 390px; gap:24px; align-items:start; }
+    .main-left { min-width:0; }
+    .results {
+      display:block;
+      position:sticky;
+      top:18px;
+      margin-top:0;
+      border:1px solid #35556d;
+      border-radius:16px;
+      overflow:hidden;
+      background:#f4f7f5;
+      color:#16251d;
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+    .results-header { margin:0; padding:15px 16px; background:#26733e; color:#fff; align-items:center; }
+    .results h2 { font-size:17px; letter-spacing:0; }
+    .results-sub { color:#d8eadf; font-size:11px; }
+    .target-label { color:#fff; font-size:11px; }
+    #cards { padding:0 14px; background:#eef4ef; }
+    .match-card { margin:0; padding:14px 2px; border:0; border-bottom:1px solid #cbd8cf; border-radius:0; background:transparent; color:#14231b; }
+    .match-meta { color:#64756b; font-size:9px; }
+    .teams { font-size:14px; color:#15231b; }
+    .pick-box { margin-top:9px; padding:10px; grid-template-columns:1fr auto auto; gap:10px; border:1px solid #c5d7ca; border-radius:9px; background:#fff; }
+    .pick-label,.small-label,.market,.index-label { color:#728078; }
+    .selection { color:#19783c; font-size:16px; }
+    .odd-box { border-left:1px solid #d5ded8; padding-left:10px; }
+    .odd { color:#173e26; font-size:17px; }
+    .index-box { background:#dff0e4; }
+    .index-value { color:#19783c; }
+    .bookmaker { margin-top:7px; color:#64756b; text-align:left; font-size:9px; }
+    .summary { margin:0; border:0; border-radius:0; background:#dce9df; }
+    .summary-grid { grid-template-columns:1fr 1fr; gap:10px; padding:14px; }
+    .summary-label { color:#64756b; }
+    .summary-value { color:#15231b; font-size:16px; }
+    .summary-value.green { color:#126f35; }
+    .summary-message { padding:11px 14px; border-top:1px solid #c6d4ca; color:#52645a; font-size:10px; }
+    .save-bet-button { width:calc(100% - 28px); margin:14px; background:#cce53b; border:0; color:#1e2b18; }
+    .bet-form { margin:0 14px 14px; background:#fff; color:#16251d; border-color:#cad7ce; }
+    .bet-form input { background:#f5f7f5; color:#17251d; border-color:#c9d5cd; }
+    .bet-form label { color:#68786e; }
+    .pending-wrap { padding:0 14px 14px; background:#eef4ef; }
+    .pending-title { padding:12px 0 8px; color:#52645a; font-size:10px; font-weight:950; letter-spacing:1px; }
+    .pending-ticket { padding:11px; margin-top:8px; border:1px solid #c7d5cb; border-radius:9px; background:#fff; color:#17251d; }
+    .pending-ticket strong { font-size:12px; }
+    .pending-ticket .mini { margin-top:5px; color:#66776d; font-size:10px; line-height:1.45; }
+    .empty-slip { padding:28px 18px; text-align:center; color:#68786e; background:#eef4ef; font-size:12px; }
+    .saved-bets { margin-top:38px; }
+    .saved-bets-head h2 { margin-bottom:4px; }
+    .archive-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .ticket.won { border-color:rgba(73,223,145,.65); }
+    .ticket.lost { border-color:rgba(255,107,107,.55); }
+    .ticket-status.won { background:rgba(73,223,145,.15); color:#49df91; }
+    .ticket-status.lost { background:rgba(255,107,107,.12); color:#ff8e8e; }
+    .result-score { margin-top:5px; color:var(--muted); font-size:10px; }
+    @media (max-width: 980px) {
+      .main-grid { grid-template-columns:1fr; }
+      .results { position:static; order:2; }
+      .archive-grid { grid-template-columns:1fr; }
+    }
+
   </style>
 </head>
 
@@ -870,7 +934,7 @@
       </div>
 
 
-      <div id="cards"></div>
+      <div id="cards"><div class="empty-slip">Crea una giocata: il biglietto BETLAB apparirà qui.</div></div>
 
 
       <div class="summary">
@@ -970,18 +1034,23 @@
         </div>
       </div>
 
+      <div class="pending-wrap">
+        <div class="pending-title">GIOCATE IN CORSO</div>
+        <div id="pendingBetsList"></div>
+      </div>
+
     </section>
     </div>
 
     <section class="saved-bets">
       <div class="saved-bets-head">
         <div>
-          <h2>Le mie giocate</h2>
+          <h2>Archivio giocate</h2>
           <div id="syncNote" class="sync-note">Accedi con Google per sincronizzare Mac e iPhone.</div>
         </div>
-        <div id="savedCount" class="saved-count">0 giocate</div>
+        <div id="savedCount" class="saved-count">0 archiviate</div>
       </div>
-      <div id="savedBetsList"></div>
+      <div id="savedBetsList" class="archive-grid"></div>
     </section>
 
   </main>
@@ -1013,8 +1082,12 @@
   const DATA_URL =
     "data/betlab-analysis.json?v=" + Date.now();
 
+  const HISTORY_URL =
+    "data/betlab-history.json?v=" + Date.now();
+
 
   let betlabData = null;
+  let betlabHistory = [];
 
   let autoMode = true;
 
@@ -1078,6 +1151,9 @@
 
   const savedBetsList =
     document.getElementById("savedBetsList");
+
+  const pendingBetsList =
+    document.getElementById("pendingBetsList");
 
   const savedCount =
     document.getElementById("savedCount");
@@ -1865,8 +1941,7 @@
         "BETLAB non ha trovato una combinazione valida con i parametri richiesti."
       );
 
-      results.style.display =
-        "none";
+      cards.innerHTML = '<div class="empty-slip">Nessuna combinazione disponibile.</div>';
 
       return;
 
@@ -2186,100 +2261,121 @@
     }
   }
 
+  function normalizeTeam(value) {
+    return String(value || "").toLowerCase().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  function historyGoals(row) {
+    const home = Number(row.homeGoals ?? row.home_goals ?? row.goals?.home ?? row.score?.fulltime?.home ?? row.score?.home);
+    const away = Number(row.awayGoals ?? row.away_goals ?? row.goals?.away ?? row.score?.fulltime?.away ?? row.score?.away);
+    return Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null;
+  }
+
+  function findFinalResult(pick) {
+    const d = String(pick.date || "").slice(0,10);
+    const h = normalizeTeam(pick.home), a = normalizeTeam(pick.away);
+    return betlabHistory.find(row => {
+      const rd = String(row.date || row.fixture?.date || "").slice(0,10);
+      const rh = normalizeTeam(row.home?.name ?? row.home ?? row.homeTeam ?? row.teams?.home?.name);
+      const ra = normalizeTeam(row.away?.name ?? row.away ?? row.awayTeam ?? row.teams?.away?.name);
+      return rd === d && rh === h && ra === a && historyGoals(row);
+    }) || null;
+  }
+
+  function settleSelection(selection, market, hg, ag) {
+    const s = String(selection || "").toUpperCase().trim();
+    const m = String(market || "").toLowerCase();
+    const total = hg + ag;
+    const homeWin = hg > ag, draw = hg === ag, awayWin = hg < ag;
+    if (m.includes("risultato esatto") || /^\d+\s*[:\-]\s*\d+$/.test(s)) {
+      const mm = s.match(/(\d+)\s*[:\-]\s*(\d+)/); return mm ? (hg === +mm[1] && ag === +mm[2]) : null;
+    }
+    if (["1","X","2","1X","X2","12"].includes(s)) {
+      if (s === "1") return homeWin; if (s === "X") return draw; if (s === "2") return awayWin;
+      if (s === "1X") return homeWin || draw; if (s === "X2") return draw || awayWin; if (s === "12") return !draw;
+    }
+    if (s === "GOAL" || s === "GG") return hg > 0 && ag > 0;
+    if (s === "NO GOAL" || s === "NOGOAL" || s === "NG") return hg === 0 || ag === 0;
+    if (s === "PARI") return total % 2 === 0;
+    if (s === "DISPARI") return total % 2 === 1;
+    let mm = s.match(/OVER\s*([0-9.]+)/); if (mm) return total > Number(mm[1]);
+    mm = s.match(/UNDER\s*([0-9.]+)/); if (mm) return total < Number(mm[1]);
+    mm = s.match(/^(\d+)\s*[-–]\s*(\d+)$/); if (mm && (m.includes("somma") || m.includes("gol"))) return total >= +mm[1] && total <= +mm[2];
+    if (/^\d+\+$/.test(s) && (m.includes("somma") || m.includes("gol"))) return total >= parseInt(s);
+    return null;
+  }
+
+  async function refreshBetStatuses() {
+    if (!betlabHistory.length) return;
+    const bets = loadSavedBets();
+    let changed = false;
+    const updated = bets.map(bet => {
+      if (bet.status === "VINTA" || bet.status === "PERSA") return bet;
+      let allFinal = true, allWon = true;
+      const picks = bet.picks.map(pick => {
+        const row = findFinalResult(pick);
+        if (!row) { allFinal = false; return pick; }
+        const g = historyGoals(row);
+        const won = settleSelection(pick.selection, pick.market, g.home, g.away);
+        if (won === null) { allFinal = false; return pick; }
+        if (!won) allWon = false;
+        return { ...pick, finalScore: `${g.home}-${g.away}`, result: won ? "VINTA" : "PERSA" };
+      });
+      if (!allFinal) return { ...bet, picks };
+      changed = true;
+      return { ...bet, picks, status: allWon ? "VINTA" : "PERSA", settledAt: new Date().toISOString() };
+    });
+    if (changed) await writeSavedBets(updated);
+  }
+
   function renderSavedBets() {
     const bets = loadSavedBets();
+    const pending = bets.filter(b => b.status !== "VINTA" && b.status !== "PERSA");
+    const archived = bets.filter(b => b.status === "VINTA" || b.status === "PERSA");
 
-    savedCount.textContent =
-      bets.length +
-      (bets.length === 1 ? " giocata" : " giocate");
+    savedCount.textContent = archived.length + (archived.length === 1 ? " archiviata" : " archiviate");
+    pendingBetsList.innerHTML = pending.length ? pending.map(bet => `
+      <div class="pending-ticket">
+        <strong>Biglietto #${safeText(bet.number)} · IN ATTESA</strong>
+        <div class="mini">${bet.picks.map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}`).join("<br>")}</div>
+        <div class="mini"><b>Quota Sisal ${oddText(bet.sisalOdd)}</b> · ${money(bet.stake)} → ${money(bet.potentialReturn)}</div>
+      </div>`).join("") : '<div class="empty-slip">Nessuna giocata in corso.</div>';
 
     savedBetsList.innerHTML = "";
-
-    if (!bets.length) {
-      savedBetsList.innerHTML =
-        '<div class="availability">Non hai ancora registrato giocate effettuate.</div>';
+    if (!archived.length) {
+      savedBetsList.innerHTML = '<div class="availability">Le giocate concluse compariranno qui automaticamente come VINTA o PERSA.</div>';
       return;
     }
 
-    for (const bet of bets) {
+    for (const bet of archived) {
       const ticket = document.createElement("article");
-      ticket.className = "ticket";
-
+      ticket.className = "ticket " + (bet.status === "VINTA" ? "won" : "lost");
       const picksHtml = bet.picks.map(pick => `
         <div class="ticket-pick">
-          <div class="ticket-teams">
-            ${safeText(pick.home)} – ${safeText(pick.away)}
-          </div>
-          <div class="ticket-selection">
-            ${safeText(pick.selection)} · ${safeText(pick.market)}
-            · Quota BETLAB ${pick.betlabOdd ? oddText(pick.betlabOdd) : "n.d."}
-            · Indice ${Number(pick.index).toFixed(1)}%
-          </div>
-        </div>
-      `).join("");
-
+          <div class="ticket-teams">${safeText(pick.home)} – ${safeText(pick.away)}</div>
+          <div class="ticket-selection">${safeText(pick.selection)} · ${safeText(pick.market)} · Quota BETLAB ${pick.betlabOdd ? oddText(pick.betlabOdd) : "n.d."} · Indice ${Number(pick.index).toFixed(1)}%</div>
+          ${pick.finalScore ? `<div class="result-score">Risultato: ${safeText(pick.finalScore)} · ${safeText(pick.result)}</div>` : ""}
+        </div>`).join("");
       ticket.innerHTML = `
-        <div class="ticket-head">
-          <div>
-            <div class="ticket-title">
-              Biglietto #${safeText(bet.number)}
-            </div>
-            <div class="ticket-date">
-              ${safeText(bet.createdAtLabel)}
-            </div>
-          </div>
-          <div class="ticket-status">
-            ${safeText(bet.status)}
-          </div>
-        </div>
-
+        <div class="ticket-head"><div><div class="ticket-title">Biglietto #${safeText(bet.number)}</div><div class="ticket-date">${safeText(bet.createdAtLabel)}</div></div>
+        <div class="ticket-status ${bet.status === "VINTA" ? "won" : "lost"}">${safeText(bet.status)}</div></div>
         ${picksHtml}
-
-        <div class="ticket-stats">
-          <div>
-            <div class="ticket-stat-label">PUNTATA</div>
-            <div class="ticket-stat-value">${money(bet.stake)}</div>
-          </div>
-          <div>
-            <div class="ticket-stat-label">QUOTA SISAL</div>
-            <div class="ticket-stat-value">${oddText(bet.sisalOdd)}</div>
-          </div>
-          <div>
-            <div class="ticket-stat-label">VINCITA POT.</div>
-            <div class="ticket-stat-value">${money(bet.potentialReturn)}</div>
-          </div>
-          <div>
-            <div class="ticket-stat-label">INCONTRI</div>
-            <div class="ticket-stat-value">${bet.picks.length}</div>
-          </div>
-        </div>
-
-        <button
-          class="delete-ticket"
-          type="button"
-          data-bet-id="${safeText(bet.id)}"
-        >
-          ELIMINA GIOCATA
-        </button>
-      `;
-
+        <div class="ticket-stats"><div><div class="ticket-stat-label">PUNTATA</div><div class="ticket-stat-value">${money(bet.stake)}</div></div>
+        <div><div class="ticket-stat-label">QUOTA SISAL</div><div class="ticket-stat-value">${oddText(bet.sisalOdd)}</div></div>
+        <div><div class="ticket-stat-label">VINCITA POT.</div><div class="ticket-stat-value">${money(bet.potentialReturn)}</div></div>
+        <div><div class="ticket-stat-label">INCONTRI</div><div class="ticket-stat-value">${bet.picks.length}</div></div></div>
+        <button class="delete-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA DALL'ARCHIVIO</button>`;
       savedBetsList.appendChild(ticket);
     }
 
-    savedBetsList
-      .querySelectorAll(".delete-ticket")
-      .forEach(button => {
-        button.addEventListener("click", async () => {
-          const id = button.dataset.betId;
-          if (currentUser) {
-            await deleteDoc(doc(db, "users", currentUser.uid, "bets", id));
-          } else {
-            const updated = loadSavedBets().filter(bet => bet.id !== id);
-            await writeSavedBets(updated);
-            renderSavedBets();
-          }
-        });
+    savedBetsList.querySelectorAll(".delete-ticket").forEach(button => {
+      button.addEventListener("click", async () => {
+        const id = button.dataset.betId;
+        if (currentUser) await deleteDoc(doc(db, "users", currentUser.uid, "bets", id));
+        else { await writeSavedBets(loadSavedBets().filter(b => b.id !== id)); renderSavedBets(); }
       });
+    });
   }
 
 
@@ -2662,6 +2758,19 @@
       betlabData =
         await response.json();
 
+      try {
+        const historyResponse = await fetch(HISTORY_URL, { cache: "no-store" });
+        if (historyResponse.ok) {
+          const historyJson = await historyResponse.json();
+          betlabHistory = Array.isArray(historyJson) ? historyJson : (Array.isArray(historyJson.history) ? historyJson.history : (Array.isArray(historyJson.matches) ? historyJson.matches : []));
+        }
+      } catch (historyError) {
+        console.warn("Storico risultati non disponibile", historyError);
+      }
+
+      await refreshBetStatuses();
+      renderSavedBets();
+
 
       const options =
         prepareOptions();
@@ -2766,6 +2875,7 @@
         await migrateLocalBetsIfNeeded(user);
       }
       renderSavedBets();
+      if (betlabHistory.length) await refreshBetStatuses();
     }, error => {
       console.error(error);
       showError("Errore sincronizzazione Firestore.");
