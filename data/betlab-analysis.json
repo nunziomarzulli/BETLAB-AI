@@ -1,15 +1,15 @@
 {
   "engine": "BETLAB V7 MULTI-MARKET",
-  "generatedAt": "2026-10-07T10:57:05.558631+02:00",
+  "generatedAt": "2026-10-07T13:48:39.455868+02:00",
   "days": [
     "2026-10-07",
     "2026-10-08"
   ],
-  "historyCount": 6525,
-  "matchesAnalyzed": 71,
+  "historyCount": 6533,
+  "matchesAnalyzed": 50,
   "matchesWithCandidates": 4,
-  "marketCandidates": 209,
-  "candidatesWithOdds": 25,
+  "marketCandidates": 103,
+  "candidatesWithOdds": 23,
   "exactScoresWithOdds": 0,
   "analysis": [
     {
@@ -75,6 +75,19 @@
         },
         {
           "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.64286,
+          "index": 64.3,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.5,
+          "bookmaker": "Betano",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 0.964
+        },
+        {
+          "market": "Doppia Chance",
           "selection": "1X",
           "modelProbability": 0.64286,
           "index": 64.3,
@@ -84,19 +97,6 @@
           "bookmaker": "Betfair",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Draw",
-          "value": 0.926
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.64286,
-          "index": 64.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.44,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
           "value": 0.926
         },
         {
@@ -107,1046 +107,12 @@
           "model": "frequency",
           "oddAvailable": true,
           "odd": 1.4,
-          "bookmaker": "Bet365",
+          "bookmaker": "BetVictor",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 1.5",
           "value": 0.84
         }
       ]
-    },
-    {
-      "fixtureId": 1640675,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Adanaspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 1,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 1.0,
-          "avgGA": 2.0
-        }
-      },
-      "away": {
-        "name": "Adana Adaletgucu",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 5,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 5.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640695,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Mazıdağı Fosfatspor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Kırşehir Belediyespor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 7,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 7.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640696,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Niğde Belediyesispor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Ağrı 1970",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640698,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Osmaniyespor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 2,
-          "ga": 4,
-          "ppg": 0.0,
-          "avgGF": 2.0,
-          "avgGA": 4.0
-        }
-      },
-      "away": {
-        "name": "Yeni Mersin Idmanyurdu",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 3,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 3.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": true,
-        "selection": "12",
-        "market": "Doppia Chance",
-        "confidence": 71.4,
-        "oddAvailable": true,
-        "odd": 1.29,
-        "bookmaker": "William Hill",
-        "apiMarket": "Double Chance",
-        "apiSelection": "Home/Away"
-      },
-      "candidates": [
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.29,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 0.921
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.64286,
-          "index": 64.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.1,
-          "bookmaker": "Bet365",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.35
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.64286,
-          "index": 64.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.25,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 0.804
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.75,
-          "bookmaker": "Bet365",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 1.05
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.22,
-          "bookmaker": "BetVictor",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 0.732
-        }
-      ]
-    },
-    {
-      "fixtureId": 1640699,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Pazarspor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Erbaaspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 2,
-          "ga": 4,
-          "ppg": 0.0,
-          "avgGF": 2.0,
-          "avgGA": 4.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": true,
-        "selection": "1X",
-        "market": "Doppia Chance",
-        "confidence": 71.4,
-        "oddAvailable": true,
-        "odd": 1.75,
-        "bookmaker": "William Hill",
-        "apiMarket": "Double Chance",
-        "apiSelection": "Home/Draw"
-      },
-      "candidates": [
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.75,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 1.25
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.25,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 0.893
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 3.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.63,
-          "bookmaker": "Betfair",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 3.5",
-          "value": 1.578
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.88,
-          "bookmaker": "Bet365",
-          "apiMarket": "Odd/Even",
-          "apiSelection": "Even",
-          "value": 1.128
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.67,
-          "bookmaker": "Bet365",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 1.002
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.57,
-          "bookmaker": "William Hill",
-          "apiMarket": "Both Teams Score",
-          "apiSelection": "Yes",
-          "value": 0.942
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.2,
-          "bookmaker": "Betfair",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 0.72
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.57143,
-          "index": 57.1,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.33,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 0.76
-        }
-      ]
-    },
-    {
-      "fixtureId": 1640704,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Tokat Bld Plevnespor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 1,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 1.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Etimesgut SK",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 1,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 1.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640705,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Zonguldak Kömürspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 1.0,
-          "avgGF": 0.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Düzcespor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 1.0,
-          "avgGF": 0.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": true,
-        "selection": "X2",
-        "market": "Doppia Chance",
-        "confidence": 71.4,
-        "oddAvailable": true,
-        "odd": 1.67,
-        "bookmaker": "William Hill",
-        "apiMarket": "Double Chance",
-        "apiSelection": "Draw/Away"
-      },
-      "candidates": [
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.67,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.193
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.71429,
-          "index": 71.4,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.3,
-          "bookmaker": "Bet365",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 0.929
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 1.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 3.2,
-          "bookmaker": "Betfair",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 1.5",
-          "value": 1.92
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "NO GOAL",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.91,
-          "bookmaker": "William Hill",
-          "apiMarket": "Both Teams Score",
-          "apiSelection": "No",
-          "value": 1.146
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.85,
-          "bookmaker": "Bet365",
-          "apiMarket": "Odd/Even",
-          "apiSelection": "Even",
-          "value": 1.11
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 2.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.73,
-          "bookmaker": "Bet365",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 2.5",
-          "value": 1.038
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.25,
-          "bookmaker": "Betfair",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 3.5",
-          "value": 0.75
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.57143,
-          "index": 57.1,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.35,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 0.771
-        }
-      ]
-    },
-    {
-      "fixtureId": 1640676,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Bigaspor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 2,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 2.0
-        }
-      },
-      "away": {
-        "name": "Balıkesirspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 2,
-          "ga": 3,
-          "ppg": 0.0,
-          "avgGF": 2.0,
-          "avgGA": 3.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640678,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Bursa Yıldırımspor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 1,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 1.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Amasyaspor 1968",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640681,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Anadolu Üniversitesi",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Kepezspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640684,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Nilüfer Belediye",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Uşak Spor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640685,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Gölcükspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 2.0
-        }
-      },
-      "away": {
-        "name": "Yozgat Bld Bozokspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 1,
-          "ga": 9,
-          "ppg": 0.0,
-          "avgGF": 1.0,
-          "avgGA": 9.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640689,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Karacabey Belediyespor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 1,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 1.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Galata",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640693,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Küçükçekmece Sinopspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 1,
-          "ga": 3,
-          "ppg": 0.0,
-          "avgGF": 1.0,
-          "avgGA": 3.0
-        }
-      },
-      "away": {
-        "name": "Beykoz İshaklıspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640701,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Silivrispor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 1.0,
-          "avgGF": 0.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Kartal Bulvarspor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 4,
-          "ga": 2,
-          "ppg": 3.0,
-          "avgGF": 4.0,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640702,
-      "date": "2026-10-07",
-      "timestamp": 1791372600,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Söke 1970",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 1,
-          "ga": 1,
-          "ppg": 1.0,
-          "avgGF": 1.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Ayvalikgucu",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 1,
-          "ga": 1,
-          "ppg": 1.0,
-          "avgGF": 1.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
     },
     {
       "fixtureId": 1640683,
@@ -1185,15 +151,96 @@
       },
       "historyScore": 2,
       "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
+        "available": true,
+        "selection": "12",
+        "market": "Doppia Chance",
+        "confidence": 71.4,
+        "oddAvailable": true,
+        "odd": 1.25,
+        "bookmaker": "William Hill",
+        "apiMarket": "Double Chance",
+        "apiSelection": "Home/Away"
       },
-      "candidates": []
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.25,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.893
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.64286,
+          "index": 64.3,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.38,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 1.53
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.64286,
+          "index": 64.3,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.17,
+          "bookmaker": "Bet365",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 0.752
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 2.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 2.5",
+          "value": 1.2
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "NO GOAL",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.95,
+          "bookmaker": "William Hill",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "No",
+          "value": 1.17
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.4,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 0.84
+        }
+      ]
     },
     {
       "fixtureId": 1640688,
@@ -1232,15 +279,83 @@
       },
       "historyScore": 2,
       "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
+        "available": true,
+        "selection": "X2",
+        "market": "Doppia Chance",
+        "confidence": 71.4,
+        "oddAvailable": true,
+        "odd": 1.36,
+        "bookmaker": "Marathonbet",
+        "apiMarket": "Double Chance",
+        "apiSelection": "Draw/Away"
       },
-      "candidates": []
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.36,
+          "bookmaker": "Marathonbet",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 0.971
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.33,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.95
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.3,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 0.78
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.29,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 0.774
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.57143,
+          "index": 57.1,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.62,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 0.926
+        }
+      ]
     },
     {
       "fixtureId": 1640682,
@@ -1279,15 +394,122 @@
       },
       "historyScore": 2,
       "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
+        "available": true,
+        "selection": "12",
+        "market": "Doppia Chance",
+        "confidence": 71.4,
+        "oddAvailable": true,
+        "odd": 1.1,
+        "bookmaker": "William Hill",
+        "apiMarket": "Double Chance",
+        "apiSelection": "Home/Away"
       },
-      "candidates": []
+      "candidates": [
+        {
+          "market": "Doppia Chance",
+          "selection": "12",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.1,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Away",
+          "value": 0.786
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "1X",
+          "modelProbability": 0.71429,
+          "index": 71.4,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.02,
+          "bookmaker": "William Hill",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Home/Draw",
+          "value": 0.729
+        },
+        {
+          "market": "Pari/Dispari",
+          "selection": "DISPARI",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.88,
+          "bookmaker": "Bet365",
+          "apiMarket": "Odd/Even",
+          "apiSelection": "Odd",
+          "value": 1.128
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 2.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.57,
+          "bookmaker": "Bet365",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 2.5",
+          "value": 0.942
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.53,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 0.918
+        },
+        {
+          "market": "Goal/No Goal",
+          "selection": "NO GOAL",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.4,
+          "bookmaker": "Betfair",
+          "apiMarket": "Both Teams Score",
+          "apiSelection": "No",
+          "value": 0.84
+        },
+        {
+          "market": "Totale Gol",
+          "selection": "OVER 1.5",
+          "modelProbability": 0.6,
+          "index": 60.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.17,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 1.5",
+          "value": 0.702
+        },
+        {
+          "market": "Doppia Chance",
+          "selection": "X2",
+          "modelProbability": 0.57143,
+          "index": 57.1,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 7.0,
+          "bookmaker": "Bet365",
+          "apiMarket": "Double Chance",
+          "apiSelection": "Draw/Away",
+          "value": 4.0
+        }
+      ]
     },
     {
       "fixtureId": 1640679,
@@ -2030,241 +1252,6 @@
         }
       },
       "historyScore": 10,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1573272,
-      "date": "2026-10-07",
-      "timestamp": 1791367200,
-      "country": "Spain",
-      "league": "Segunda División RFEF - Group 5",
-      "priority": 4,
-      "home": {
-        "name": "Real Madrid III",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Guadalajara",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 3,
-          "ga": 3,
-          "ppg": 1.0,
-          "avgGF": 3.0,
-          "avgGA": 3.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640686,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Hakkari Zapspor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Adana Demirspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640687,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Hatayspor",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Karaköprü Belediyespor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640690,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Kars 36",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Fatsa Belediyespor",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1640703,
-      "date": "2026-10-07",
-      "timestamp": 1791370800,
-      "country": "Turkey",
-      "league": "Türkiye Kupası",
-      "priority": 4,
-      "home": {
-        "name": "Somaspor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Alanya 1221 FK",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 1.0,
-          "avgGF": 0.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 1,
       "prediction": {
         "available": false,
         "selection": null,
