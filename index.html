@@ -735,6 +735,14 @@
     .save-bet-button { width:calc(100% - 28px); margin:14px; background:#cce53b; border:0; color:#1e2b18; }
     .bet-form { margin:0 14px 14px; background:#fff; color:#16251d; border-color:#cad7ce; }
     .bet-form input { background:#f5f7f5; color:#17251d; border-color:#c9d5cd; }
+    /* Modulo di registrazione: campi leggibili nella colonna laterale */
+    .bet-form-grid { grid-template-columns: minmax(0, 1fr); gap:12px; }
+    .bet-form-grid .field, .bet-form-grid .input-wrap { min-width:0; width:100%; }
+    .bet-form-grid input { width:100%; min-width:0; height:46px; font-size:15px; padding:0 38px 0 12px; }
+    .bet-form-grid .field > input { padding-right:12px; }
+    .bet-form-grid .euro { right:12px; }
+    .bet-form .form-actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+    .bet-form .form-actions button { min-width:0; height:45px; font-size:12px; }
     .bet-form label { color:#68786e; }
     .pending-wrap { padding:0 14px 14px; background:#eef4ef; }
     .pending-title { padding:12px 0 8px; color:#52645a; font-size:10px; font-weight:950; letter-spacing:1px; }
