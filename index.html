@@ -1507,45 +1507,41 @@
       qualitySum += candidateQuality(candidate);
       const rawProbability = Number(candidate.modelProbability);
       const fallbackProbability = Number(candidate.index) / 100;
-      const probability = Number.isFinite(rawProbability) && rawProbability > 0 && rawProbability <= 1
-        ? rawProbability
-        : fallbackProbability;
-      // Una probabilità assente o non valida non deve diventare un vantaggio.
-      probabilityProduct *= Number.isFinite(probability) && probability > 0 && probability <= 1
-        ? probability
-        : 0.01;
+      const p = Number.isFinite(rawProbability) && rawProbability > 0 && rawProbability <= 1
+        ? rawProbability : fallbackProbability;
+      probabilityProduct *= Number.isFinite(p) && p > 0 && p <= 1 ? p : 0.01;
       if (candidate.market === "Risultato Esatto") exactScoreCount++;
     }
 
     const potential = stake * totalOdd;
     const averageQuality = qualitySum / picks.length;
+    const hasTarget = Number.isFinite(target) && target > 0 && stake > 0;
 
-    // Penalizziamo la perdita di probabilità della MULTIPLA, non soltanto
-    // la qualità media delle singole selezioni. Il log evita sottosquadri numerici.
-    const probabilityPenalty = -Math.log(Math.max(probabilityProduct, 1e-100)) * 12;
+    // La probabilità totale pesa, ma non deve obbligare AUTO a scegliere
+    // sempre un solo incontro. La qualità media resta una componente importante.
+    let score = averageQuality * 0.65
+      + 6 * Math.log(Math.max(probabilityProduct, 1e-100))
+      - exactScoreCount * 4;
 
-    // Poisson sui risultati esatti non è ancora calibrato su dati fuori campione.
-    // La penalità aggiuntiva impedisce che molti risultati esatti siano scelti
-    // solo per gonfiare la quota; non li vieta in assoluto.
-    const exactScorePenalty = exactScoreCount * 5;
-
-    let targetBonus = 0;
-    if (Number.isFinite(target) && target > 0 && stake > 0) {
-      const targetOdd = Math.max(target / stake, 1.0001);
-      const distance = Math.abs(Math.log(Math.max(totalOdd, 1.0001) / targetOdd));
-      // Preferenza SECONDARIA: al massimo 6 punti, mai una penalità illimitata.
-      targetBonus = 6 * Math.exp(-distance);
+    if (hasTarget) {
+      // Un obiettivo enorme non deve trascinare il sistema verso jackpot
+      // con probabilità trascurabile: massimo rapporto-obiettivo 50x.
+      const requestedOdd = Math.max(target / stake, 1.0001);
+      const workingTargetOdd = Math.min(requestedOdd, 50);
+      const distance = Math.abs(
+        Math.log(Math.max(totalOdd, 1.0001) / workingTargetOdd)
+      );
+      score -= 10 * distance;
     }
 
     return {
-      score: averageQuality - probabilityPenalty - exactScorePenalty + targetBonus,
+      score,
       totalOdd,
       potential,
       averageQuality,
       probabilityProduct
     };
   }
-
 
   function isBetterResult(
     candidateResult,
@@ -2192,7 +2188,7 @@
           +
           oddText(requiredOdd)
           +
-          "</strong>. BETLAB considera l’obiettivo una preferenza secondaria e privilegia la probabilità complessiva della combinazione.";
+          "</strong>. BETLAB bilancia l’obiettivo con la qualità e la probabilità complessiva; per obiettivi estremi limita la ricerca di quote jackpot.";
 
       }
 
