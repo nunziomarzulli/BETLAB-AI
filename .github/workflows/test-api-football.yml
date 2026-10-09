@@ -2404,6 +2404,10 @@ jobs:
               }:
                   continue
 
+              kickoff_ts = int(fixture.get("timestamp") or 0)
+              if kickoff_ts <= int(datetime.now(ROME).timestamp()):
+                  continue
+
 
               league = (
                   item.get("league")
@@ -2868,6 +2872,136 @@ jobs:
 
               })
 
+
+          # ==========================================================
+          # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
+          # Una selezione per fixture, alla prima analisi disponibile.
+          # ==========================================================
+
+          prediction_log_path = "data/betlab-predictions-log.json"
+          prediction_log = load_json(prediction_log_path, [])
+          if not isinstance(prediction_log, list):
+              prediction_log = []
+
+          logged_ids = {
+              str(row.get("fixtureId"))
+              for row in prediction_log
+              if isinstance(row, dict) and row.get("fixtureId") is not None
+          }
+          recorded_at = datetime.now(ROME).isoformat()
+          recorded_ts = int(datetime.now(ROME).timestamp())
+          added_predictions = 0
+
+          for match in analysis:
+              fixture_id = match.get("fixtureId")
+              kickoff_ts = int(match.get("timestamp") or 0)
+              quoted = match.get("candidates") or []
+              if (fixture_id is None or str(fixture_id) in logged_ids
+                  or kickoff_ts <= recorded_ts or not quoted):
+                  continue
+              pick = quoted[0]
+              prediction_log.append({
+                  "fixtureId": fixture_id,
+                  "date": match.get("date"),
+                  "timestamp": kickoff_ts,
+                  "country": match.get("country"),
+                  "league": match.get("league"),
+                  "home": match["home"]["name"],
+                  "away": match["away"]["name"],
+                  "market": pick["market"],
+                  "selection": pick["selection"],
+                  "odd": pick["odd"],
+                  "bookmaker": pick.get("bookmaker"),
+                  "index": pick["index"],
+                  "recordedAt": recorded_at,
+                  "status": "IN_ATTESA",
+                  "homeGoals": None,
+                  "awayGoals": None
+              })
+              logged_ids.add(str(fixture_id))
+              added_predictions += 1
+
+          def grade_pick(market, selection, hg, ag):
+              market = str(market or "").lower()
+              selection = str(selection or "").strip().upper()
+              total = hg + ag
+              outcome = "1" if hg > ag else ("2" if ag > hg else "X")
+              if market == "1x2":
+                  return outcome == selection
+              if market == "doppia chance":
+                  return outcome in selection
+              if market == "goal/no goal":
+                  return (hg > 0 and ag > 0) if selection == "GOAL" else (hg == 0 or ag == 0)
+              if market == "totale gol":
+                  parts = selection.split()
+                  if len(parts) != 2:
+                      return None
+                  try:
+                      threshold = float(parts[1])
+                  except ValueError:
+                      return None
+                  return total > threshold if parts[0] == "OVER" else total < threshold if parts[0] == "UNDER" else None
+              if market == "pari/dispari":
+                  return (total % 2 == 0) if selection == "PARI" else (total % 2 != 0)
+              if market == "somma gol":
+                  if selection.endswith("+"):
+                      return total >= int(selection[:-1])
+                  if "-" in selection:
+                      a, b = selection.split("-", 1)
+                      return int(a) <= total <= int(b)
+              if market == "risultato esatto":
+                  return selection.replace("-", ":") == f"{hg}:{ag}"
+              return None
+
+          results_by_id = {}
+          results_by_key = {}
+          for item in all_api_matches:
+              fixture = item.get("fixture") or {}
+              if (fixture.get("status") or {}).get("short") not in {"FT", "AET", "PEN"}:
+                  continue
+              goals = item.get("goals") or {}
+              if goals.get("home") is None or goals.get("away") is None:
+                  continue
+              teams = item.get("teams") or {}
+              home = (teams.get("home") or {}).get("name")
+              away = (teams.get("away") or {}).get("name")
+              result = (int(goals["home"]), int(goals["away"]))
+              results_by_id[str(fixture.get("id"))] = result
+              results_by_key[(str(fixture.get("date") or "")[:10], canonical(home), canonical(away))] = result
+
+          # Lo storico persistente consente anche la liquidazione nei run successivi.
+          for record in history:
+              hg, ag = historical_goals(record)
+              if hg is None or ag is None:
+                  continue
+              result = (int(hg), int(ag))
+              if record.get("fixtureId") is not None:
+                  results_by_id[str(record["fixtureId"])] = result
+              results_by_key[logical_history_key(record)] = result
+
+          settled_predictions = 0
+          for row in prediction_log:
+              if not isinstance(row, dict) or row.get("status") != "IN_ATTESA":
+                  continue
+              result = results_by_id.get(str(row.get("fixtureId")))
+              if result is None:
+                  result = results_by_key.get((str(row.get("date") or "")[:10], canonical(row.get("home")), canonical(row.get("away"))))
+              if result is None:
+                  continue
+              hg, ag = result
+              verdict = grade_pick(row.get("market"), row.get("selection"), hg, ag)
+              if verdict is None:
+                  continue
+              row["homeGoals"] = hg
+              row["awayGoals"] = ag
+              row["status"] = "VINTA" if verdict else "PERSA"
+              row["settledAt"] = recorded_at
+              settled_predictions += 1
+
+          save_json(prediction_log_path, prediction_log)
+          print("Pronostici pre-partita registrati:", added_predictions)
+          print("Pronostici liquidati:", settled_predictions)
+          print("Totale registro:", len(prediction_log))
 
           # ==========================================================
           # SALVA ANALISI
