@@ -1,351 +1,17 @@
 {
   "engine": "BETLAB V7 MULTI-MARKET",
-  "generatedAt": "2026-10-09T13:56:13.282300+02:00",
+  "generatedAt": "2026-10-09T19:28:06.309749+02:00",
   "days": [
     "2026-10-09",
     "2026-10-10"
   ],
-  "historyCount": 6848,
-  "matchesAnalyzed": 449,
-  "matchesWithCandidates": 11,
-  "marketCandidates": 1235,
-  "candidatesWithOdds": 222,
-  "exactScoresWithOdds": 137,
+  "historyCount": 6991,
+  "matchesAnalyzed": 421,
+  "matchesWithCandidates": 8,
+  "marketCandidates": 1195,
+  "candidatesWithOdds": 172,
+  "exactScoresWithOdds": 111,
   "analysis": [
-    {
-      "fixtureId": 1576189,
-      "date": "2026-10-09",
-      "timestamp": 1791563400,
-      "country": "Germany",
-      "league": "2. Bundesliga",
-      "priority": 5,
-      "home": {
-        "name": "Eintracht Braunschweig",
-        "form": {
-          "played": 10,
-          "wins": 2,
-          "draws": 1,
-          "losses": 7,
-          "gf": 11,
-          "ga": 22,
-          "ppg": 0.7,
-          "avgGF": 1.1,
-          "avgGA": 2.2
-        }
-      },
-      "away": {
-        "name": "Holstein Kiel",
-        "form": {
-          "played": 10,
-          "wins": 4,
-          "draws": 3,
-          "losses": 3,
-          "gf": 14,
-          "ga": 9,
-          "ppg": 1.5,
-          "avgGF": 1.4,
-          "avgGA": 0.9
-        }
-      },
-      "historyScore": 20,
-      "prediction": {
-        "available": true,
-        "selection": "OVER 1.5",
-        "market": "Totale Gol",
-        "confidence": 90.0,
-        "oddAvailable": true,
-        "odd": 1.17,
-        "bookmaker": "Pinnacle",
-        "apiMarket": "Goals Over/Under",
-        "apiSelection": "Over 1.5"
-      },
-      "candidates": [
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.9,
-          "index": 90.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.17,
-          "bookmaker": "Pinnacle",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 1.053
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.8,
-          "index": 80.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.65,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 3.5",
-          "value": 1.32
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.8,
-          "index": 80.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.28,
-          "bookmaker": "Bet365",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 1.024
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.75,
-          "index": 75.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.5,
-          "bookmaker": "Betfair",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.125
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.7,
-          "index": 70.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.5,
-          "bookmaker": "Betfair",
-          "apiMarket": "Both Teams Score",
-          "apiSelection": "Yes",
-          "value": 1.05
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "DISPARI",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Odd/Even",
-          "apiSelection": "Odd",
-          "value": 1.2
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.57,
-          "bookmaker": "Pinnacle",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 0.942
-        },
-        {
-          "market": "1X2",
-          "selection": "2",
-          "modelProbability": 0.55,
-          "index": 55.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.4,
-          "bookmaker": "Betfair",
-          "apiMarket": "Match Winner",
-          "apiSelection": "Away",
-          "value": 1.32
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:1",
-          "modelProbability": 0.11382,
-          "index": 11.4,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 8.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:1",
-          "value": 0.911,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:1",
-          "modelProbability": 0.10351,
-          "index": 10.4,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 13.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:1",
-          "value": 1.346,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:2",
-          "modelProbability": 0.09662,
-          "index": 9.7,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 10.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:2",
-          "value": 0.966,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:2",
-          "modelProbability": 0.08787,
-          "index": 8.8,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 15.5,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:2",
-          "value": 1.362,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:0",
-          "modelProbability": 0.06704,
-          "index": 6.7,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 13.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:0",
-          "value": 0.872,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:1",
-          "modelProbability": 0.06258,
-          "index": 6.3,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 11.25,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:1",
-          "value": 0.704,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:0",
-          "modelProbability": 0.06097,
-          "index": 6.1,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 19.25,
-          "bookmaker": "Marathonbet",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:0",
-          "value": 1.174,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:3",
-          "modelProbability": 0.05468,
-          "index": 5.5,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 17.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:3",
-          "value": 0.93,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:2",
-          "modelProbability": 0.05313,
-          "index": 5.3,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 11.5,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:2",
-          "value": 0.611,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:3",
-          "modelProbability": 0.04973,
-          "index": 5.0,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 26.0,
-          "bookmaker": "1xBet",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:3",
-          "value": 1.293,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:0",
-          "modelProbability": 0.03686,
-          "index": 3.7,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 21.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:0",
-          "value": 0.774,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:3",
-          "modelProbability": 0.03007,
-          "index": 3.0,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 21.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:3",
-          "value": 0.631,
-          "expectedHomeGoals": 1.1,
-          "expectedAwayGoals": 1.698
-        }
-      ]
-    },
     {
       "fixtureId": 1576193,
       "date": "2026-10-10",
@@ -466,11 +132,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 2.5,
+          "odd": 2.52,
           "bookmaker": "Pinnacle",
           "apiMarket": "Match Winner",
           "apiSelection": "Away",
-          "value": 1.5
+          "value": 1.512
         },
         {
           "market": "Totale Gol",
@@ -479,11 +145,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.91,
+          "odd": 1.92,
           "bookmaker": "Pinnacle",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Under 3.5",
-          "value": 1.146
+          "value": 1.152
         },
         {
           "market": "Goal/No Goal",
@@ -580,11 +246,11 @@
           "index": 6.5,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 27.0,
+          "odd": 28.0,
           "bookmaker": "Marathonbet",
           "apiMarket": "Exact Score",
           "apiSelection": "0:0",
-          "value": 1.75,
+          "value": 1.815,
           "expectedHomeGoals": 1.08,
           "expectedAwayGoals": 1.656
         },
@@ -787,11 +453,11 @@
           "index": 65.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.44,
-          "bookmaker": "William Hill",
+          "odd": 1.45,
+          "bookmaker": "Betano",
           "apiMarket": "Both Teams Score",
           "apiSelection": "Yes",
-          "value": 0.936
+          "value": 0.943
         },
         {
           "market": "1X2",
@@ -807,6 +473,19 @@
           "value": 2.794
         },
         {
+          "market": "Totale Gol",
+          "selection": "UNDER 3.5",
+          "modelProbability": 0.55,
+          "index": 55.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 2.0,
+          "bookmaker": "Betfair",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Under 3.5",
+          "value": 1.1
+        },
+        {
           "market": "Pari/Dispari",
           "selection": "PARI",
           "modelProbability": 0.55,
@@ -820,30 +499,17 @@
           "value": 1.067
         },
         {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.55,
-          "index": 55.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.93,
-          "bookmaker": "Pinnacle",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 3.5",
-          "value": 1.062
-        },
-        {
           "market": "Risultato Esatto",
           "selection": "1:1",
           "modelProbability": 0.09887,
           "index": 9.9,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 10.25,
+          "odd": 10.5,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "1:1",
-          "value": 1.013,
+          "value": 1.038,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -869,11 +535,11 @@
           "index": 7.0,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 23.0,
-          "bookmaker": "Bet365",
+          "odd": 23.5,
+          "bookmaker": "Pinnacle",
           "apiMarket": "Exact Score",
           "apiSelection": "1:0",
-          "value": 1.609,
+          "value": 1.644,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -899,11 +565,11 @@
           "index": 6.6,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 40.0,
-          "bookmaker": "Betano",
+          "odd": 41.0,
+          "bookmaker": "Pinnacle",
           "apiMarket": "Exact Score",
           "apiSelection": "2:0",
-          "value": 2.624,
+          "value": 2.689,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -989,11 +655,11 @@
           "index": 3.7,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 27.0,
-          "bookmaker": "Marathonbet",
+          "odd": 28.84,
+          "bookmaker": "SBO",
           "apiMarket": "Exact Score",
           "apiSelection": "0:0",
-          "value": 1.007,
+          "value": 1.076,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -1004,11 +670,11 @@
           "index": 3.7,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 12.0,
+          "odd": 11.75,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "0:2",
-          "value": 0.447,
+          "value": 0.438,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -1019,11 +685,11 @@
           "index": 3.3,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 11.5,
+          "odd": 11.75,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "1:3",
-          "value": 0.379,
+          "value": 0.387,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -1034,11 +700,11 @@
           "index": 3.1,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 17.0,
-          "bookmaker": "Bet365",
+          "odd": 17.5,
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "2:3",
-          "value": 0.525,
+          "value": 0.54,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         },
@@ -1049,11 +715,11 @@
           "index": 2.7,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 124.84,
+          "odd": 120.04,
           "bookmaker": "SBO",
           "apiMarket": "Exact Score",
           "apiSelection": "4:1",
-          "value": 3.392,
+          "value": 3.261,
           "expectedHomeGoals": 1.875,
           "expectedAwayGoals": 1.413
         }
@@ -1153,11 +819,11 @@
           "index": 80.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.2,
+          "odd": 1.21,
           "bookmaker": "1xBet",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Away",
-          "value": 0.96
+          "value": 0.968
         },
         {
           "market": "Doppia Chance",
@@ -1167,7 +833,7 @@
           "model": "frequency",
           "oddAvailable": true,
           "odd": 1.21,
-          "bookmaker": "Betano",
+          "bookmaker": "1xBet",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Draw",
           "value": 0.847
@@ -1179,11 +845,11 @@
           "index": 65.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.81,
+          "odd": 1.79,
           "bookmaker": "1xBet",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 3.5",
-          "value": 1.177
+          "value": 1.163
         },
         {
           "market": "Risultato Esatto",
@@ -1312,11 +978,11 @@
           "index": 3.9,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 28.84,
-          "bookmaker": "SBO",
+          "odd": 29.0,
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "2:3",
-          "value": 1.138,
+          "value": 1.144,
           "expectedHomeGoals": 2.327,
           "expectedAwayGoals": 1.698
         },
@@ -1357,11 +1023,11 @@
           "index": 3.4,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 38.44,
-          "bookmaker": "SBO",
+          "odd": 37.0,
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "1:3",
-          "value": 1.304,
+          "value": 1.255,
           "expectedHomeGoals": 2.327,
           "expectedAwayGoals": 1.698
         },
@@ -1372,11 +1038,11 @@
           "index": 3.1,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 34.6,
+          "odd": 32.68,
           "bookmaker": "SBO",
           "apiMarket": "Exact Score",
           "apiSelection": "3:3",
-          "value": 1.059,
+          "value": 1.0,
           "expectedHomeGoals": 2.327,
           "expectedAwayGoals": 1.698
         },
@@ -1818,8 +1484,8 @@
         "market": "Doppia Chance",
         "confidence": 75.0,
         "oddAvailable": true,
-        "odd": 1.33,
-        "bookmaker": "1xBet",
+        "odd": 1.3,
+        "bookmaker": "William Hill",
         "apiMarket": "Double Chance",
         "apiSelection": "Draw/Away"
       },
@@ -1831,11 +1497,11 @@
           "index": 75.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.33,
-          "bookmaker": "1xBet",
+          "odd": 1.3,
+          "bookmaker": "William Hill",
           "apiMarket": "Double Chance",
           "apiSelection": "Draw/Away",
-          "value": 0.998
+          "value": 0.975
         },
         {
           "market": "Totale Gol",
@@ -1844,11 +1510,11 @@
           "index": 70.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.49,
+          "odd": 1.5,
           "bookmaker": "Pinnacle",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Under 3.5",
-          "value": 1.043
+          "value": 1.05
         },
         {
           "market": "Doppia Chance",
@@ -1857,11 +1523,11 @@
           "index": 65.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.87,
-          "bookmaker": "SBO",
+          "odd": 1.88,
+          "bookmaker": "1xBet",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Draw",
-          "value": 1.216
+          "value": 1.222
         },
         {
           "market": "Totale Gol",
@@ -1883,11 +1549,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 2.25,
-          "bookmaker": "Betfair",
+          "odd": 2.27,
+          "bookmaker": "Pinnacle",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Under 2.5",
-          "value": 1.35
+          "value": 1.362
         },
         {
           "market": "Pari/Dispari",
@@ -2010,11 +1676,11 @@
           "index": 7.4,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 15.5,
+          "odd": 15.75,
           "bookmaker": "Marathonbet",
           "apiMarket": "Exact Score",
           "apiSelection": "0:0",
-          "value": 1.147,
+          "value": 1.165,
           "expectedHomeGoals": 1.316,
           "expectedAwayGoals": 1.288
         },
@@ -2100,11 +1766,11 @@
           "index": 2.8,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 57.64,
-          "bookmaker": "SBO",
+          "odd": 55.0,
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "3:0",
-          "value": 1.619,
+          "value": 1.545,
           "expectedHomeGoals": 1.316,
           "expectedAwayGoals": 1.288
         },
@@ -2245,11 +1911,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 2.16,
+          "odd": 2.17,
           "bookmaker": "Pinnacle",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 2.5",
-          "value": 1.296
+          "value": 1.302
         },
         {
           "market": "Pari/Dispari",
@@ -2374,11 +2040,11 @@
           "index": 6.0,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 16.36,
+          "odd": 15.4,
           "bookmaker": "SBO",
           "apiMarket": "Exact Score",
           "apiSelection": "2:2",
-          "value": 0.985,
+          "value": 0.927,
           "expectedHomeGoals": 1.404,
           "expectedAwayGoals": 1.472
         },
@@ -2390,7 +2056,7 @@
           "model": "poisson",
           "oddAvailable": true,
           "odd": 10.0,
-          "bookmaker": "Betfair",
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "2:0",
           "value": 0.555,
@@ -2404,11 +2070,11 @@
           "index": 5.6,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 9.5,
-          "bookmaker": "William Hill",
+          "odd": 9.0,
+          "bookmaker": "Betfair",
           "apiMarket": "Exact Score",
           "apiSelection": "0:0",
-          "value": 0.535,
+          "value": 0.507,
           "expectedHomeGoals": 1.404,
           "expectedAwayGoals": 1.472
         },
@@ -2495,7 +2161,7 @@
           "model": "poisson",
           "oddAvailable": true,
           "odd": 21.0,
-          "bookmaker": "Betfair",
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "3:0",
           "value": 0.546,
@@ -2546,7 +2212,7 @@
         "market": "Totale Gol",
         "confidence": 95.0,
         "oddAvailable": true,
-        "odd": 1.14,
+        "odd": 1.13,
         "bookmaker": "Betano",
         "apiMarket": "Goals Over/Under",
         "apiSelection": "Over 1.5"
@@ -2559,24 +2225,11 @@
           "index": 95.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.14,
+          "odd": 1.13,
           "bookmaker": "Betano",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 1.5",
-          "value": 1.083
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.85,
-          "index": 85.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.45,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 1.232
+          "value": 1.073
         },
         {
           "market": "Goal/No Goal",
@@ -2592,17 +2245,30 @@
           "value": 1.224
         },
         {
+          "market": "Totale Gol",
+          "selection": "OVER 2.5",
+          "modelProbability": 0.85,
+          "index": 85.0,
+          "model": "frequency",
+          "oddAvailable": true,
+          "odd": 1.42,
+          "bookmaker": "Betano",
+          "apiMarket": "Goals Over/Under",
+          "apiSelection": "Over 2.5",
+          "value": 1.207
+        },
+        {
           "market": "Doppia Chance",
           "selection": "1X",
           "modelProbability": 0.8,
           "index": 80.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.25,
-          "bookmaker": "William Hill",
+          "odd": 1.24,
+          "bookmaker": "Betano",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Draw",
-          "value": 1.0
+          "value": 0.992
         },
         {
           "market": "Totale Gol",
@@ -2611,11 +2277,11 @@
           "index": 75.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 2.07,
-          "bookmaker": "Betano",
+          "odd": 2.01,
+          "bookmaker": "SBO",
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 3.5",
-          "value": 1.552
+          "value": 1.507
         },
         {
           "market": "Doppia Chance",
@@ -2624,11 +2290,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 2.08,
-          "bookmaker": "SBO",
+          "odd": 2.15,
+          "bookmaker": "Betano",
           "apiMarket": "Double Chance",
           "apiSelection": "Draw/Away",
-          "value": 1.248
+          "value": 1.29
         },
         {
           "market": "Pari/Dispari",
@@ -2637,11 +2303,11 @@
           "index": 60.0,
           "model": "frequency",
           "oddAvailable": true,
-          "odd": 1.93,
+          "odd": 1.91,
           "bookmaker": "SBO",
           "apiMarket": "Odd/Even",
           "apiSelection": "Even",
-          "value": 1.158
+          "value": 1.146
         },
         {
           "market": "Doppia Chance",
@@ -2651,7 +2317,7 @@
           "model": "frequency",
           "oddAvailable": true,
           "odd": 1.25,
-          "bookmaker": "1xBet",
+          "bookmaker": "William Hill",
           "apiMarket": "Double Chance",
           "apiSelection": "Home/Away",
           "value": 0.75
@@ -2708,11 +2374,11 @@
           "index": 6.5,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 9.0,
-          "bookmaker": "Betfair",
+          "odd": 9.25,
+          "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "1:1",
-          "value": 0.586,
+          "value": 0.602,
           "expectedHomeGoals": 2.553,
           "expectedAwayGoals": 1.564
         },
@@ -2768,11 +2434,11 @@
           "index": 4.5,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 23.0,
+          "odd": 22.0,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "4:1",
-          "value": 1.037,
+          "value": 0.992,
           "expectedHomeGoals": 2.553,
           "expectedAwayGoals": 1.564
         },
@@ -2783,11 +2449,11 @@
           "index": 4.5,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 19.0,
+          "odd": 18.5,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "3:0",
-          "value": 0.858,
+          "value": 0.836,
           "expectedHomeGoals": 2.553,
           "expectedAwayGoals": 1.564
         },
@@ -2828,26 +2494,11 @@
           "index": 3.4,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 29.0,
+          "odd": 30.0,
           "bookmaker": "Betano",
           "apiMarket": "Exact Score",
           "apiSelection": "2:3",
-          "value": 0.982,
-          "expectedHomeGoals": 2.553,
-          "expectedAwayGoals": 1.564
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "4:0",
-          "modelProbability": 0.02884,
-          "index": 2.9,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 35.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "4:0",
-          "value": 1.009,
+          "value": 1.016,
           "expectedHomeGoals": 2.553,
           "expectedAwayGoals": 1.564
         },
@@ -2858,11 +2509,26 @@
           "index": 2.9,
           "model": "poisson",
           "oddAvailable": true,
-          "odd": 35.0,
-          "bookmaker": "Betano",
+          "odd": 36.52,
+          "bookmaker": "SBO",
           "apiMarket": "Exact Score",
           "apiSelection": "3:3",
-          "value": 1.008,
+          "value": 1.052,
+          "expectedHomeGoals": 2.553,
+          "expectedAwayGoals": 1.564
+        },
+        {
+          "market": "Risultato Esatto",
+          "selection": "4:0",
+          "modelProbability": 0.02884,
+          "index": 2.9,
+          "model": "poisson",
+          "oddAvailable": true,
+          "odd": 32.68,
+          "bookmaker": "SBO",
+          "apiMarket": "Exact Score",
+          "apiSelection": "4:0",
+          "value": 0.942,
           "expectedHomeGoals": 2.553,
           "expectedAwayGoals": 1.564
         },
@@ -3241,332 +2907,15 @@
       },
       "historyScore": 18,
       "prediction": {
-        "available": true,
-        "selection": "OVER 1.5",
-        "market": "Totale Gol",
-        "confidence": 83.3,
-        "oddAvailable": true,
-        "odd": 1.45,
-        "bookmaker": "Betano",
-        "apiMarket": "Goals Over/Under",
-        "apiSelection": "Over 1.5"
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
       },
-      "candidates": [
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.83333,
-          "index": 83.3,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.45,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 1.208
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.72222,
-          "index": 72.2,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.62,
-          "bookmaker": "Betano",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.17
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.72222,
-          "index": 72.2,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.23,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Under 3.5",
-          "value": 0.888
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.66667,
-          "index": 66.7,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.36,
-          "bookmaker": "William Hill",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Away",
-          "value": 0.907
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.61111,
-          "index": 61.1,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.95,
-          "bookmaker": "Bet365",
-          "apiMarket": "Both Teams Score",
-          "apiSelection": "Yes",
-          "value": 1.192
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.61111,
-          "index": 61.1,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.39,
-          "bookmaker": "Betano",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 0.849
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.55556,
-          "index": 55.6,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.38,
-          "bookmaker": "Betfair",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 1.322
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.55556,
-          "index": 55.6,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.9,
-          "bookmaker": "SBO",
-          "apiMarket": "Odd/Even",
-          "apiSelection": "Even",
-          "value": 1.056
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:1",
-          "modelProbability": 0.11099,
-          "index": 11.1,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 6.4,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:1",
-          "value": 0.71,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:1",
-          "modelProbability": 0.0899,
-          "index": 9.0,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 10.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:1",
-          "value": 0.899,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:0",
-          "modelProbability": 0.07983,
-          "index": 8.0,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 7.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:0",
-          "value": 0.559,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:2",
-          "modelProbability": 0.07715,
-          "index": 7.7,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 12.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:2",
-          "value": 0.926,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:1",
-          "modelProbability": 0.06851,
-          "index": 6.9,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 8.5,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:1",
-          "value": 0.582,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:0",
-          "modelProbability": 0.06467,
-          "index": 6.5,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 11.25,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:0",
-          "value": 0.728,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:2",
-          "modelProbability": 0.06249,
-          "index": 6.2,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 17.5,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:2",
-          "value": 1.094,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "3:1",
-          "modelProbability": 0.04855,
-          "index": 4.9,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 23.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "3:1",
-          "value": 1.117,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:0",
-          "modelProbability": 0.04928,
-          "index": 4.9,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 8.0,
-          "bookmaker": "Bet365",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:0",
-          "value": 0.394,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "0:2",
-          "modelProbability": 0.04762,
-          "index": 4.8,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 15.5,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "0:2",
-          "value": 0.738,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "1:3",
-          "modelProbability": 0.03575,
-          "index": 3.6,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 35.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "1:3",
-          "value": 1.251,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "3:0",
-          "modelProbability": 0.03492,
-          "index": 3.5,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 26.0,
-          "bookmaker": "1xBet",
-          "apiMarket": "Exact Score",
-          "apiSelection": "3:0",
-          "value": 0.908,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "3:2",
-          "modelProbability": 0.03374,
-          "index": 3.4,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 40.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "3:2",
-          "value": 1.35,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        },
-        {
-          "market": "Risultato Esatto",
-          "selection": "2:3",
-          "modelProbability": 0.02896,
-          "index": 2.9,
-          "model": "poisson",
-          "oddAvailable": true,
-          "odd": 50.0,
-          "bookmaker": "Betano",
-          "apiMarket": "Exact Score",
-          "apiSelection": "2:3",
-          "value": 1.448,
-          "expectedHomeGoals": 1.62,
-          "expectedAwayGoals": 1.39
-        }
-      ]
+      "candidates": []
     },
     {
       "fixtureId": 1576190,
@@ -3605,122 +2954,15 @@
       },
       "historyScore": 11,
       "prediction": {
-        "available": true,
-        "selection": "1X",
-        "market": "Doppia Chance",
-        "confidence": 90.0,
-        "oddAvailable": true,
-        "odd": 1.44,
-        "bookmaker": "Betano",
-        "apiMarket": "Double Chance",
-        "apiSelection": "Home/Draw"
+        "available": false,
+        "selection": null,
+        "market": null,
+        "confidence": null,
+        "oddAvailable": false,
+        "odd": null,
+        "bookmaker": null
       },
-      "candidates": [
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.9,
-          "index": 90.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.44,
-          "bookmaker": "Betano",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 1.296
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.8,
-          "index": 80.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.92,
-          "bookmaker": "SBO",
-          "apiMarket": "Odd/Even",
-          "apiSelection": "Even",
-          "value": 1.536
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.8,
-          "index": 80.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.67,
-          "bookmaker": "Betfair",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.336
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.8,
-          "index": 80.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.14,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 1.5",
-          "value": 0.912
-        },
-        {
-          "market": "1X2",
-          "selection": "X",
-          "modelProbability": 0.7,
-          "index": 70.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 4.05,
-          "bookmaker": "Pinnacle",
-          "apiMarket": "Match Winner",
-          "apiSelection": "Draw",
-          "value": 2.835
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.7,
-          "index": 70.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.45,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 2.5",
-          "value": 1.015
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.7,
-          "index": 70.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 1.39,
-          "bookmaker": "Betano",
-          "apiMarket": "Both Teams Score",
-          "apiSelection": "Yes",
-          "value": 0.973
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 3.5",
-          "modelProbability": 0.6,
-          "index": 60.0,
-          "model": "frequency",
-          "oddAvailable": true,
-          "odd": 2.1,
-          "bookmaker": "Betano",
-          "apiMarket": "Goals Over/Under",
-          "apiSelection": "Over 3.5",
-          "value": 1.26
-        }
-      ]
+      "candidates": []
     },
     {
       "fixtureId": 1576196,
@@ -6684,147 +5926,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1497080,
-      "date": "2026-10-09",
-      "timestamp": 1791558000,
-      "country": "Norway",
-      "league": "3. Division - Girone 4",
-      "priority": 2,
-      "home": {
-        "name": "Flekkerøy",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 2,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 2.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Odd II",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1510693,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Sweden",
-      "league": "Division 2 - Norra Götaland",
-      "priority": 2,
-      "home": {
-        "name": "IFK Skövde",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 0.0
-        }
-      },
-      "away": {
-        "name": "Skara",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1577798,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Denmark",
-      "league": "3. Division",
-      "priority": 2,
-      "home": {
-        "name": "Sundby",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Ishøj",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 2,
-          "ga": 2,
-          "ppg": 1.0,
-          "avgGF": 2.0,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1608092,
       "date": "2026-10-09",
       "timestamp": 1791565200,
@@ -6904,53 +6005,6 @@
           "ppg": 0.0,
           "avgGF": 0.0,
           "avgGA": 2.0
-        }
-      },
-      "historyScore": 2,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1607982,
-      "date": "2026-10-09",
-      "timestamp": 1791566400,
-      "country": "Austria",
-      "league": "Regionalliga - South",
-      "priority": 2,
-      "home": {
-        "name": "Austria Klagenfurt",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 2.0
-        }
-      },
-      "away": {
-        "name": "Bleiburg",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 3,
-          "ga": 1,
-          "ppg": 3.0,
-          "avgGF": 3.0,
-          "avgGA": 1.0
         }
       },
       "historyScore": 2,
@@ -11337,53 +10391,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1576191,
-      "date": "2026-10-09",
-      "timestamp": 1791563400,
-      "country": "Germany",
-      "league": "2. Bundesliga",
-      "priority": 5,
-      "home": {
-        "name": "1. FC Heidenheim",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "1. FC Kaiserslautern",
-        "form": {
-          "played": 10,
-          "wins": 6,
-          "draws": 2,
-          "losses": 2,
-          "gf": 20,
-          "ga": 12,
-          "ppg": 2.0,
-          "avgGF": 2.0,
-          "avgGA": 1.2
-        }
-      },
-      "historyScore": 10,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1575176,
       "date": "2026-10-09",
       "timestamp": 1791570600,
@@ -11651,53 +10658,6 @@
           "ppg": 2.0,
           "avgGF": 1.8,
           "avgGA": 0.8
-        }
-      },
-      "historyScore": 10,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1584424,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Turkey",
-      "league": "Süper Lig",
-      "priority": 4,
-      "home": {
-        "name": "Galatasaray",
-        "form": {
-          "played": 10,
-          "wins": 8,
-          "draws": 2,
-          "losses": 0,
-          "gf": 22,
-          "ga": 5,
-          "ppg": 2.6,
-          "avgGF": 2.2,
-          "avgGA": 0.5
-        }
-      },
-      "away": {
-        "name": "Kasımpaşa",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
         }
       },
       "historyScore": 10,
@@ -14345,288 +13305,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1496716,
-      "date": "2026-10-09",
-      "timestamp": 1791562500,
-      "country": "Norway",
-      "league": "3. Division - Girone 2",
-      "priority": 2,
-      "home": {
-        "name": "Herd",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Spjelkavik",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 2,
-          "ga": 5,
-          "ppg": 0.0,
-          "avgGF": 2.0,
-          "avgGA": 5.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1494292,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Sweden",
-      "league": "Allsvenskan",
-      "priority": 2,
-      "home": {
-        "name": "IFK Goteborg",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Vasteras SK FK",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1505298,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Sweden",
-      "league": "Ettan - Norra",
-      "priority": 2,
-      "home": {
-        "name": "Sollentuna",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Stocksund",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 1,
-          "losses": 0,
-          "gf": 1,
-          "ga": 1,
-          "ppg": 1.0,
-          "avgGF": 1.0,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1549031,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Denmark",
-      "league": "Superliga",
-      "priority": 2,
-      "home": {
-        "name": "FC Nordsjaelland",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 3,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 3.0
-        }
-      },
-      "away": {
-        "name": "Odense",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1574122,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - Ost",
-      "priority": 2,
-      "home": {
-        "name": "Mannsdorf-Großenzersdorf",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Mattersburg SV 2020",
-        "form": {
-          "played": 1,
-          "wins": 1,
-          "draws": 0,
-          "losses": 0,
-          "gf": 1,
-          "ga": 0,
-          "ppg": 3.0,
-          "avgGF": 1.0,
-          "avgGA": 0.0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1574123,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - Ost",
-      "priority": 2,
-      "home": {
-        "name": "Parndorf",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 0,
-          "ga": 1,
-          "ppg": 0.0,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Wiener SC",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 1,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1608091,
       "date": "2026-10-09",
       "timestamp": 1791565200,
@@ -16319,53 +14997,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1639323,
-      "date": "2026-10-09",
-      "timestamp": 1791549900,
-      "country": "Norway",
-      "league": "Nasjonal U19 Champions League",
-      "priority": 5,
-      "home": {
-        "name": "Fredrikstad FK U19",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Brann U19",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1627085,
       "date": "2026-10-09",
       "timestamp": 1791568800,
@@ -17986,194 +16617,6 @@
       },
       "away": {
         "name": "Villarreal",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1585769,
-      "date": "2026-10-09",
-      "timestamp": 1791554400,
-      "country": "Turkey",
-      "league": "1. Lig",
-      "priority": 4,
-      "home": {
-        "name": "Bodrum FK",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Keçiörengücü",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1585776,
-      "date": "2026-10-09",
-      "timestamp": 1791554400,
-      "country": "Turkey",
-      "league": "1. Lig",
-      "priority": 4,
-      "home": {
-        "name": "Sivasspor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Pendikspor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1585777,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Turkey",
-      "league": "1. Lig",
-      "priority": 4,
-      "home": {
-        "name": "Ümraniyespor",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Sarıyer",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1585778,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Turkey",
-      "league": "1. Lig",
-      "priority": 4,
-      "home": {
-        "name": "Vanspor FK",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Bandırmaspor",
         "form": {
           "played": 0,
           "wins": 0,
@@ -20690,53 +19133,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1592869,
-      "date": "2026-10-09",
-      "timestamp": 1791558000,
-      "country": "Mexico",
-      "league": "Liga MX U21",
-      "priority": 3,
-      "home": {
-        "name": "Puebla U21",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Club Leon U21",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1592871,
       "date": "2026-10-09",
       "timestamp": 1791558000,
@@ -22570,288 +20966,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1551351,
-      "date": "2026-10-09",
-      "timestamp": 1791561600,
-      "country": "Denmark",
-      "league": "1. Division",
-      "priority": 2,
-      "home": {
-        "name": "Vejle",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Hvidovre",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1567917,
-      "date": "2026-10-09",
-      "timestamp": 1791563400,
-      "country": "Austria",
-      "league": "2. Liga",
-      "priority": 2,
-      "home": {
-        "name": "SKU Amstetten",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "FC BW Linz",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1567921,
-      "date": "2026-10-09",
-      "timestamp": 1791563400,
-      "country": "Austria",
-      "league": "2. Liga",
-      "priority": 2,
-      "home": {
-        "name": "SV Kapfenberg",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Austria Vienna (Am)",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1494774,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Norway",
-      "league": "Eliteserien",
-      "priority": 2,
-      "home": {
-        "name": "Brann",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Viking",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1551347,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Denmark",
-      "league": "1. Division",
-      "priority": 2,
-      "home": {
-        "name": "AB Copenhagen",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Aarhus Fremad",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1607977,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - South",
-      "priority": 2,
-      "home": {
-        "name": "Kalsdorf",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Gleisdorf 09",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1607978,
       "date": "2026-10-09",
       "timestamp": 1791565200,
@@ -22874,147 +20988,6 @@
       },
       "away": {
         "name": "Allerheiligen",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1607979,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - South",
-      "priority": 2,
-      "home": {
-        "name": "Tillmitsch",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "SV Lafnitz",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1607981,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - South",
-      "priority": 2,
-      "home": {
-        "name": "Wolfsberg",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Velden",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "historyScore": 0,
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1608090,
-      "date": "2026-10-09",
-      "timestamp": 1791565200,
-      "country": "Austria",
-      "league": "Regionalliga - North",
-      "priority": 2,
-      "home": {
-        "name": "Bad Schallerbach",
-        "form": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "gf": 0,
-          "ga": 0,
-          "ppg": 0,
-          "avgGF": 0,
-          "avgGA": 0
-        }
-      },
-      "away": {
-        "name": "Wallern / Marienkirchen",
         "form": {
           "played": 0,
           "wins": 0,
