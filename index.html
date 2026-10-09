@@ -764,7 +764,9 @@
     .real-outcome select { width:90px; max-width:90px; }
     .real-outcome input { width:82px; max-width:82px; }
     .real-outcome .update-real { padding:6px 9px; font-size:11px; }
-    .archive-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .archive-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; align-items:start; }
+    .archive-grid .ticket { min-width:0; }
+    @media (max-width: 1100px) and (min-width: 701px) { .archive-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     .ticket.won { border-color:rgba(73,223,145,.65); }
     .ticket.lost { border-color:rgba(255,107,107,.55); }
     .ticket-status.won { background:rgba(73,223,145,.15); color:#49df91; }
@@ -773,6 +775,9 @@
     @media (max-width: 980px) {
       .main-grid { grid-template-columns:1fr; }
       .results { position:static; order:2; }
+      .archive-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 700px) {
       .archive-grid { grid-template-columns:1fr; }
     }
 
@@ -2391,7 +2396,7 @@
     const displayNumbers = new Map(orderedBets.map((b,i) => [String(b.id), i+1]));
     const ticketNumber = b => displayNumbers.get(String(b.id)) || b.number || 1;
     const pending = bets.filter(b => b.kind !== "manual" && b.status !== "VINTA" && b.status !== "PERSA");
-    const archived = bets.filter(b => b.kind === "manual" || b.status === "VINTA" || b.status === "PERSA");
+    const archived = bets.filter(b => b.kind === "manual" || b.status === "VINTA" || b.status === "PERSA").sort((a,b) => String(a.createdAt || a.id || "").localeCompare(String(b.createdAt || b.id || "")));
     const staked = bets.reduce((sum,b) => sum + (Number(b.stake)||0),0);
     const received = bets.reduce((sum,b) => sum + (b.realStatus === "VINTA" ? (Number(b.realReceived)||0) : 0),0);
     document.getElementById("totalStaked").textContent = money(staked);
