@@ -1495,139 +1495,55 @@
   }
 
 
-  function combinationScore(
-    picks,
-    stake,
-    target
-  ) {
-
+  function combinationScore(picks, stake, target) {
     let totalOdd = 1;
-
     let qualitySum = 0;
-
     let probabilityProduct = 1;
-
+    let exactScoreCount = 0;
 
     for (const pick of picks) {
-
-      totalOdd *=
-        Number(pick.candidate.odd);
-
-      qualitySum +=
-        candidateQuality(
-          pick.candidate
-        );
-
-      const p =
-        Number(
-          pick.candidate
-            .modelProbability
-        );
-
-      if (
-        Number.isFinite(p) &&
-        p > 0 &&
-        p <= 1
-      ) {
-
-        probabilityProduct *= p;
-
-      } else {
-
-        probabilityProduct *=
-          (
-            Number(
-              pick.candidate.index
-            ) / 100
-          );
-
-      }
-
+      const candidate = pick.candidate;
+      totalOdd *= Number(candidate.odd);
+      qualitySum += candidateQuality(candidate);
+      const rawProbability = Number(candidate.modelProbability);
+      const fallbackProbability = Number(candidate.index) / 100;
+      const probability = Number.isFinite(rawProbability) && rawProbability > 0 && rawProbability <= 1
+        ? rawProbability
+        : fallbackProbability;
+      // Una probabilità assente o non valida non deve diventare un vantaggio.
+      probabilityProduct *= Number.isFinite(probability) && probability > 0 && probability <= 1
+        ? probability
+        : 0.01;
+      if (candidate.market === "Risultato Esatto") exactScoreCount++;
     }
 
+    const potential = stake * totalOdd;
+    const averageQuality = qualitySum / picks.length;
 
-    const potential =
-      stake * totalOdd;
+    // Penalizziamo la perdita di probabilità della MULTIPLA, non soltanto
+    // la qualità media delle singole selezioni. Il log evita sottosquadri numerici.
+    const probabilityPenalty = -Math.log(Math.max(probabilityProduct, 1e-100)) * 12;
 
-    const averageQuality =
-      qualitySum / picks.length;
+    // Poisson sui risultati esatti non è ancora calibrato su dati fuori campione.
+    // La penalità aggiuntiva impedisce che molti risultati esatti siano scelti
+    // solo per gonfiare la quota; non li vieta in assoluto.
+    const exactScorePenalty = exactScoreCount * 5;
 
-
-    /*
-      Senza obiettivo:
-      priorità alla qualità.
-    */
-
-    if (
-      !Number.isFinite(target) ||
-      target <= 0
-    ) {
-
-      return {
-
-        score:
-          averageQuality,
-
-        totalOdd,
-        potential,
-        averageQuality,
-        probabilityProduct
-
-      };
-
+    let targetBonus = 0;
+    if (Number.isFinite(target) && target > 0 && stake > 0) {
+      const targetOdd = Math.max(target / stake, 1.0001);
+      const distance = Math.abs(Math.log(Math.max(totalOdd, 1.0001) / targetOdd));
+      // Preferenza SECONDARIA: al massimo 6 punti, mai una penalità illimitata.
+      targetBonus = 6 * Math.exp(-distance);
     }
-
-
-    /*
-      Con obiettivo:
-      misuriamo quanto siamo lontani.
-
-      Usiamo il logaritmo perché una quota 10
-      rispetto a 20 deve essere trattata in modo
-      più sensato di una semplice differenza €.
-    */
-
-    const targetOdd =
-      target / stake;
-
-
-    const distance =
-      Math.abs(
-        Math.log(
-          Math.max(
-            totalOdd,
-            1.0001
-          )
-          /
-          Math.max(
-            targetOdd,
-            1.0001
-          )
-        )
-      );
-
-
-    /*
-      L'obiettivo conta, ma non può annullare
-      completamente la qualità statistica.
-    */
-
-    const score =
-      averageQuality
-      -
-      distance * 22;
-
 
     return {
-
-      score,
+      score: averageQuality - probabilityPenalty - exactScorePenalty + targetBonus,
       totalOdd,
       potential,
       averageQuality,
       probabilityProduct
-
     };
-
   }
 
 
@@ -2276,14 +2192,14 @@
           +
           oddText(requiredOdd)
           +
-          "</strong>. Tra i candidati statisticamente ammessi, BETLAB ha preferito questa combinazione senza forzare pronostici soltanto per raggiungere la quota.";
+          "</strong>. BETLAB considera l’obiettivo una preferenza secondaria e privilegia la probabilità complessiva della combinazione.";
 
       }
 
     } else {
 
       message.textContent =
-        "Nessun obiettivo economico impostato: BETLAB ha privilegiato la qualità dei candidati disponibili.";
+        "Nessun obiettivo economico impostato: BETLAB ha privilegiato la qualità e la probabilità complessiva dei pronostici.";
 
     }
 
