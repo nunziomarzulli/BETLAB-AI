@@ -1132,67 +1132,31 @@ jobs:
               )
 
 
-          def adjusted_probability(
-              raw,
-              sample_size
-          ):
-
-              factor = min(
-                  sample_size / 10.0,
-                  1.0
-              )
-
-              return (
-                  0.50
-                  +
-                  (
-                      raw - 0.50
-                  )
-                  *
-                  factor
-              )
-
+          # Smussamento bayesiano: ogni squadra contribuisce in base
+          # al proprio campione; il prior evita percentuali estreme.
+          PRIOR_STRENGTH = 8.0
+          MIN_TEAM_HISTORY = 3
 
           def combined_probability(
               home_games,
               away_games,
               home_predicate,
-              away_predicate
+              away_predicate,
+              prior=0.50
           ):
+              nh = len(home_games)
+              na = len(away_games)
+              if nh == 0 or na == 0:
+                  return prior
 
-              sample_size = (
-                  len(home_games)
-                  +
-                  len(away_games)
-              )
+              home_hits = sum(1 for g in home_games if home_predicate(g))
+              away_hits = sum(1 for g in away_games if away_predicate(g))
 
-
-              if sample_size == 0:
-                  return 0.5
-
-
-              home_freq = event_frequency(
-                  home_games,
-                  home_predicate
-              )
-
-              away_freq = event_frequency(
-                  away_games,
-                  away_predicate
-              )
-
-
-              raw = (
-                  home_freq
-                  +
-                  away_freq
-              ) / 2
-
-
-              return adjusted_probability(
-                  raw,
-                  sample_size
-              )
+              # Non assegnare lo stesso peso a 1 e 10 partite.
+              # Le osservazioni vengono aggregate, con prior esplicito.
+              return (
+                  home_hits + away_hits + PRIOR_STRENGTH * prior
+              ) / (nh + na + PRIOR_STRENGTH)
 
 
           # ==========================================================
@@ -1398,9 +1362,9 @@ jobs:
 
 
               if (
-                  len(home_games) == 0
+                  len(home_games) < MIN_TEAM_HISTORY
                   or
-                  len(away_games) == 0
+                  len(away_games) < MIN_TEAM_HISTORY
               ):
 
                   return candidates
@@ -1416,7 +1380,8 @@ jobs:
                   lambda g:
                       g["gf"] > g["ga"],
                   lambda g:
-                      g["gf"] < g["ga"]
+                      g["gf"] < g["ga"],
+                  prior=0.43
               )
 
               draw = combined_probability(
@@ -1425,7 +1390,8 @@ jobs:
                   lambda g:
                       g["gf"] == g["ga"],
                   lambda g:
-                      g["gf"] == g["ga"]
+                      g["gf"] == g["ga"],
+                  prior=0.27
               )
 
               away_win = combined_probability(
@@ -1434,7 +1400,8 @@ jobs:
                   lambda g:
                       g["gf"] < g["ga"],
                   lambda g:
-                      g["gf"] > g["ga"]
+                      g["gf"] > g["ga"],
+                  prior=0.30
               )
 
 
@@ -1704,9 +1671,9 @@ jobs:
               # ------------------------------------------------------
 
               if (
-                  len(home_games) >= 3
+                  len(home_games) >= 5
                   and
-                  len(away_games) >= 3
+                  len(away_games) >= 5
               ):
 
                   home_xg, away_xg = (
@@ -3010,7 +2977,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V7 MULTI-MARKET",
+                  "BETLAB V7.1 MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
