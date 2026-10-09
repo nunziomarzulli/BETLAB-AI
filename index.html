@@ -699,6 +699,17 @@
       color:#16251d;
       box-shadow:0 14px 34px rgba(0,0,0,.22);
     }
+    /* Consenti lo scroll interno della scheda lunga sul desktop. */
+    @media (min-width: 981px) {
+      .results {
+        max-height: calc(100dvh - 36px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
     .results-header { margin:0; padding:15px 16px; background:#26733e; color:#fff; align-items:center; }
     .results h2 { font-size:17px; letter-spacing:0; }
     .results-sub { color:#d8eadf; font-size:11px; }
