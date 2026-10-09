@@ -760,7 +760,10 @@
     .ticket-details { margin:10px 0; }
     .ticket-details summary { cursor:pointer; color:#9ab3c3; font-size:12px; }
     .real-outcome { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; font-size:12px; }
-    .real-outcome select,.real-outcome input { background:#fff; color:#102030; border:1px solid #c7d4d1; border-radius:6px; padding:7px; max-width:140px; }
+    .real-outcome select,.real-outcome input { background:#fff; color:#102030; border:1px solid #c7d4d1; border-radius:6px; padding:6px; }
+    .real-outcome select { width:90px; max-width:90px; }
+    .real-outcome input { width:82px; max-width:82px; }
+    .real-outcome .update-real { padding:6px 9px; font-size:11px; }
     .archive-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
     .ticket.won { border-color:rgba(73,223,145,.65); }
     .ticket.lost { border-color:rgba(255,107,107,.55); }
@@ -1098,7 +1101,6 @@
       <section class="finance-panel">
         <h3>Bilancio reale delle giocate</h3>
         <div class="finance-numbers"><div>Giocato<strong id="totalStaked">0,00 €</strong></div><div>Incassato<strong id="totalReceived">0,00 €</strong></div><div>Saldo netto<strong id="netBalance">0,00 €</strong></div></div>
-        <div class="finance-inputs"><input id="manualStake" type="number" min="0.01" step="0.01" placeholder="Puntata €" aria-label="Puntata"><input id="manualReceived" type="number" min="0" step="0.01" placeholder="Incassato € (0 se persa)" aria-label="Incassato"><button id="addManualBet" type="button">AGGIUNGI GIOCATA REALE</button></div>
         <div id="financeMessage" class="mini" style="margin-top:8px;color:#a6b6c2">Il bilancio usa gli incassi reali, non le vincite teoriche BETLAB.</div>
       </section>
       <div id="savedBetsList" class="archive-grid"></div>
@@ -2383,6 +2385,11 @@
 
   function renderSavedBets() {
     const bets = loadSavedBets();
+    // Numerazione stabile per ordine di creazione, indipendente dal numero salvato in passato.
+    const orderedBets = [...bets].filter(b => b.kind !== "manual").sort((a,b) =>
+      String(a.createdAt || a.id || "").localeCompare(String(b.createdAt || b.id || "")) || String(a.id).localeCompare(String(b.id)));
+    const displayNumbers = new Map(orderedBets.map((b,i) => [String(b.id), i+1]));
+    const ticketNumber = b => displayNumbers.get(String(b.id)) || b.number || 1;
     const pending = bets.filter(b => b.kind !== "manual" && b.status !== "VINTA" && b.status !== "PERSA");
     const archived = bets.filter(b => b.kind === "manual" || b.status === "VINTA" || b.status === "PERSA");
     const staked = bets.reduce((sum,b) => sum + (Number(b.stake)||0),0);
@@ -2392,7 +2399,7 @@
     document.getElementById("netBalance").textContent = (received-staked >= 0 ? "+" : "") + money(received-staked);
     savedCount.textContent = archived.length + (archived.length === 1 ? " archiviata" : " archiviate");
     pendingBetsList.innerHTML = pending.length ? pending.map(bet => `
-      <div class="pending-ticket"><strong>Biglietto #${safeText(bet.number)} · IN ATTESA</strong>
+      <div class="pending-ticket"><strong>Biglietto #${safeText(ticketNumber(bet))} · IN ATTESA</strong>
       <div class="mini">${(bet.picks||[]).map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}`).join("<br>")}</div>
       <div class="mini"><b>Quota Sisal ${oddText(bet.sisalOdd)}</b> · ${money(bet.stake)} → ${money(bet.potentialReturn)}</div>
       <button class="delete-pending-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA GIOCATA</button></div>`).join("") : '<div class="empty-slip">Nessuna giocata in corso.</div>';
@@ -2408,7 +2415,7 @@
       const modelStatus = bet.kind === "manual" ? "SOLO REALE" : bet.status;
       ticket.className = "ticket " + (modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : "");
       const picksHtml = (bet.picks||[]).map(pick => `<div class="ticket-pick"><div class="ticket-teams">${safeText(pick.home)} – ${safeText(pick.away)}</div><div class="ticket-selection">${safeText(pick.selection)} · ${safeText(pick.market)} · Quota BETLAB ${pick.betlabOdd ? oddText(pick.betlabOdd) : "n.d."} · Indice ${Number(pick.index||0).toFixed(1)}%</div>${pick.finalScore ? `<div class="result-score">Risultato: ${safeText(pick.finalScore)} · ${safeText(pick.result)}</div>` : ""}</div>`).join("");
-      ticket.innerHTML = `<div class="ticket-head"><div><div class="ticket-title">${bet.kind === "manual" ? "Giocata reale" : "Biglietto #"+safeText(bet.number)}</div><div class="ticket-date">${safeText(bet.createdAtLabel||"")}</div></div><div class="ticket-status ${modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : ""}">${safeText(modelStatus)}</div></div>
+      ticket.innerHTML = `<div class="ticket-head"><div><div class="ticket-title">${bet.kind === "manual" ? "Giocata reale" : "Biglietto #"+safeText(ticketNumber(bet))}</div><div class="ticket-date">${safeText(bet.createdAtLabel||"")}</div></div><div class="ticket-status ${modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : ""}">${safeText(modelStatus)}</div></div>
       ${picksHtml ? `<details class="ticket-details"><summary>VEDI ${bet.picks.length} PRONOSTICI</summary>${picksHtml}</details>` : ""}
       <div class="ticket-stats"><div><div class="ticket-stat-label">PUNTATA REALE</div><div class="ticket-stat-value">${money(bet.stake)}</div></div><div><div class="ticket-stat-label">INCASSATO</div><div class="ticket-stat-value">${bet.realStatus === "VINTA" ? money(bet.realReceived||0) : bet.realStatus === "PERSA" ? money(0) : "DA INSERIRE"}</div></div></div>
       <div class="real-outcome"><label>Esito reale <select class="real-status" data-bet-id="${safeText(bet.id)}"><option value="" ${!bet.realStatus?"selected":""}>Da indicare</option><option value="VINTA" ${bet.realStatus==="VINTA"?"selected":""}>Vinta</option><option value="PERSA" ${bet.realStatus==="PERSA"?"selected":""}>Persa</option></select></label><input class="real-received" data-bet-id="${safeText(bet.id)}" type="number" min="0" step="0.01" placeholder="Incassato €" value="${bet.realReceived ?? ""}" aria-label="Incassato reale"><button class="update-real" data-bet-id="${safeText(bet.id)}" type="button">SALVA ESITO</button></div>
@@ -2429,15 +2436,6 @@
       else { await writeSavedBets(loadSavedBets().filter(b=>b.id!==id)); renderSavedBets(); }
     }));
   }
-  document.getElementById("addManualBet").addEventListener("click",async()=>{
-    const stake=Number(document.getElementById("manualStake").value),raw=document.getElementById("manualReceived").value,received=Number(raw);
-    if(!Number.isFinite(stake)||stake<=0||raw===""||!Number.isFinite(received)||received<0){document.getElementById("financeMessage").textContent="Inserisci puntata e incasso (0 se persa).";return;}
-    const now=new Date(),bet={id:String(Date.now())+"-manual-"+Math.random().toString(36).slice(2,7),kind:"manual",createdAt:now.toISOString(),createdAtLabel:now.toLocaleString("it-IT"),status:"SOLO REALE",realStatus:received>0?"VINTA":"PERSA",realReceived:received,stake,picks:[]};
-    await writeSavedBets([bet,...loadSavedBets()]);
-    document.getElementById("manualStake").value="";document.getElementById("manualReceived").value="";
-    document.getElementById("financeMessage").textContent="Giocata reale registrata.";
-    if(!currentUser)renderSavedBets();
-  });
 
 
   function openBetForm() {
