@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V9 - Contesto
+      - name: BETLAB Prediction Engine V9.1 - Contesto verificabile
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -2700,9 +2700,12 @@ jobs:
           # Le assenze non cambiano probabilita' senza dati sull'impatto.
 
           MAX_CONTEXT_FIXTURES = 20
+          # I dati mancanti non equivalgono a un'infermeria vuota.
           injuries_by_fixture = {}
-          coverage_injuries = set()
-          injury_fetch_note = "non richiesto"
+          requested_injury_ids = set()
+          injuries_api_status = "non_consultata"
+          injury_fetch_note = "Nessuna richiesta effettuata"
+          injury_records = 0
 
           eligible_context = [m for m in candidate_matches
                               if len(m["homeGames"]) >= MIN_TEAM_HISTORY
@@ -2710,31 +2713,39 @@ jobs:
           context_fixtures = eligible_context[:MAX_CONTEXT_FIXTURES]
           context_ids = [int(m["fixtureId"]) for m in context_fixtures]
           if context_ids:
+              requested_injury_ids = set(context_ids)
               try:
                   response = api_get("injuries", {"ids": "-".join(map(str, context_ids))})
-                  coverage_injuries = set(context_ids)
-                  for record in response.get("response") or []:
+                  rows = response.get("response")
+                  if not isinstance(rows, list):
+                      raise ValueError("Formato risposta /injuries non valido")
+                  injuries_api_status = "consultata"
+                  for record in rows:
                       if not isinstance(record, dict):
                           continue
                       fixture_id = (record.get("fixture") or {}).get("id")
-                      if not isinstance(fixture_id, int) or fixture_id not in coverage_injuries:
+                      if not isinstance(fixture_id, int) or fixture_id not in requested_injury_ids:
                           continue
                       team = record.get("team") or {}
                       player = record.get("player") or {}
                       if not isinstance(team.get("id"), int) or not player.get("name"):
                           continue
                       item = {
-                          "teamId": team.get("id"),
-                          "name": str(player.get("name"))[:100],
+                          "teamId": team["id"],
+                          "name": str(player["name"])[:100],
                           "playerId": player.get("id"),
                           "type": str(player.get("type") or "Non specificato")[:60],
                           "reason": str(player.get("reason") or "Motivo non riportato")[:120]
                       }
                       injuries_by_fixture.setdefault(fixture_id, []).append(item)
-                  injury_fetch_note = "API-Football /injuries consultata"
+                      injury_records += 1
+                  injury_fetch_note = ("/injuries: " + str(len(rows)) +
+                                       " righe API; " + str(injury_records) +
+                                       " segnalazioni con fixture e squadra verificate")
               except Exception as exc:
-                  injury_fetch_note = "API indisponibile: " + str(exc)[:180]
-                  print("NOTA: indisponibilita' non ottenibili:", exc)
+                  injuries_api_status = "errore"
+                  injury_fetch_note = "API /injuries non disponibile: " + str(exc)[:180]
+                  print("NOTA: indisponibilita' non verificabili:", exc)
 
           def venue_summary(games, is_home):
               subset = [g for g in games if g.get("home") is is_home]
@@ -2751,17 +2762,32 @@ jobs:
                   "avgGA": round(sum(g["ga"] for g in subset) / n, 2)
               }
 
+          # Un intervallo e' interpretabile soltanto se il calendario storico
+          # e' abbastanza recente. Non equivale comunque a riposo verificato.
+          MAX_REST_LOOKBACK_DAYS = 21
+
           def rest_before(games, match_date):
               if not games:
-                  return None
+                  return {"days": None, "status": "storico_insufficiente",
+                          "lastRecorded": None, "ageDays": None}
               try:
-                  last = max(g["date"] for g in games)
-                  # Giorni interi senza partita tra le due date.
-                  gap = (datetime.fromisoformat(match_date).date()
-                         - datetime.fromisoformat(last).date()).days
-                  return max(0, gap - 1) if gap > 0 else None
-              except (ValueError, TypeError):
-                  return None
+                  target_date = datetime.fromisoformat(match_date).date()
+                  dates = [datetime.fromisoformat(str(g["date"])[:10]).date()
+                           for g in games if g.get("date")]
+                  prior_dates = [date for date in dates if date < target_date]
+                  if not prior_dates:
+                      return {"days": None, "status": "storico_insufficiente",
+                              "lastRecorded": None, "ageDays": None}
+                  last_date = max(prior_dates)
+                  gap = (target_date - last_date).days
+                  if gap > MAX_REST_LOOKBACK_DAYS:
+                      return {"days": None, "status": "storico_non_recente",
+                              "lastRecorded": last_date.isoformat(), "ageDays": gap}
+                  return {"days": max(0, gap - 1), "status": "indicativo",
+                          "lastRecorded": last_date.isoformat(), "ageDays": gap}
+              except (ValueError, TypeError, KeyError):
+                  return {"days": None, "status": "storico_insufficiente",
+                          "lastRecorded": None, "ageDays": None}
 
           def fixture_context(match):
               raw = match.get("raw") or {}
@@ -2771,10 +2797,13 @@ jobs:
               fid = int(match["fixtureId"])
               fixture = raw.get("fixture") or {}
               venue = fixture.get("venue") or {}
-              invalid = (not isinstance(h_id, int) or not isinstance(a_id, int)
-                         or h_id == a_id)
-              known = fid in coverage_injuries and not invalid
-              injuries = injuries_by_fixture.get(fid, []) if known else []
+              valid_ids = (isinstance(h_id, int) and isinstance(a_id, int)
+                           and h_id != a_id)
+              fetched = fid in requested_injury_ids and injuries_api_status == "consultata"
+              # Almeno una segnalazione verificabile per la fixture e le squadre corrette.
+              injuries = ([row for row in injuries_by_fixture.get(fid, [])
+                           if row["teamId"] in {h_id, a_id}] if valid_ids and fetched else [])
+              has_reports = bool(injuries)
               def by_side(team_id):
                   unique = {}
                   for item in injuries:
@@ -2783,23 +2812,42 @@ jobs:
                       key = str(item.get("playerId") or item["name"])
                       unique[key] = item
                   return list(unique.values())[:15]
+
+              if not valid_ids:
+                  injury_note = "Identificativi delle squadre incoerenti: assenze non verificabili"
+              elif not fetched:
+                  injury_note = injury_fetch_note if fid in requested_injury_ids else "Incontro non ancora consultato nell'endpoint /injuries"
+              elif not has_reports:
+                  injury_note = "Endpoint consultato, ma nessuna segnalazione ricevuta per questa partita: non equivale a rosa completa"
+              else:
+                  injury_note = "Segnalazioni presenti in API-Football; elenco potenzialmente incompleto e aggiornabile"
+
+              home_gap = rest_before(match["homeGames"], match["date"])
+              away_gap = rest_before(match["awayGames"], match["date"])
               return {
                   "source": "API-Football + storico BETLAB",
                   "generatedAt": datetime.now(ROME).isoformat(),
-                  "injuriesStatus": "disponibile" if known else "non_verificato",
-                  "injuriesNote": "Dati non disponibili nel piano/campionato o non ancora consultati" if not known else "Le assenze segnalate possono cambiare: controllare prima del calcio d'inizio",
-                  "homeInjuries": by_side(h_id) if known else [],
-                  "awayInjuries": by_side(a_id) if known else [],
+                  "injuriesStatus": "disponibile" if has_reports else "non_verificato",
+                  "injuriesRequestStatus": injuries_api_status if fetched else "non_consultata_o_errore",
+                  "injuriesNote": injury_note,
+                  "homeInjuries": by_side(h_id) if has_reports else [],
+                  "awayInjuries": by_side(a_id) if has_reports else [],
                   "homeVenueForm": venue_summary(match["homeGames"], True),
                   "awayVenueForm": venue_summary(match["awayGames"], False),
-                  "homeRestDays": rest_before(match["homeGames"], match["date"]),
-                  "awayRestDays": rest_before(match["awayGames"], match["date"]),
+                  "homeRestDays": home_gap["days"],
+                  "awayRestDays": away_gap["days"],
+                  "homeRestStatus": home_gap["status"],
+                  "awayRestStatus": away_gap["status"],
+                  "homeLastRecorded": home_gap["lastRecorded"],
+                  "awayLastRecorded": away_gap["lastRecorded"],
+                  "homeHistoryAgeDays": home_gap["ageDays"],
+                  "awayHistoryAgeDays": away_gap["ageDays"],
                   "venue": {"name": str(venue.get("name") or "")[:120],
                             "city": str(venue.get("city") or "")[:100]},
                   "homeTeamId": h_id,
                   "awayTeamId": a_id,
                   "lineupsStatus": "non_verificato",
-                  "note": "Casa/trasferta: correzione statistica limitata. Assenze e giorni di riposo: segnalazioni informative; nessuna variazione numerica arbitraria della probabilita'."
+                  "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
               }
 
           # analizza tutte le partite candidate disponibili
@@ -3095,8 +3143,9 @@ jobs:
               })
 
 
-          print("Contesto indisponibili:", len(coverage_injuries),
-                "fixture consultate |", injury_fetch_note)
+          print("Contesto indisponibili:", len(requested_injury_ids),
+                "fixture richieste |", injury_fetch_note,
+                "| stato:", injuries_api_status)
 
           # ==========================================================
           # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
@@ -3235,7 +3284,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V9 CONTEXT MULTI-MARKET",
+                  "BETLAB V9.1 CONTEXT MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
@@ -3262,6 +3311,11 @@ jobs:
 
               "exactScoresWithOdds":
                   exact_scores_with_odds,
+
+              "injuriesApiStatus": injuries_api_status,
+              "injuriesApiNote": injury_fetch_note,
+              "injuriesFixturesQueried": len(requested_injury_ids),
+              "injuriesFixturesWithReports": len(injuries_by_fixture),
 
               "analysis":
                   analysis
