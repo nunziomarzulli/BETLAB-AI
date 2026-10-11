@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V7.3
+      - name: BETLAB Prediction Engine V9 - Contesto
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -327,7 +327,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V7.3")
+          print("BETLAB MULTI-MARKET ENGINE V9")
           print("==============================================")
           print("")
 
@@ -1271,6 +1271,32 @@ jobs:
 
 
           # ==========================================================
+          # CASA/TRASFERTA: AGGIUSTAMENTO SPERIMENTALE E LIMITATO
+          # ==========================================================
+          # Non usiamo come prova 1-2 sole partite in casa/trasferta.
+          # Il risultato specifico per sede viene smussato verso la
+          # probabilita' generale (prior 8 incontri equivalenti) e
+          # la correzione non puo' superare 10 punti percentuali.
+          # L'euristica richiede backtesting: NON e' una calibrazione.
+          def contextual_probability(home_games, away_games,
+                                     home_predicate, away_predicate,
+                                     prior=0.50):
+              base = combined_probability(
+                  home_games, away_games, home_predicate,
+                  away_predicate, prior=prior
+              )
+              recent_home = [g for g in home_games if g.get("home") is True]
+              recent_away = [g for g in away_games if g.get("home") is False]
+              if len(recent_home) < 3 or len(recent_away) < 3:
+                  return base
+              hits = (sum(1 for g in recent_home if home_predicate(g))
+                      + sum(1 for g in recent_away if away_predicate(g)))
+              sample = len(recent_home) + len(recent_away)
+              conditional = (hits + 8.0 * base) / (sample + 8.0)
+              return clamp(base + clamp(conditional - base, -0.10, 0.10),
+                           0.01, 0.99)
+
+          # ==========================================================
           # POISSON RISULTATO ESATTO
           # ==========================================================
 
@@ -1485,7 +1511,7 @@ jobs:
               # 1 / X / 2
               # ------------------------------------------------------
 
-              home_win = combined_probability(
+              home_win = contextual_probability(
                   home_games,
                   away_games,
                   lambda g:
@@ -1495,7 +1521,7 @@ jobs:
                   prior=0.43
               )
 
-              draw = combined_probability(
+              draw = contextual_probability(
                   home_games,
                   away_games,
                   lambda g:
@@ -1505,7 +1531,7 @@ jobs:
                   prior=0.27
               )
 
-              away_win = combined_probability(
+              away_win = contextual_probability(
                   home_games,
                   away_games,
                   lambda g:
@@ -1598,7 +1624,7 @@ jobs:
               # GOAL / NO GOAL
               # ------------------------------------------------------
 
-              btts = combined_probability(
+              btts = contextual_probability(
                   home_games,
                   away_games,
                   lambda g:
@@ -1639,7 +1665,7 @@ jobs:
                   3.5
               ]:
 
-                  over = combined_probability(
+                  over = contextual_probability(
                       home_games,
                       away_games,
                       lambda g, line=line:
@@ -1678,7 +1704,7 @@ jobs:
               # PARI / DISPARI
               # ------------------------------------------------------
 
-              even = combined_probability(
+              even = contextual_probability(
                   home_games,
                   away_games,
                   lambda g:
@@ -1749,7 +1775,7 @@ jobs:
               for label, condition in ranges:
 
                   probability = (
-                      combined_probability(
+                      contextual_probability(
                           home_games,
                           away_games,
                           lambda g, condition=condition:
@@ -2665,6 +2691,117 @@ jobs:
           exact_scores_with_odds = 0
 
 
+          # ==========================================================
+          # DATI CONTESTUALI PRE-PARTITA - SOLO FONTI VERIFICABILI
+          # ==========================================================
+          # La chiamata injuries accetta fino a 20 fixture IDs per volta.
+          # Limitiamo il numero di richieste per rispettare il piano API.
+          # Se non e' disponibile NON registriamo "nessun infortunato".
+          # Le assenze non cambiano probabilita' senza dati sull'impatto.
+
+          MAX_CONTEXT_FIXTURES = 20
+          injuries_by_fixture = {}
+          coverage_injuries = set()
+          injury_fetch_note = "non richiesto"
+
+          eligible_context = [m for m in candidate_matches
+                              if len(m["homeGames"]) >= MIN_TEAM_HISTORY
+                              and len(m["awayGames"]) >= MIN_TEAM_HISTORY]
+          context_fixtures = eligible_context[:MAX_CONTEXT_FIXTURES]
+          context_ids = [int(m["fixtureId"]) for m in context_fixtures]
+          if context_ids:
+              try:
+                  response = api_get("injuries", {"ids": "-".join(map(str, context_ids))})
+                  coverage_injuries = set(context_ids)
+                  for record in response.get("response") or []:
+                      if not isinstance(record, dict):
+                          continue
+                      fixture_id = (record.get("fixture") or {}).get("id")
+                      if not isinstance(fixture_id, int) or fixture_id not in coverage_injuries:
+                          continue
+                      team = record.get("team") or {}
+                      player = record.get("player") or {}
+                      if not isinstance(team.get("id"), int) or not player.get("name"):
+                          continue
+                      item = {
+                          "teamId": team.get("id"),
+                          "name": str(player.get("name"))[:100],
+                          "playerId": player.get("id"),
+                          "type": str(player.get("type") or "Non specificato")[:60],
+                          "reason": str(player.get("reason") or "Motivo non riportato")[:120]
+                      }
+                      injuries_by_fixture.setdefault(fixture_id, []).append(item)
+                  injury_fetch_note = "API-Football /injuries consultata"
+              except Exception as exc:
+                  injury_fetch_note = "API indisponibile: " + str(exc)[:180]
+                  print("NOTA: indisponibilita' non ottenibili:", exc)
+
+          def venue_summary(games, is_home):
+              subset = [g for g in games if g.get("home") is is_home]
+              n = len(subset)
+              if not n:
+                  return {"played": 0, "wins": 0, "draws": 0, "losses": 0,
+                          "avgGF": None, "avgGA": None}
+              return {
+                  "played": n,
+                  "wins": sum(g["gf"] > g["ga"] for g in subset),
+                  "draws": sum(g["gf"] == g["ga"] for g in subset),
+                  "losses": sum(g["gf"] < g["ga"] for g in subset),
+                  "avgGF": round(sum(g["gf"] for g in subset) / n, 2),
+                  "avgGA": round(sum(g["ga"] for g in subset) / n, 2)
+              }
+
+          def rest_before(games, match_date):
+              if not games:
+                  return None
+              try:
+                  last = max(g["date"] for g in games)
+                  # Giorni interi senza partita tra le due date.
+                  gap = (datetime.fromisoformat(match_date).date()
+                         - datetime.fromisoformat(last).date()).days
+                  return max(0, gap - 1) if gap > 0 else None
+              except (ValueError, TypeError):
+                  return None
+
+          def fixture_context(match):
+              raw = match.get("raw") or {}
+              team_raw = raw.get("teams") or {}
+              h_id = (team_raw.get("home") or {}).get("id")
+              a_id = (team_raw.get("away") or {}).get("id")
+              fid = int(match["fixtureId"])
+              fixture = raw.get("fixture") or {}
+              venue = fixture.get("venue") or {}
+              invalid = (not isinstance(h_id, int) or not isinstance(a_id, int)
+                         or h_id == a_id)
+              known = fid in coverage_injuries and not invalid
+              injuries = injuries_by_fixture.get(fid, []) if known else []
+              def by_side(team_id):
+                  unique = {}
+                  for item in injuries:
+                      if item["teamId"] != team_id:
+                          continue
+                      key = str(item.get("playerId") or item["name"])
+                      unique[key] = item
+                  return list(unique.values())[:15]
+              return {
+                  "source": "API-Football + storico BETLAB",
+                  "generatedAt": datetime.now(ROME).isoformat(),
+                  "injuriesStatus": "disponibile" if known else "non_verificato",
+                  "injuriesNote": "Dati non disponibili nel piano/campionato o non ancora consultati" if not known else "Le assenze segnalate possono cambiare: controllare prima del calcio d'inizio",
+                  "homeInjuries": by_side(h_id) if known else [],
+                  "awayInjuries": by_side(a_id) if known else [],
+                  "homeVenueForm": venue_summary(match["homeGames"], True),
+                  "awayVenueForm": venue_summary(match["awayGames"], False),
+                  "homeRestDays": rest_before(match["homeGames"], match["date"]),
+                  "awayRestDays": rest_before(match["awayGames"], match["date"]),
+                  "venue": {"name": str(venue.get("name") or "")[:120],
+                            "city": str(venue.get("city") or "")[:100]},
+                  "homeTeamId": h_id,
+                  "awayTeamId": a_id,
+                  "lineupsStatus": "non_verificato",
+                  "note": "Casa/trasferta: correzione statistica limitata. Assenze e giorni di riposo: segnalazioni informative; nessuna variazione numerica arbitraria della probabilita'."
+              }
+
           # analizza tutte le partite candidate disponibili
           for match in candidate_matches:
 
@@ -2947,6 +3084,8 @@ jobs:
                           "historyScore"
                       ],
 
+                  "context": fixture_context(match),
+
                   "prediction":
                       prediction,
 
@@ -2955,6 +3094,9 @@ jobs:
 
               })
 
+
+          print("Contesto indisponibili:", len(coverage_injuries),
+                "fixture consultate |", injury_fetch_note)
 
           # ==========================================================
           # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
@@ -3093,7 +3235,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V7.3 MULTI-MARKET",
+                  "BETLAB V9 CONTEXT MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
@@ -3195,7 +3337,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("RISULTATO BETLAB V7.3")
+          print("RISULTATO BETLAB V9")
           print("==============================================")
 
           print(
