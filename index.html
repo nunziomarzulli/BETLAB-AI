@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BETLAB AI · Analisi V9</title>
+  <title>BETLAB AI · V9 e V7</title>
 
   <style>
     * {
@@ -1145,6 +1145,35 @@
     .context-note{font-size:10px;color:#64786c;line-height:1.45;margin-top:8px}
     @media(max-width:700px){.context-injuries{grid-template-columns:1fr}}
 
+
+    /* BETLAB V9 + V7: due schermate realmente separate */
+    [hidden] { display:none !important; }
+    .engine-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 23px; padding:6px; border:1px solid #254056; border-radius:14px; background:#0c1c2d; width:max-content; max-width:100%; }
+    .engine-tab { border:1px solid transparent; border-radius:10px; padding:12px 19px; color:#b3c3d2; background:transparent; font-size:13px; font-weight:900; cursor:pointer; }
+    .engine-tab[aria-selected="true"] { color:#082517; background:#54df96; border-color:#54df96; }
+    .engine-tab:focus-visible { outline:3px solid #fff; outline-offset:2px; }
+    .v7-section { padding-bottom:8px; }
+    .v7-intro { margin:0 0 14px; color:#aec1d0; font-size:14px; line-height:1.65; max-width:1000px; }
+    .v7-info { margin:0 0 20px; padding:12px 15px; border-radius:10px; border:1px solid #2a4e64; background:#0d2435; color:#d4e3ee; font-size:12px; line-height:1.6; }
+    .v7-info strong { color:#69e6a3; }
+    .v7-head { display:flex; gap:12px; justify-content:space-between; align-items:center; margin:20px 0 12px; }
+    .v7-head h2 { margin:0; font-size:21px; }
+    .v7-refresh { border:1px solid #46657c; border-radius:8px; background:#132b40; color:#fff; padding:10px 13px; font-size:11px; font-weight:900; cursor:pointer; }
+    .v7-summary { color:#b9cbd6; font-size:12px; margin:5px 0 17px; }
+    .v7-card { background:#f7faf8; border:1px solid #cddbd3; border-radius:14px; padding:18px; color:#162d20; display:flex; flex-direction:column; gap:9px; min-width:0; }
+    .v7-card-date { color:#61796b; font-size:10px; font-weight:750; }
+    .v7-card-teams { margin:2px 0 5px; font-size:19px; font-weight:950; line-height:1.25; min-height:45px; }
+    .v7-pick { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px; background:#e3f5ea; border:1px solid #c1e4cf; border-radius:10px; }
+    .v7-pick .v7-tag { display:block; color:#597266; font-size:9px; letter-spacing:1px; font-weight:900; margin-bottom:5px; }
+    .v7-pick .v7-bet { display:block; font-size:23px; font-weight:950; color:#066b40; line-height:1.1; }
+    .v7-pick .v7-market { display:block; margin-top:4px; color:#557568; font-size:11px; }
+    .v7-pick .v7-price { text-align:right; border-left:1px solid #b5d6c4; padding-left:13px; flex-shrink:0; }
+    .v7-pick .v7-price strong { display:block; font-size:25px; font-weight:950; color:#0d3825; }
+    .v7-comparison { border-top:1px solid #d7e4da; padding-top:10px; color:#435e50; font-size:11px; line-height:1.55; }
+    .v7-original { margin-top:auto; background:#f0f2f0; padding:9px 11px; border-radius:8px; font-size:11px; color:#4b6155; line-height:1.45; }
+    .v7-unavailable { padding:25px; border:1px solid #2d4b60; border-radius:12px; background:#10283a; color:#d1e2ec; line-height:1.65; font-size:13px; }
+    @media(max-width:700px) { .engine-tabs { width:100%; } .engine-tab { flex:1; padding:12px 8px; font-size:12px; } .v7-head h2 { font-size:18px; } .v7-card-teams { min-height:auto; } }
+
 </style>
 </head>
 
@@ -1166,7 +1195,11 @@
 
 
   <main>
-    <div class="main-grid">
+    <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V9 · Attuale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
+    </nav>
+    <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
       <div class="main-left">
 
     <div class="eyebrow">
@@ -1347,6 +1380,16 @@
     </section>
     </div>
 
+    <section id="v7Panel" class="v7-section" role="tabpanel" aria-labelledby="tabV7" hidden>
+      <div class="eyebrow">SIMULAZIONE · VERSIONE STORICA</div>
+      <h1>Pronostici BETLAB V7</h1>
+      <p class="v7-intro">La schermata alternativa mostra i pronostici calcolati dal vecchio motore V7 e le quote conservate nel confronto offline, affiancati alle scelte V9 quando disponibili.</p>
+      <div class="v7-info"><strong>Come leggere questa pagina:</strong> la quota proviene dallo snapshot dei bookmaker raccolto da BETLAB, non è una quota creata dalla V7. Lo stesso criterio di scelta dei mercati viene applicato a V7 e V9, per confrontarli in modo omogeneo. Queste proposte <strong>non sono schedine giocabili</strong> e non dimostrano che un modello sia migliore.</div>
+      <div class="v7-head"><h2>Analisi V7 e quote</h2><button type="button" id="refreshComparison" class="v7-refresh">AGGIORNA CONFRONTO</button></div>
+      <p id="comparisonInfo" class="v7-summary" aria-live="polite">Caricamento confronto...</p>
+      <div id="v7Cards" class="daily-grid"></div>
+    </section>
+
     <section class="saved-bets">
       <div class="saved-bets-head">
         <div>
@@ -1417,6 +1460,15 @@
   const dailyMatches = document.getElementById("dailyMatches");
   const monitorList = document.getElementById("monitorList");
   const monitorCount = document.getElementById("monitorCount");
+  const v7Panel = document.getElementById("v7Panel");
+  const v9Panel = document.getElementById("v9Panel");
+  const tabV7 = document.getElementById("tabV7");
+  const tabV9 = document.getElementById("tabV9");
+  const v7Cards = document.getElementById("v7Cards");
+  const comparisonInfo = document.getElementById("comparisonInfo");
+  const refreshComparison = document.getElementById("refreshComparison");
+  let comparisonLoaded = false;
+
   const refreshButton = document.getElementById("refreshButton");
 
   const createButton =
@@ -1478,6 +1530,64 @@
       .replaceAll("'", "&#039;");
   }
 
+
+  function switchEngineView(view) {
+    const showV7 = view === "v7";
+    v7Panel.hidden = !showV7;
+    v9Panel.hidden = showV7;
+    tabV7.setAttribute("aria-selected", String(showV7));
+    tabV9.setAttribute("aria-selected", String(!showV7));
+    if (showV7 && !comparisonLoaded) loadComparison();
+  }
+
+  tabV7.addEventListener("click", () => switchEngineView("v7"));
+  tabV9.addEventListener("click", () => switchEngineView("v9"));
+  refreshComparison.addEventListener("click", loadComparison);
+
+  const comparisonOdd = value => {
+    const odd = Number(value);
+    return Number.isFinite(odd) && odd >= 1.10 ? odd.toLocaleString("it-IT", {minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
+  };
+
+  async function loadComparison() {
+    refreshComparison.disabled = true;
+    comparisonInfo.textContent = "Aggiornamento analisi V7 in corso...";
+    try {
+      const res = await fetch("data/betlab-confronto.json?v=" + Date.now(), {cache:"no-store"});
+      if (!res.ok) throw new Error("Il confronto non è ancora stato pubblicato sul sito");
+      const payload = await res.json();
+      if (!Array.isArray(payload.matches)) throw new Error("Formato confronto non riconosciuto");
+      const rows = payload.matches.filter(m => m.v7?.selection || m.v9?.selection);
+      const date = new Date(payload.generatedAt);
+      const when = Number.isFinite(date.getTime()) ? date.toLocaleString("it-IT") : "n.d.";
+      const feedDate = new Date(payload.quoteSnapshotAt);
+      const snapshot = Number.isFinite(feedDate.getTime()) ? feedDate.toLocaleString("it-IT") : "n.d.";
+      comparisonInfo.textContent = `${rows.length} partite con selezioni confrontabili · Confronto generato: ${when} · Quote archiviate: ${snapshot}`;
+      v7Cards.innerHTML = rows.length ? rows.map(m => {
+        const p = m.v7 || {}, q = m.v9 || {};
+        const raw = Number(p.probability);
+        const prob = Number.isFinite(raw) && raw > 0 && raw < 1 ? (raw*100).toLocaleString("it-IT",{maximumFractionDigits:1}) + "%" : "n.d.";
+        const v9Text = q.selection ? `${safeText(q.selection)} · quota ${comparisonOdd(q.odd)}` : "nessuna selezione comparabile";
+        const same = q.selection && p.selection === q.selection && p.market === q.market;
+        const original = p.originalSelection ? `${safeText(p.originalSelection)}${p.originalMarket ? " ("+safeText(p.originalMarket)+")" : ""}` : "non disponibile";
+        return `<article class="v7-card">
+          <div class="v7-card-date">${safeText(m.date || "")}</div>
+          <div class="v7-card-teams">${safeText(m.match || "Incontro")}</div>
+          <div class="v7-pick"><div><span class="v7-tag">SCELTA V7 · CRITERIO COMUNE</span><strong class="v7-bet">${p.selection ? safeText(p.selection) : "Nessuna"}</strong><span class="v7-market">${safeText(p.market || "Nessun mercato quotato")}</span></div>
+          <div class="v7-price"><span class="v7-tag">QUOTA ARCHIVIATA</span><strong>${comparisonOdd(p.odd)}</strong></div></div>
+          <div class="v7-comparison"><strong>Probabilità stimata V7:</strong> ${prob}<br><strong>V9 sullo stesso incontro:</strong> ${v9Text}${same ? " · stesso pronostico" : ""}</div>
+          <div class="v7-original"><strong>Pronostico principale originale V7:</strong> ${original}. Può differire dalla scelta del criterio comune.</div>
+        </article>`;
+      }).join("") : `<div class="v7-unavailable">In questo snapshot non ci sono mercati quotati confrontabili. Il test offline non inventa quote: riprova dopo il prossimo aggiornamento del feed.</div>`;
+      comparisonLoaded = true;
+    } catch (error) {
+      comparisonLoaded = false;
+      comparisonInfo.textContent = "Confronto V7 non ancora disponibile";
+      v7Cards.innerHTML = `<div class="v7-unavailable">Per mostrare i pronostici V7 nel sito, esegui <strong>Actions → BETLAB Confronto V7 e V9 (offline)</strong> dopo aver installato il nuovo workflow. I dati appariranno qui senza scaricare file Excel.<br><small>${safeText(error.message || "")}</small></div>`;
+    } finally {
+      refreshComparison.disabled = false;
+    }
+  }
 
   function money(value) {
     return Number(value).toLocaleString(
@@ -1954,7 +2064,7 @@
       const lostPicks = (bet.picks||[]).filter(p=>p.result==="PERSA").length;
       const openPicks = (bet.picks||[]).length - wonPicks - lostPicks;
       ticket.innerHTML = `<div class="ticket-head"><div><div class="ticket-title">${bet.kind === "manual" ? "Giocata reale" : "Biglietto #"+safeText(ticketNumber(bet))}</div><div class="ticket-date">${safeText(bet.createdAtLabel||"")}</div></div><div class="ticket-status ${modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : ""}">${safeText(modelStatus)}</div></div>
-      ${picksHtml ? `<details class="ticket-details" open><summary>ESITI: <span class="archive-win">${wonPicks} PRESE</span> · <span class="archive-loss">${lostPicks} PERSE</span>${openPicks ? ` · ${openPicks} IN ATTESA` : ""}</summary>${picksHtml}</details>` : ""}
+      ${picksHtml ? `<details class="ticket-details"><summary>ESITI: <span class="archive-win">${wonPicks} PRESE</span> · <span class="archive-loss">${lostPicks} PERSE</span>${openPicks ? ` · ${openPicks} IN ATTESA` : ""}</summary>${picksHtml}</details>` : ""}
       <div class="ticket-stats"><div><div class="ticket-stat-label">PUNTATA REALE</div><div class="ticket-stat-value">${money(bet.stake)}</div></div><div><div class="ticket-stat-label">INCASSATO</div><div class="ticket-stat-value">${bet.realStatus === "VINTA" ? money(bet.realReceived||0) : bet.realStatus === "PERSA" ? money(0) : "DA INSERIRE"}</div></div></div>
       <div class="real-outcome"><label>Esito reale <select class="real-status" data-bet-id="${safeText(bet.id)}"><option value="" ${!bet.realStatus?"selected":""}>Da indicare</option><option value="VINTA" ${bet.realStatus==="VINTA"?"selected":""}>Vinta</option><option value="PERSA" ${bet.realStatus==="PERSA"?"selected":""}>Persa</option></select></label><input class="real-received" data-bet-id="${safeText(bet.id)}" type="number" min="0" step="0.01" placeholder="Incassato €" value="${bet.realReceived ?? ""}" aria-label="Incassato reale"><button class="update-real" data-bet-id="${safeText(bet.id)}" type="button">SALVA ESITO</button></div>
       <button class="delete-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA DALL'ARCHIVIO</button>`;
