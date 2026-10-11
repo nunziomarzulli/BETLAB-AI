@@ -1,0 +1,225 @@
+name: BETLAB Confronto V7 e V9 (simulazione)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confronto:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Scarica repo e cronologia
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Esegui i due motori senza modificare BETLAB
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          python3 <<'PY'
+          import csv
+          import json
+          import math
+          import os
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+          import sys
+          import textwrap
+          from datetime import datetime, timezone
+
+          ROOT = Path(os.environ['GITHUB_WORKSPACE'])
+          TEMP = Path(os.environ['RUNNER_TEMP']) / 'betlab_parallel'
+          OUT = ROOT / 'betlab_confronto_output'
+          ORIGINAL_SHA = '9aa2d8b61282dca91c82bed23d3c729ec72902e7'
+          START = datetime.now(timezone.utc)
+          RUN_EPOCH = int(START.timestamp())
+          TEMP.mkdir(parents=True, exist_ok=True)
+          OUT.mkdir(parents=True, exist_ok=True)
+
+
+          def extract_python(workflow: str) -> str:
+              lines = workflow.splitlines()
+              starts = [i for i, line in enumerate(lines) if "python3 <<'PY'" in line]
+              if len(starts) != 1:
+                  raise ValueError('Atteso esattamente un blocco Python nel workflow, trovati: ' + str(len(starts)))
+              i = starts[0]
+              base_indent = len(lines[i]) - len(lines[i].lstrip())
+              for end in range(i + 1, len(lines)):
+                  line = lines[end]
+                  indent = len(line) - len(line.lstrip())
+                  if line.strip() == 'PY' and indent <= base_indent:
+                      source = textwrap.dedent('\n'.join(lines[i+1:end])) + '\n'
+                      compile(source, '<engine>', 'exec')
+                      return source
+              raise ValueError('Terminatore PY non trovato')
+
+
+          def get_old_workflow():
+              return subprocess.check_output(
+                  ['git', 'show', ORIGINAL_SHA + ':.github/workflows/test-api-football.yml'],
+                  cwd=ROOT, text=True)
+
+
+          def current_sha():
+              return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+
+
+          def run_engine(label, code, history_file=None):
+              work = TEMP / label
+              work.mkdir(exist_ok=True)
+              if (ROOT / 'data').exists():
+                  shutil.copytree(ROOT / 'data', work / 'data', dirs_exist_ok=True)
+              else:
+                  raise RuntimeError('Manca la cartella data nel repository')
+              if history_file:
+                  shutil.copy2(history_file, work / 'data' / 'betlab-history.json')
+              script = work / 'engine.py'
+              script.write_text(code, encoding='utf-8')
+              env = os.environ.copy()
+              env['PYTHONUNBUFFERED'] = '1'
+              print('\n=== AVVIO', label, '===', flush=True)
+              subprocess.run([sys.executable, str(script)], cwd=work, env=env, check=True)
+              output_file = work / 'data' / 'betlab-analysis.json'
+              if not output_file.exists():
+                  raise RuntimeError(label + ': betlab-analysis.json non generato')
+              result = OUT / (label + '_analisi.json')
+              shutil.copy2(output_file, result)
+              return json.loads(output_file.read_text(encoding='utf-8')), work / 'data' / 'betlab-history.json'
+
+
+          def safe_float(v):
+              try:
+                  x = float(v)
+                  return x if math.isfinite(x) else None
+              except (TypeError, ValueError):
+                  return None
+
+
+          def choose_under_common_rules(match):
+              # Valuta entrambi i modelli con gli stessi criteri (selezione front-end V9).
+              # I valori NON sono probabilita' validate.
+              hg = int(((match.get('home') or {}).get('form') or {}).get('played') or 0)
+              ag = int(((match.get('away') or {}).get('form') or {}).get('played') or 0)
+              if min(hg, ag) < 5:
+                  return None
+              scored = []
+              for c in (match.get('candidates') or []):
+                  odd, p = safe_float(c.get('odd')), safe_float(c.get('modelProbability'))
+                  if c.get('oddAvailable') is not True or odd is None or p is None:
+                      continue
+                  if odd < 1.10 or p <= 0 or p >= 1:
+                      continue
+                  exact = c.get('market') == 'Risultato Esatto'
+                  if exact and (min(hg,ag) < 8 or c.get('model') != 'poisson'):
+                      continue
+                  implied = 1/odd
+                  if p/implied > 2.4:
+                      continue
+                  volume = min(hg,ag,10)/10
+                  conservative = implied + (0.45 if exact else 0.60)*volume*(p-implied)
+                  edge = conservative*odd-1
+                  if edge < 0.06:
+                      continue
+                  score = edge*math.sqrt(conservative)/(1+0.35*math.log(odd))*(0.8 if exact else 1)
+                  scored.append((score,c))
+              if not scored:
+                  return None
+              best = max(scored, key=lambda pair: pair[0])[1]
+              return {'mercato':best.get('market'), 'pronostico':best.get('selection'),
+                      'quota':best.get('odd'), 'probabilita':best.get('modelProbability')}
+
+
+          def unpack(raw):
+              result = {}
+              for m in raw.get('analysis') or []:
+                  try:
+                      ident = int(m['fixtureId'])
+                      kickoff = int(m['timestamp'])
+                  except (ValueError, TypeError, KeyError):
+                      continue
+                  # Solo partite non ancora iniziate, con un margine di 15 minuti.
+                  if kickoff <= RUN_EPOCH + 15*60:
+                      continue
+                  home = str((m.get('home') or {}).get('name') or '')
+                  away = str((m.get('away') or {}).get('name') or '')
+                  if not home or not away or home == away:
+                      continue
+                  result[ident] = {'fixtureId':ident, 'data':m.get('date'), 'inizioUTC':kickoff,
+                                   'partita':home+' - '+away, 'pick':choose_under_common_rules(m)}
+              return result
+
+
+          current_workflow = (ROOT/'.github/workflows/test-api-football.yml').read_text(encoding='utf-8')
+          v9 = extract_python(current_workflow)
+          if 'LOOKUPS_PER_RUN = 4' not in v9:
+              raise RuntimeError('Il motore corrente non ha il controllo previsto per il recupero storico: verificare versione V9')
+          v9 = v9.replace('LOOKUPS_PER_RUN = 4', 'LOOKUPS_PER_RUN = 0', 1)
+          original = extract_python(get_old_workflow())
+
+          # Prima V9: puo' aggiornare lo storico con risultati gia' conclusi.
+          # Poi V7 riceve la stessa copia finale dello storico.
+          result9, final_history = run_engine('V9', v9)
+          result7, _ = run_engine('V7_originale', original, final_history)
+
+          r9 = unpack(result9)
+          r7 = unpack(result7)
+          all_ids = sorted(set(r9)|set(r7), key=lambda k: ((r9.get(k) or r7[k])['inizioUTC'], k))
+          rows = []
+          for fid in all_ids:
+              a = r7.get(fid,{}); b = r9.get(fid,{})
+              basic = b or a
+              p7, p9 = a.get('pick') or {}, b.get('pick') or {}
+              rows.append({
+                 'fixtureId':fid, 'data':basic.get('data'), 'partita':basic.get('partita'),
+                 'V7_pronostico':p7.get('pronostico',''), 'V7_mercato':p7.get('mercato',''),
+                 'V7_quota':p7.get('quota',''), 'V7_probabilita':p7.get('probabilita',''),
+                 'V9_pronostico':p9.get('pronostico',''), 'V9_mercato':p9.get('mercato',''),
+                 'V9_quota':p9.get('quota',''), 'V9_probabilita':p9.get('probabilita','')
+              })
+
+          if rows:
+              with (OUT/'confronto.csv').open('w', newline='', encoding='utf-8-sig') as f:
+                  writer=csv.DictWriter(f, fieldnames=list(rows[0].keys()), delimiter=';')
+                  writer.writeheader()
+                  writer.writerows(rows)
+          else:
+              (OUT/'confronto.csv').write_text('Nessuna partita futura analizzabile in questo momento.\n', encoding='utf-8')
+
+          meta = {'esecuzioneUTC':START.isoformat(), 'V7commit':ORIGINAL_SHA,
+                  'V9commit':current_sha(), 'partite_future_confrontate':len(all_ids),
+                  'V7_selezioni':sum(bool(row['V7_pronostico']) for row in rows),
+                  'V9_selezioni':sum(bool(row['V9_pronostico']) for row in rows),
+                  'nota':'Test simulato. Entrambi valutati con lo stesso selettore V9 e uno storico condiviso. Quote raccolte durante il test; nessuna scommessa reale.'}
+          (OUT/'metadati.json').write_text(json.dumps(meta,indent=2,ensure_ascii=False),encoding='utf-8')
+          summary = ['# Confronto BETLAB V7 vs V9', '',
+                     '- Esecuzione UTC: '+meta['esecuzioneUTC'],
+                     '- V7 commit: `'+meta['V7commit']+'`',
+                     '- V9 commit: `'+meta['V9commit']+'`',
+                     '- Incontri futuri: '+str(meta['partite_future_confrontate']),
+                     '- Pronostici V7: '+str(meta['V7_selezioni']),
+                     '- Pronostici V9: '+str(meta['V9_selezioni']), '',
+                     'V7 e V9 sono valutati con le stesse regole di scelta del pronostico.',
+                     'Le probabilita sono sperimentali e il test non accerta vincite.', '',
+                     'Scarica gli artifact per vedere CSV e JSON completi.']
+          (OUT/'RIEPILOGO.md').write_text('\n'.join(summary)+'\n',encoding='utf-8')
+          summary_path=os.getenv('GITHUB_STEP_SUMMARY')
+          if summary_path:
+              with open(summary_path,'a',encoding='utf-8') as f:
+                  f.write('\n'.join(summary)+'\n')
+          print('COMPLETATO',json.dumps(meta,ensure_ascii=False))
+          PY
+
+      - name: Salva i risultati del confronto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BETLAB-confronto-V7-V9
+          path: betlab_confronto_output/
+          if-no-files-found: warn
+          retention-days: 30
