@@ -1,7 +1,9 @@
-name: BETLAB Import storico V2
+name: BETLAB Import storico V3 sicuro
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "30 4 * * *"
 
 permissions:
   contents: write
@@ -9,590 +11,176 @@ permissions:
 jobs:
   import-history:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Scarica repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Importa storico OpenFootball V2
+      - name: Arricchisci storico senza eliminare dati precedenti
         run: |
-          mkdir -p data
-
-          python3 - <<'PY'
-
+          python3 <<'PY'
+          import hashlib
           import json
           import os
-          import urllib.request
-          import hashlib
           import re
           import unicodedata
+          import urllib.request
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
 
-          from datetime import datetime, timezone
-
-          HISTORY_FILE = "data/betlab-history.json"
-
-          BASE = (
-              "https://raw.githubusercontent.com/"
-              "openfootball/football.json/master"
-          )
-
-          # =====================================================
-          # DATASET
-          #
-          # Europa: stagione attuale 2026/27
-          # Brasile: stagione 2026
-          # =====================================================
-
+          PATH = "data/betlab-history.json"
+          BASE = "https://raw.githubusercontent.com/openfootball/football.json/master"
+          TODAY = datetime.now(ZoneInfo("Europe/Rome")).date()
+          SEASON = "2026-27"
           DATASETS = [
-
-              # EUROPA 2026/27
-
-              ("2026-27", "en.1.json",
-               "England", "Premier League"),
-
-              ("2026-27", "en.2.json",
-               "England", "Championship"),
-
-              ("2026-27", "it.1.json",
-               "Italy", "Serie A"),
-
-              ("2026-27", "it.2.json",
-               "Italy", "Serie B"),
-
-              ("2026-27", "es.1.json",
-               "Spain", "La Liga"),
-
-              ("2026-27", "es.2.json",
-               "Spain", "Segunda División"),
-
-              ("2026-27", "de.1.json",
-               "Germany", "Bundesliga"),
-
-              ("2026-27", "de.2.json",
-               "Germany", "2. Bundesliga"),
-
-              ("2026-27", "fr.1.json",
-               "France", "Ligue 1"),
-
-              ("2026-27", "fr.2.json",
-               "France", "Ligue 2"),
-
-              ("2026-27", "pt.1.json",
-               "Portugal", "Primeira Liga"),
-
-              ("2026-27", "nl.1.json",
-               "Netherlands", "Eredivisie"),
-
-              ("2026-27", "be.1.json",
-               "Belgium", "Jupiler Pro League"),
-
-              ("2026-27", "tr.1.json",
-               "Turkey", "Süper Lig"),
-
-              ("2026-27", "sco.1.json",
-               "Scotland", "Premiership"),
-
-              ("2026-27", "at.1.json",
-               "Austria", "Bundesliga"),
-
-              ("2026-27", "gr.1.json",
-               "Greece", "Super League 1"),
-
-              # BRASILE 2026
-
-              ("2026", "br.1.json",
-               "Brazil", "Serie A")
+              (SEASON, "en.1.json", "England", "Premier League"),
+              (SEASON, "en.2.json", "England", "Championship"),
+              (SEASON, "it.1.json", "Italy", "Serie A"),
+              (SEASON, "it.2.json", "Italy", "Serie B"),
+              (SEASON, "es.1.json", "Spain", "La Liga"),
+              (SEASON, "es.2.json", "Spain", "Segunda Division"),
+              (SEASON, "de.1.json", "Germany", "Bundesliga"),
+              (SEASON, "de.2.json", "Germany", "2. Bundesliga"),
+              (SEASON, "fr.1.json", "France", "Ligue 1"),
+              (SEASON, "fr.2.json", "France", "Ligue 2"),
+              (SEASON, "pt.1.json", "Portugal", "Primeira Liga"),
+              (SEASON, "nl.1.json", "Netherlands", "Eredivisie"),
+              (SEASON, "be.1.json", "Belgium", "Jupiler Pro League"),
+              (SEASON, "tr.1.json", "Turkey", "Super Lig"),
+              (SEASON, "sco.1.json", "Scotland", "Premiership"),
+              (SEASON, "at.1.json", "Austria", "Bundesliga"),
+              (SEASON, "gr.1.json", "Greece", "Super League 1"),
+              ("2026", "br.1.json", "Brazil", "Serie A"),
           ]
 
+          def norm(value):
+              value = unicodedata.normalize("NFKD", str(value or ""))
+              value = "".join(c for c in value if not unicodedata.combining(c))
+              return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
 
-          # =====================================================
-          # NORMALIZZAZIONE
-          # =====================================================
+          def team_name(row, side):
+              value = row.get(side)
+              return value.get("name") if isinstance(value, dict) else value
 
-          def normalize(name):
-
-              if not name:
-                  return ""
-
-              name = unicodedata.normalize(
-                  "NFKD",
-                  name
-              )
-
-              name = "".join(
-                  c for c in name
-                  if not unicodedata.combining(c)
-              )
-
-              name = name.lower()
-
-              name = re.sub(
-                  r"[^a-z0-9]+",
-                  " ",
-                  name
-              )
-
-              return re.sub(
-                  r"\s+",
-                  " ",
-                  name
-              ).strip()
-
-
-          # =====================================================
-          # RISULTATO
-          # =====================================================
-
-          def extract_score(score):
-
-              if score is None:
-                  return None
-
-              if isinstance(score, list):
-
-                  if (
-                      len(score) >= 2
-                      and isinstance(score[0], int)
-                      and isinstance(score[1], int)
-                  ):
-
-                      return [
-                          score[0],
-                          score[1]
-                      ]
-
-                  return None
-
+          def result_goals(score):
               if isinstance(score, dict):
-
-                  ft = score.get("ft")
-
-                  if (
-                      isinstance(ft, list)
-                      and len(ft) >= 2
-                      and isinstance(ft[0], int)
-                      and isinstance(ft[1], int)
-                  ):
-
-                      return [
-                          ft[0],
-                          ft[1]
-                      ]
-
+                  score = score.get("ft")
+              if isinstance(score, list) and len(score) >= 2:
+                  a, b = score[:2]
+                  if type(a) is int and type(b) is int and a >= 0 and b >= 0:
+                      return a, b
               return None
 
-
-          # =====================================================
-          # CARICA STORICO
-          # =====================================================
-
-          if os.path.exists(HISTORY_FILE):
-
-              try:
-
-                  with open(
-                      HISTORY_FILE,
-                      encoding="utf-8"
-                  ) as f:
-
-                      old = json.load(f)
-
-                  history = old.get(
-                      "matches",
-                      []
-                  )
-
-              except Exception:
-
-                  history = []
-
+          if not os.path.isfile(PATH):
+              raise RuntimeError("Storico BETLAB non trovato: per sicurezza non creo un archivio sostitutivo")
+          with open(PATH, encoding="utf-8") as f:
+              payload = json.load(f)
+          if isinstance(payload, list):
+              history = payload
+          elif isinstance(payload, dict) and isinstance(payload.get("matches"), list):
+              history = payload["matches"]
+          elif isinstance(payload, dict) and isinstance(payload.get("history"), list):
+              history = payload["history"]
           else:
-
-              history = []
-
-
-          print("=================================")
-          print("BETLAB OPENFOOTBALL IMPORT V2")
-          print("=================================")
-
-          print(
-              "Storico iniziale:",
-              len(history)
-          )
-
-          print()
-
-
-          # =====================================================
-          # CHIAVI ESISTENTI
-          # =====================================================
-
-          existing = set()
-
-          for match in history:
-
-              date = str(
-                  match.get("date", "")
-              )[:10]
-
-              home = normalize(
-                  match.get(
-                      "home",
-                      {}
-                  ).get(
-                      "name",
-                      ""
-                  )
-              )
-
-              away = normalize(
-                  match.get(
-                      "away",
-                      {}
-                  ).get(
-                      "name",
-                      ""
-                  )
-              )
-
-              existing.add(
-                  (
-                      date,
-                      home,
-                      away
-                  )
-              )
-
-
-          # =====================================================
-          # ID
-          # =====================================================
-
-          def create_id(
-              season,
-              country,
-              league,
-              date,
-              home,
-              away
-          ):
-
-              raw = (
-                  f"{season}|"
-                  f"{country}|"
-                  f"{league}|"
-                  f"{date}|"
-                  f"{home}|"
-                  f"{away}"
-              )
-
-              return (
-                  "OF-" +
-                  hashlib.sha1(
-                      raw.encode("utf-8")
-                  ).hexdigest()[:16]
-              )
-
-
-          # =====================================================
-          # IMPORT
-          # =====================================================
-
-          successful = 0
-          failed = 0
-
-          total_read = 0
-          total_added = 0
-
-
-          for (
-              season,
-              filename,
-              country,
-              league
-          ) in DATASETS:
-
-              url = (
-                  f"{BASE}/"
-                  f"{season}/"
-                  f"{filename}"
-              )
-
-              print(
-                  f"Scarico "
-                  f"{country} - "
-                  f"{league} "
-                  f"({season})..."
-              )
-
-              try:
-
-                  request = urllib.request.Request(
-                      url,
-                      headers={
-                          "User-Agent":
-                              "BETLAB-AI/2.0"
-                      }
-                  )
-
-                  with urllib.request.urlopen(
-                      request,
-                      timeout=60
-                  ) as response:
-
-                      payload = json.loads(
-                          response
-                          .read()
-                          .decode("utf-8")
-                      )
-
-              except Exception as e:
-
-                  failed += 1
-
-                  print(
-                      "  NON DISPONIBILE:",
-                      e
-                  )
-
-                  continue
-
-
-              successful += 1
-
-              matches = payload.get(
-                  "matches",
-                  []
-              )
-
-              total_read += len(matches)
-
-              league_added = 0
-
-
-              for match in matches:
-
-                  date = match.get("date")
-                  home = match.get("team1")
-                  away = match.get("team2")
-
-                  if not date:
-                      continue
-
-                  if not home:
-                      continue
-
-                  if not away:
-                      continue
-
-
-                  result = extract_score(
-                      match.get("score")
-                  )
-
-                  # Ignora partite non ancora giocate
-
-                  if result is None:
-                      continue
-
-
-                  home_goals = result[0]
-                  away_goals = result[1]
-
-
-                  key = (
-                      str(date)[:10],
-                      normalize(home),
-                      normalize(away)
-                  )
-
-
-                  if key in existing:
-                      continue
-
-
-                  history.append({
-
-                      "fixtureId":
-                          create_id(
-                              season,
-                              country,
-                              league,
-                              date,
-                              home,
-                              away
-                          ),
-
-                      "source":
-                          "OpenFootball",
-
-                      "date":
-                          date,
-
-                      "timestamp":
-                          0,
-
-                      "status":
-                          "FT",
-
-                      "country":
-                          country,
-
-                      "league":
-                          league,
-
-                      "leagueId":
-                          None,
-
-                      "season":
-                          season,
-
-                      "round":
-                          match.get("round"),
-
-                      "home": {
-
-                          "id":
-                              None,
-
-                          "name":
-                              home
-                      },
-
-                      "away": {
-
-                          "id":
-                              None,
-
-                          "name":
-                              away
-                      },
-
-                      "goals": {
-
-                          "home":
-                              home_goals,
-
-                          "away":
-                              away_goals
-                      }
-
-                  })
-
-
-                  existing.add(key)
-
-                  league_added += 1
-                  total_added += 1
-
-
-              print(
-                  f"  {len(matches)} partite | "
-                  f"+{league_added} risultati"
-              )
-
-
-          # =====================================================
-          # SALVA
-          # =====================================================
-
-          history.sort(
-              key=lambda x:
-                  str(
-                      x.get(
-                          "date",
-                          ""
-                      )
-                  )
-          )
-
-
-          output = {
-
-              "updatedAt":
-                  datetime.now(
-                      timezone.utc
-                  ).isoformat(),
-
-              "total":
-                  len(history),
-
-              "sources": [
-                  "API-Football",
-                  "OpenFootball"
-              ],
-
-              "matches":
-                  history
+              raise RuntimeError("Formato storico inatteso: nessuna modifica effettuata")
+
+          previous_count = len(history)
+          existing = {
+              (str(row.get("date") or "")[:10], norm(team_name(row, "home")), norm(team_name(row, "away")))
+              for row in history if isinstance(row, dict)
           }
+          new_records = []
+          succeeded = failed = 0
+          for season, filename, country, league in DATASETS:
+              try:
+                  url = f"{BASE}/{season}/{filename}"
+                  request = urllib.request.Request(url, headers={"User-Agent": "BETLAB-AI-historical-import/3.0"})
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      data = json.load(response)
+                  matches = data.get("matches", [])
+                  if not isinstance(matches, list):
+                      raise ValueError("elenco incontri mancante")
+                  succeeded += 1
+                  count = 0
+                  for row in matches:
+                      if not isinstance(row, dict):
+                          continue
+                      date = str(row.get("date") or "")[:10]
+                      try:
+                          match_day = datetime.strptime(date, "%Y-%m-%d").date()
+                      except ValueError:
+                          continue
+                      # Mai caricare in storico partite odierne/future (potenzialmente non concluse).
+                      if match_day >= TODAY:
+                          continue
+                      home, away = row.get("team1"), row.get("team2")
+                      goals = result_goals(row.get("score"))
+                      if not home or not away or norm(home) == norm(away) or goals is None:
+                          continue
+                      key = (date, norm(home), norm(away))
+                      if key in existing:
+                          continue
+                      digest = hashlib.sha1(f"{season}|{country}|{league}|{date}|{home}|{away}".encode()).hexdigest()[:16]
+                      new_records.append({
+                          "fixtureId": "OF-" + digest,
+                          "source": "OpenFootball",
+                          "date": date,
+                          "timestamp": 0,
+                          "status": "FT",
+                          "country": country,
+                          "league": league,
+                          "season": season,
+                          "home": {"id": None, "name": home},
+                          "away": {"id": None, "name": away},
+                          "goals": {"home": goals[0], "away": goals[1]}
+                      })
+                      existing.add(key)
+                      count += 1
+                  print(f"{league}: +{count} risultati completati")
+              except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+                  failed += 1
+                  print(f"{league}: fonte non disponibile - {exc}")
 
-
-          with open(
-              HISTORY_FILE,
-              "w",
-              encoding="utf-8"
-          ) as f:
-
-              json.dump(
-                  output,
-                  f,
-                  ensure_ascii=False,
-                  indent=2
-              )
-
-
-          print()
-          print("=================================")
-          print("RISULTATO IMPORT V2")
-          print("=================================")
-
-          print(
-              "Dataset riusciti:",
-              successful
-          )
-
-          print(
-              "Dataset non disponibili:",
-              failed
-          )
-
-          print(
-              "Partite lette:",
-              total_read
-          )
-
-          print(
-              "Nuovi risultati:",
-              total_added
-          )
-
-          print(
-              "Totale storico BETLAB:",
-              len(history)
-          )
-
-          print()
-          print(
-              "BETLAB OPENFOOTBALL IMPORT V2 OK"
-          )
-
+          print(f"Fonti riuscite: {succeeded} | non disponibili: {failed}")
+          print(f"Storico prima: {previous_count} | nuovi risultati: {len(new_records)}")
+          if succeeded == 0:
+              raise RuntimeError("Nessuna fonte leggibile: storico originale conservato")
+          if not new_records:
+              print("Nessun nuovo risultato: storico lasciato invariato")
+          else:
+              history.extend(new_records)
+              history.sort(key=lambda x: str(x.get("date") or ""))
+              if len(history) < previous_count:
+                  raise RuntimeError("Protezione archivio: diminuzione dei record vietata")
+              # Conserva la struttura del file esistente (lista oppure dizionario).
+              if isinstance(payload, list):
+                  updated = history
+              else:
+                  updated = dict(payload)
+                  field = "matches" if "matches" in payload else "history"
+                  updated[field] = history
+                  if "total" in updated:
+                      updated["total"] = len(history)
+                  updated["updatedAt"] = datetime.now(ZoneInfo("Europe/Rome")).isoformat()
+              temp_path = PATH + ".new"
+              with open(temp_path, "w", encoding="utf-8") as f:
+                  json.dump(updated, f, ensure_ascii=False, indent=2)
+              with open(temp_path, encoding="utf-8") as f:
+                  check = json.load(f)
+              recovered = check if isinstance(check, list) else check.get("matches", check.get("history", []))
+              if len(recovered) < previous_count:
+                  raise RuntimeError("Controllo finale fallito: archivio originale conservato")
+              os.replace(temp_path, PATH)
+              print(f"Storico salvato: {len(history)} risultati, nessun record precedente rimosso")
           PY
 
-
-      - name: Salva storico BETLAB
+      - name: Registra nuovi risultati nel repository
         run: |
           git config user.name "BETLAB AI Bot"
           git config user.email "actions@github.com"
-
           git add data/betlab-history.json
-
-          if git diff --cached --quiet
-          then
-            echo "Nessun nuovo dato."
-          else
-            git commit -m "Importa storico BETLAB V2"
-
-            git pull --rebase origin main
-
-            git push origin main
+          if git diff --cached --quiet; then
+            echo "Nessun nuovo dato"
+            exit 0
           fi
+          git commit -m "BETLAB: integra risultati storici recenti"
+          git pull --rebase origin main
+          git push origin main
