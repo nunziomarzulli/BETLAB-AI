@@ -2,19 +2,24 @@ name: BETLAB Confronto V7 e V9 (offline)
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Aggiorna feed BETLAB"]
+    types: [completed]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   confronto:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 12
     steps:
       - name: Scarica repo e cronologia
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Confronta i due motori senza nuove richieste API
         run: |
@@ -287,6 +292,26 @@ jobs:
                 'V9_con_pronostico':sum(bool(r['V9_selezione_comune']) for r in rows),
                 'nota':'Solo snapshot locali: il confronto include solo quote archiviate dal motore corrente. Non riproduce l’intero mercato delle quote. Selettore comune applicato a entrambi; i pronostici originali sono esposti a parte. Nessuna chiamata API, nessun esito reale o giocata.'}
           (OUT/'metadati.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+          public_rows=[]
+          for r in rows:
+              if not (r['V7_selezione_comune'] or r['V9_selezione_comune']):
+                  continue
+              public_rows.append({
+                  'fixtureId':r['fixtureId'],'date':r['data'],'match':r['partita'],
+                  'v7':{'selection':r['V7_selezione_comune'],'market':r['V7_mercato_comune'],
+                        'odd':r['V7_quota'] or None,'probability':r['V7_probabilita'] or None,
+                        'originalSelection':r['V7_originale'],'originalMarket':r['V7_mercato_originale']},
+                  'v9':{'selection':r['V9_selezione_comune'],'market':r['V9_mercato_comune'],
+                        'odd':r['V9_quota'] or None,'probability':r['V9_probabilita'] or None}
+              })
+          public={'schemaVersion':1,'generatedAt':START.isoformat(),
+                  'quoteSnapshotAt':coverage['date'],'source':'confronto offline V7/V9',
+                  'v7Commit':ORIGINAL_SHA,'v9Commit':meta['V9_commit'],
+                  'caveat':'Quote archiviate dal feed corrente, applicazione di un selettore comune; non coincide con il generatore originale delle multiple.',
+                  'matches':public_rows}
+          (ROOT/'data/betlab-confronto.json').write_text(json.dumps(public,ensure_ascii=False,indent=2),encoding='utf-8')
+          print('Schede V7 pubblicabili:',len(public_rows),flush=True)
+
           summary=['# BETLAB: confronto V7 e V9 (solo dati archiviati)','',
            '- V7: `'+ORIGINAL_SHA+'`','- V9: `'+meta['V9_commit']+'`',
            '- Incontri futuri confrontati: '+str(len(rows)),
@@ -315,3 +340,17 @@ jobs:
           path: betlab_confronto_output/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Pubblica il confronto nel sito senza toccare gli altri dati
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/betlab-confronto.json
+          if git diff --cached --quiet; then
+            echo "Confronto invariato"
+            exit 0
+          fi
+          git commit -m "Aggiorna confronto V7 V9 per sito"
+          git pull --rebase origin main
+          git push origin HEAD:main
