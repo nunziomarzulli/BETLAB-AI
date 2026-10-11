@@ -1,4 +1,4 @@
-name: BETLAB Confronto V7 e V9 (simulazione)
+name: BETLAB Confronto V7 e V9 (offline)
 
 on:
   workflow_dispatch:
@@ -16,210 +16,302 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Esegui i due motori senza modificare BETLAB
-        env:
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+      - name: Confronta i due motori senza nuove richieste API
         run: |
           python3 <<'PY'
+          import ast
           import csv
           import json
           import math
           import os
           from pathlib import Path
-          import re
           import shutil
           import subprocess
           import sys
           import textwrap
-          from datetime import datetime, timezone
+          from datetime import datetime, timezone, timedelta
+          from zoneinfo import ZoneInfo
 
           ROOT = Path(os.environ['GITHUB_WORKSPACE'])
-          TEMP = Path(os.environ['RUNNER_TEMP']) / 'betlab_parallel'
+          TEMP = Path(os.environ['RUNNER_TEMP']) / 'betlab_parallel_offline'
           OUT = ROOT / 'betlab_confronto_output'
           ORIGINAL_SHA = '9aa2d8b61282dca91c82bed23d3c729ec72902e7'
           START = datetime.now(timezone.utc)
           RUN_EPOCH = int(START.timestamp())
+          TODAY = datetime.now(ZoneInfo('Europe/Rome')).date()
+          DAYS = [TODAY.isoformat(), (TODAY + timedelta(days=1)).isoformat()]
           TEMP.mkdir(parents=True, exist_ok=True)
           OUT.mkdir(parents=True, exist_ok=True)
 
 
-          def extract_python(workflow: str) -> str:
+          def extract_python(workflow):
               lines = workflow.splitlines()
               starts = [i for i, line in enumerate(lines) if "python3 <<'PY'" in line]
               if len(starts) != 1:
-                  raise ValueError('Atteso esattamente un blocco Python nel workflow, trovati: ' + str(len(starts)))
-              i = starts[0]
-              base_indent = len(lines[i]) - len(lines[i].lstrip())
-              for end in range(i + 1, len(lines)):
+                  raise RuntimeError('Motore non riconosciuto: serve un solo blocco Python, rilevati: ' + str(len(starts)))
+              start = starts[0]
+              indent = len(lines[start]) - len(lines[start].lstrip())
+              for end in range(start+1, len(lines)):
                   line = lines[end]
-                  indent = len(line) - len(line.lstrip())
-                  if line.strip() == 'PY' and indent <= base_indent:
-                      source = textwrap.dedent('\n'.join(lines[i+1:end])) + '\n'
+                  if line.strip() == 'PY' and len(line)-len(line.lstrip()) <= indent:
+                      source = textwrap.dedent('\n'.join(lines[start+1:end]))+'\n'
                       compile(source, '<engine>', 'exec')
                       return source
-              raise ValueError('Terminatore PY non trovato')
+              raise RuntimeError('Terminatore del motore Python non trovato')
 
 
-          def get_old_workflow():
-              return subprocess.check_output(
-                  ['git', 'show', ORIGINAL_SHA + ':.github/workflows/test-api-football.yml'],
-                  cwd=ROOT, text=True)
+          def get_original():
+              return subprocess.check_output(['git','show',ORIGINAL_SHA+':.github/workflows/test-api-football.yml'], cwd=ROOT, text=True)
 
 
-          def current_sha():
-              return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+          def head_sha():
+              return subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip()
 
 
-          def run_engine(label, code, history_file=None):
-              work = TEMP / label
+          def freeze_inputs():
+              # Recuperiamo file del repository: NESSUNA chiamata HTTP.
+              if not (ROOT/'data/betlab-history.json').exists():
+                  raise RuntimeError('Manca data/betlab-history.json')
+              future = {}
+              counts = {}
+              for day in DAYS:
+                  path = ROOT/'data/future'/f'{day}.json'
+                  if not path.exists():
+                      print('ATTENZIONE: snapshot calendario assente per',day)
+                      future[day] = []
+                      counts[day] = 0
+                      continue
+                  raw = json.loads(path.read_text(encoding='utf-8'))
+                  rows = raw.get('response', []) if isinstance(raw,dict) else []
+                  future[day] = rows if isinstance(rows,list) else []
+                  counts[day] = len(future[day])
+              if not any(counts.values()):
+                  raise RuntimeError('Nessuno snapshot calendario per oggi/domani: prima eseguire Aggiorna feed BETLAB, poi il confronto. Non usare l’API due volte.')
+
+              path = ROOT/'data/betlab-analysis.json'
+              if not path.exists():
+                  raise RuntimeError('Manca data/betlab-analysis.json: occorrono le quote gia archiviate')
+              feed = json.loads(path.read_text(encoding='utf-8'))
+              odds = {}
+              count_quotes = 0
+              for match in (feed.get('analysis') or []):
+                  ident = match.get('fixtureId')
+                  if ident is None:
+                      continue
+                  bookmakers = {}
+                  candidates = list(match.get('candidates') or [])
+                  main = match.get('prediction') or {}
+                  if main.get('oddAvailable'):
+                      candidates.append(main)
+                  for row in candidates:
+                      if not row.get('oddAvailable'):
+                          continue
+                      try:
+                          odd = float(row.get('odd'))
+                      except (TypeError, ValueError):
+                          continue
+                      market = str(row.get('apiMarket') or '')
+                      selection = str(row.get('apiSelection') or '')
+                      if not market or not selection or odd <= 1 or not math.isfinite(odd):
+                          continue
+                      book = str(row.get('bookmaker') or 'BETLAB snapshot')
+                      bets = bookmakers.setdefault(book, {})
+                      markets = bets.setdefault(market, {})
+                      markets[selection] = max(odd, markets.get(selection,0))
+                  if not bookmakers:
+                      continue
+                  odds[str(ident)] = [{
+                      'fixture':{'id':ident},
+                      'bookmakers': [
+                          {'name':book,'bets':[
+                              {'name':market,'values':[{'value':sel,'odd':str(value)} for sel,value in selections.items()]}
+                              for market,selections in markets.items()]}
+                          for book,markets in bookmakers.items()]
+                  }]
+                  count_quotes += sum(len(x) for bet in bookmakers.values() for x in bet.values())
+              print('Calendari congelati:',counts, 'fixture con quote:',len(odds),'quote registrate:',count_quotes,flush=True)
+              if not odds:
+                  raise RuntimeError('Nessuna quota archiviata nel feed: non è possibile confrontare i due motori senza nuove richieste')
+              return {'fixtures':future,'odds':odds}, {'date':feed.get('generatedAt'), 'matchesWithQuotes':len(odds), 'quotations':count_quotes, 'dates':counts}
+
+
+          def patch_engine_to_offline(code):
+              tree = ast.parse(code)
+              funcs = [n for n in tree.body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and n.name=='api_get']
+              if len(funcs)!=1:
+                  raise RuntimeError('Impossibile localizzare api_get nel motore ('+str(len(funcs))+')')
+              fn = funcs[0]
+              lines=code.splitlines(keepends=True)
+              original_line=lines[fn.lineno-1]
+              indent=original_line[:len(original_line)-len(original_line.lstrip())]
+              replacement=indent+'def api_get(endpoint, params):\n'+indent+'    return offline_api_get(endpoint, params)\n'
+              lines[fn.lineno-1:fn.end_lineno]=[replacement]
+              new=''.join(lines)
+              compile(new,'<offline-engine>','exec')
+              return new
+
+
+          OFFLINE_HEADER = '''import json as _snapshot_json
+          from pathlib import Path as _SnapshotPath
+          _SNAPSHOT = _snapshot_json.loads(_SnapshotPath('offline-input.json').read_text(encoding='utf-8'))
+
+          def offline_api_get(endpoint, params):
+              if endpoint == 'fixtures' and 'date' in params:
+                  rows = _SNAPSHOT['fixtures'].get(str(params['date']), [])
+                  return {'response':rows, 'paging':{'current':1,'total':1}}
+              if endpoint == 'odds' and 'fixture' in params:
+                  rows = _SNAPSHOT['odds'].get(str(params['fixture']), [])
+                  return {'response':rows if int(params.get('page',1))==1 else [],'paging':{'current':1,'total':1}}
+              raise RuntimeError('Richiesta API non consentita nel confronto offline: '+str(endpoint)+' '+str(params))
+
+          '''
+
+
+          def run_engine(label, code, snapshot):
+              work = TEMP/label
               work.mkdir(exist_ok=True)
-              if (ROOT / 'data').exists():
-                  shutil.copytree(ROOT / 'data', work / 'data', dirs_exist_ok=True)
-              else:
-                  raise RuntimeError('Manca la cartella data nel repository')
-              if history_file:
-                  shutil.copy2(history_file, work / 'data' / 'betlab-history.json')
-              script = work / 'engine.py'
-              script.write_text(code, encoding='utf-8')
-              env = os.environ.copy()
-              env['PYTHONUNBUFFERED'] = '1'
-              print('\n=== AVVIO', label, '===', flush=True)
-              subprocess.run([sys.executable, str(script)], cwd=work, env=env, check=True)
-              output_file = work / 'data' / 'betlab-analysis.json'
+              shutil.copytree(ROOT/'data',work/'data',dirs_exist_ok=True)
+              (work/'offline-input.json').write_text(json.dumps(snapshot,ensure_ascii=False),encoding='utf-8')
+              engine = work/'engine.py'
+              engine.write_text(OFFLINE_HEADER+patch_engine_to_offline(code),encoding='utf-8')
+              env=os.environ.copy()
+              env['API_FOOTBALL_KEY']='OFFLINE_SENZA_CHIAMATE'
+              env['PYTHONUNBUFFERED']='1'
+              print('=== Eseguo',label,'solo da snapshot ===',flush=True)
+              subprocess.run([sys.executable,str(engine)],cwd=work,env=env,check=True)
+              output_file=work/'data/betlab-analysis.json'
               if not output_file.exists():
-                  raise RuntimeError(label + ': betlab-analysis.json non generato')
-              result = OUT / (label + '_analisi.json')
-              shutil.copy2(output_file, result)
-              return json.loads(output_file.read_text(encoding='utf-8')), work / 'data' / 'betlab-history.json'
+                  raise RuntimeError(label+' non ha creato analisi')
+              shutil.copy2(output_file,OUT/(label+'_analisi.json'))
+              return json.loads(output_file.read_text(encoding='utf-8'))
 
 
           def safe_float(v):
               try:
-                  x = float(v)
+                  x=float(v)
                   return x if math.isfinite(x) else None
-              except (TypeError, ValueError):
+              except (ValueError,TypeError):
                   return None
 
 
-          def choose_under_common_rules(match):
-              # Valuta entrambi i modelli con gli stessi criteri (selezione front-end V9).
-              # I valori NON sono probabilita' validate.
-              hg = int(((match.get('home') or {}).get('form') or {}).get('played') or 0)
-              ag = int(((match.get('away') or {}).get('form') or {}).get('played') or 0)
-              if min(hg, ag) < 5:
+          def select_common(match):
+              # Criterio identico fra versioni: quote da 1,10; edge teorico prudenziale.
+              hg=int(((match.get('home') or {}).get('form') or {}).get('played') or 0)
+              ag=int(((match.get('away') or {}).get('form') or {}).get('played') or 0)
+              if min(hg,ag)<5:
                   return None
-              scored = []
-              for c in (match.get('candidates') or []):
-                  odd, p = safe_float(c.get('odd')), safe_float(c.get('modelProbability'))
-                  if c.get('oddAvailable') is not True or odd is None or p is None:
+              scored=[]
+              for cand in (match.get('candidates') or []):
+                  odd,p=safe_float(cand.get('odd')),safe_float(cand.get('modelProbability'))
+                  if cand.get('oddAvailable') is not True or odd is None or p is None or odd<1.10 or not 0<p<1:
                       continue
-                  if odd < 1.10 or p <= 0 or p >= 1:
+                  exact=cand.get('market')=='Risultato Esatto'
+                  if exact and (min(hg,ag)<8 or cand.get('model')!='poisson'):
                       continue
-                  exact = c.get('market') == 'Risultato Esatto'
-                  if exact and (min(hg,ag) < 8 or c.get('model') != 'poisson'):
+                  implied=1/odd
+                  if p/implied>2.4:
                       continue
-                  implied = 1/odd
-                  if p/implied > 2.4:
+                  volume=min(hg,ag,10)/10
+                  conservative=implied+(0.45 if exact else 0.60)*volume*(p-implied)
+                  edge=conservative*odd-1
+                  if edge<0.06:
                       continue
-                  volume = min(hg,ag,10)/10
-                  conservative = implied + (0.45 if exact else 0.60)*volume*(p-implied)
-                  edge = conservative*odd-1
-                  if edge < 0.06:
-                      continue
-                  score = edge*math.sqrt(conservative)/(1+0.35*math.log(odd))*(0.8 if exact else 1)
-                  scored.append((score,c))
+                  score=edge*math.sqrt(conservative)/(1+0.35*math.log(odd))*(0.8 if exact else 1)
+                  scored.append((score,cand))
               if not scored:
                   return None
-              best = max(scored, key=lambda pair: pair[0])[1]
-              return {'mercato':best.get('market'), 'pronostico':best.get('selection'),
-                      'quota':best.get('odd'), 'probabilita':best.get('modelProbability')}
+              best=max(scored,key=lambda pair:pair[0])[1]
+              return {'selection':best.get('selection'),'market':best.get('market'),
+                      'odd':best.get('odd'),'probability':best.get('modelProbability')}
 
 
-          def unpack(raw):
-              result = {}
-              for m in raw.get('analysis') or []:
+          def unpack(feed):
+              matches={}
+              for m in feed.get('analysis') or []:
                   try:
-                      ident = int(m['fixtureId'])
-                      kickoff = int(m['timestamp'])
-                  except (ValueError, TypeError, KeyError):
+                      fid=int(m['fixtureId']); start=int(m['timestamp'])
+                  except (KeyError,ValueError,TypeError):
                       continue
-                  # Solo partite non ancora iniziate, con un margine di 15 minuti.
-                  if kickoff <= RUN_EPOCH + 15*60:
+                  if start<=RUN_EPOCH+15*60:
                       continue
-                  home = str((m.get('home') or {}).get('name') or '')
-                  away = str((m.get('away') or {}).get('name') or '')
-                  if not home or not away or home == away:
+                  home=str((m.get('home') or {}).get('name') or '')
+                  away=str((m.get('away') or {}).get('name') or '')
+                  if not home or not away or home==away:
                       continue
-                  result[ident] = {'fixtureId':ident, 'data':m.get('date'), 'inizioUTC':kickoff,
-                                   'partita':home+' - '+away, 'pick':choose_under_common_rules(m)}
-              return result
+                  main=m.get('prediction') or {}
+                  matches[fid]={'id':fid,'date':m.get('date'),'kickoff':start,
+                                'match':home+' – '+away,
+                                'pick':select_common(m),
+                                'originalPrediction': main.get('selection') if main.get('available') else None,
+                                'originalMarket':main.get('market') if main.get('available') else None,
+                                'originalOdd':main.get('odd') if main.get('available') else None}
+              return matches
 
 
-          current_workflow = (ROOT/'.github/workflows/test-api-football.yml').read_text(encoding='utf-8')
-          v9 = extract_python(current_workflow)
-          if 'LOOKUPS_PER_RUN = 4' not in v9:
-              raise RuntimeError('Il motore corrente non ha il controllo previsto per il recupero storico: verificare versione V9')
-          v9 = v9.replace('LOOKUPS_PER_RUN = 4', 'LOOKUPS_PER_RUN = 0', 1)
-          original = extract_python(get_old_workflow())
+          snapshot,coverage = freeze_inputs()
+          v7_code=extract_python(get_original())
+          v9_code=extract_python((ROOT/'.github/workflows/test-api-football.yml').read_text(encoding='utf-8'))
+          if 'LOOKUPS_PER_RUN = 4' not in v9_code:
+              raise RuntimeError('V9 attesa con LOOKUPS_PER_RUN = 4; controllare la revisione del motore')
+          v9_code=v9_code.replace('LOOKUPS_PER_RUN = 4','LOOKUPS_PER_RUN = 0',1)
+          # IDENTICO storico iniziale per entrambi. Zero chiamate HTTP.
+          r7=unpack(run_engine('V7_originale',v7_code,snapshot))
+          r9=unpack(run_engine('V9_corrente',v9_code,snapshot))
+          ids=sorted(set(r7)|set(r9),key=lambda fid:((r7.get(fid) or r9.get(fid))['kickoff'],fid))
+          rows=[]
+          for fid in ids:
+              a=r7.get(fid,{})
+              b=r9.get(fid,{})
+              z=b or a
+              p7=a.get('pick') or {};p9=b.get('pick') or {}
+              rows.append({'fixtureId':fid,'data':z.get('date'),'partita':z.get('match'),
+                 'V7_originale':a.get('originalPrediction') or '',
+                 'V7_mercato_originale':a.get('originalMarket') or '',
+                 'V7_selezione_comune':p7.get('selection') or '',
+                 'V7_mercato_comune':p7.get('market') or '',
+                 'V7_quota':p7.get('odd') or '', 'V7_probabilita':p7.get('probability') or '',
+                 'V9_originale':b.get('originalPrediction') or '',
+                 'V9_mercato_originale':b.get('originalMarket') or '',
+                 'V9_selezione_comune':p9.get('selection') or '',
+                 'V9_mercato_comune':p9.get('market') or '',
+                 'V9_quota':p9.get('odd') or '', 'V9_probabilita':p9.get('probability') or ''})
 
-          # Prima V9: puo' aggiornare lo storico con risultati gia' conclusi.
-          # Poi V7 riceve la stessa copia finale dello storico.
-          result9, final_history = run_engine('V9', v9)
-          result7, _ = run_engine('V7_originale', original, final_history)
-
-          r9 = unpack(result9)
-          r7 = unpack(result7)
-          all_ids = sorted(set(r9)|set(r7), key=lambda k: ((r9.get(k) or r7[k])['inizioUTC'], k))
-          rows = []
-          for fid in all_ids:
-              a = r7.get(fid,{}); b = r9.get(fid,{})
-              basic = b or a
-              p7, p9 = a.get('pick') or {}, b.get('pick') or {}
-              rows.append({
-                 'fixtureId':fid, 'data':basic.get('data'), 'partita':basic.get('partita'),
-                 'V7_pronostico':p7.get('pronostico',''), 'V7_mercato':p7.get('mercato',''),
-                 'V7_quota':p7.get('quota',''), 'V7_probabilita':p7.get('probabilita',''),
-                 'V9_pronostico':p9.get('pronostico',''), 'V9_mercato':p9.get('mercato',''),
-                 'V9_quota':p9.get('quota',''), 'V9_probabilita':p9.get('probabilita','')
-              })
-
-          if rows:
-              with (OUT/'confronto.csv').open('w', newline='', encoding='utf-8-sig') as f:
-                  writer=csv.DictWriter(f, fieldnames=list(rows[0].keys()), delimiter=';')
-                  writer.writeheader()
-                  writer.writerows(rows)
-          else:
-              (OUT/'confronto.csv').write_text('Nessuna partita futura analizzabile in questo momento.\n', encoding='utf-8')
-
-          meta = {'esecuzioneUTC':START.isoformat(), 'V7commit':ORIGINAL_SHA,
-                  'V9commit':current_sha(), 'partite_future_confrontate':len(all_ids),
-                  'V7_selezioni':sum(bool(row['V7_pronostico']) for row in rows),
-                  'V9_selezioni':sum(bool(row['V9_pronostico']) for row in rows),
-                  'nota':'Test simulato. Entrambi valutati con lo stesso selettore V9 e uno storico condiviso. Quote raccolte durante il test; nessuna scommessa reale.'}
-          (OUT/'metadati.json').write_text(json.dumps(meta,indent=2,ensure_ascii=False),encoding='utf-8')
-          summary = ['# Confronto BETLAB V7 vs V9', '',
-                     '- Esecuzione UTC: '+meta['esecuzioneUTC'],
-                     '- V7 commit: `'+meta['V7commit']+'`',
-                     '- V9 commit: `'+meta['V9commit']+'`',
-                     '- Incontri futuri: '+str(meta['partite_future_confrontate']),
-                     '- Pronostici V7: '+str(meta['V7_selezioni']),
-                     '- Pronostici V9: '+str(meta['V9_selezioni']), '',
-                     'V7 e V9 sono valutati con le stesse regole di scelta del pronostico.',
-                     'Le probabilita sono sperimentali e il test non accerta vincite.', '',
-                     'Scarica gli artifact per vedere CSV e JSON completi.']
+          fields=['fixtureId','data','partita','V7_originale','V7_mercato_originale',
+                  'V7_selezione_comune','V7_mercato_comune','V7_quota','V7_probabilita',
+                  'V9_originale','V9_mercato_originale','V9_selezione_comune','V9_mercato_comune','V9_quota','V9_probabilita']
+          with (OUT/'confronto.csv').open('w',newline='',encoding='utf-8-sig') as f:
+              writer=csv.DictWriter(f,fieldnames=fields,delimiter=';');writer.writeheader();writer.writerows(rows)
+          meta={'esecuzioneUTC':START.isoformat(),'V7_commit':ORIGINAL_SHA,'V9_commit':head_sha(),
+                'quote_cache':coverage,'confrontate':len(rows),
+                'V7_con_pronostico':sum(bool(r['V7_selezione_comune']) for r in rows),
+                'V9_con_pronostico':sum(bool(r['V9_selezione_comune']) for r in rows),
+                'nota':'Solo snapshot locali: il confronto include solo quote archiviate dal motore corrente. Non riproduce l’intero mercato delle quote. Selettore comune applicato a entrambi; i pronostici originali sono esposti a parte. Nessuna chiamata API, nessun esito reale o giocata.'}
+          (OUT/'metadati.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+          summary=['# BETLAB: confronto V7 e V9 (solo dati archiviati)','',
+           '- V7: `'+ORIGINAL_SHA+'`','- V9: `'+meta['V9_commit']+'`',
+           '- Incontri futuri confrontati: '+str(len(rows)),
+           '- V7 con selezione comparabile: '+str(meta['V7_con_pronostico']),
+           '- V9 con selezione comparabile: '+str(meta['V9_con_pronostico']),
+           '- Fixture con quote in archivio: '+str(coverage['matchesWithQuotes']),
+           '- Generazione feed quote: '+str(coverage['date']), '',
+           '## Limiti essenziali','',
+           '- Test **offline**: non usa API-Football e non modifica lo storico del repository.',
+           '- Quote disponibili limitate a quelle pubblicate nel JSON delle analisi: non è il catalogo completo dei bookmaker.',
+           '- Il selettore comune serve a confrontare i modelli, non riproduce la vecchia generazione automatica delle multiple.',
+           '- Non prova quale modello sia migliore. Per valutarlo occorrono pronostici salvati prima dell’inizio e risultati finali.', '',
+           'Scarica `confronto.csv`, i due JSON e `metadati.json` dall’artifact dell’esecuzione.']
           (OUT/'RIEPILOGO.md').write_text('\n'.join(summary)+'\n',encoding='utf-8')
-          summary_path=os.getenv('GITHUB_STEP_SUMMARY')
-          if summary_path:
-              with open(summary_path,'a',encoding='utf-8') as f:
+          if os.environ.get('GITHUB_STEP_SUMMARY'):
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:
                   f.write('\n'.join(summary)+'\n')
-          print('COMPLETATO',json.dumps(meta,ensure_ascii=False))
+          print('COMPLETATO',json.dumps(meta,ensure_ascii=False),flush=True)
           PY
 
-      - name: Salva i risultati del confronto
+      - name: Scarica report e analisi
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: BETLAB-confronto-V7-V9
+          name: BETLAB-confronto-V7-V9-offline
           path: betlab_confronto_output/
           if-no-files-found: warn
           retention-days: 30
