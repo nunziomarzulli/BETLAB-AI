@@ -1094,6 +1094,45 @@
       .archive-grid { grid-template-columns:1fr; }
     }
 
+
+/* BETLAB 8.1 - Monitoraggio e archivio leggibile */
+.monitor-panel{margin:14px 0 3px;padding:12px 15px;border:1px solid #2a4857;border-radius:12px;background:#101e2b;color:#d6e5eb}
+.monitor-panel>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;font-size:12px;font-weight:900;letter-spacing:.15px}
+.monitor-panel>summary::marker{color:#49df91}
+.monitor-count{color:#91afbe;font-size:10px;font-weight:700}
+.monitor-info{color:#91a8b6;font-size:11px;line-height:1.5;margin:10px 0}
+.monitor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px}
+.monitor-row{padding:9px 11px;border:1px solid #284254;border-radius:8px;display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px}
+.monitor-row div{min-width:0}
+.monitor-row b{color:#f1f6f9;display:block;font-size:12px}
+.monitor-row small{color:#809ba9;display:block;font-size:10px;margin-top:3px}
+.monitor-row>span{font-size:10px;color:#bdd0da;text-align:right;max-width:130px}
+.ticket-status.won,.ticket-status.lost{font-size:11px!important;padding:6px 10px!important;font-weight:950!important}
+.ticket-details{border-top:1px solid #254052;margin-top:11px;padding-top:8px}
+.ticket-details summary{cursor:pointer;color:#d4e4ed!important;font-size:11px!important;font-weight:850}
+.ticket-details summary::marker{color:#8ba4b3}
+.archive-win{color:#45e89b;font-weight:950}
+.archive-loss{color:#ff848b;font-weight:950}
+.ticket-pick{padding:10px 11px!important;border-radius:7px;margin:7px 0;border:1px solid #28394a!important}
+.ticket-pick.result-won{background:rgba(46,191,117,.14);border-color:rgba(51,210,128,.48)!important}
+.ticket-pick.result-lost{background:rgba(231,69,76,.14);border-color:rgba(255,107,107,.48)!important}
+.ticket-pick.result-waiting{background:#102132}
+.ticket-teams{font-size:12px!important;line-height:1.35}
+.ticket-pick-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-top:5px}
+.ticket-selection{font-size:13px!important;color:#e5f3fa!important;font-weight:900!important}
+.pick-outcome{border-radius:5px;padding:3px 6px;font-size:10px;font-weight:950}
+.pick-outcome.won{color:#4effa0;background:rgba(43,190,109,.2)}
+.pick-outcome.lost{color:#ff9195;background:rgba(237,75,83,.2)}
+.pick-outcome.waiting{color:#b6c4d1;background:rgba(150,170,190,.1)}
+.result-score{color:#acbfcb!important;font-size:10px!important;margin-top:5px}
+.pending-picks{margin:9px 0}
+.pending-pick{padding:7px 0;border-bottom:1px solid #dbe5de;color:#283b30}
+.pending-pick b{font-size:10px;display:block}
+.pending-pick span{font-size:10px;display:block;margin-top:3px}
+.pending-pick.won{border-left:3px solid #119c54;padding-left:5px;background:#e1f5e6}
+.pending-pick.lost{border-left:3px solid #dc4b52;padding-left:5px;background:#ffe6e6}
+@media(max-width:700px){.monitor-grid{grid-template-columns:1fr}.monitor-row{align-items:start;flex-direction:column}.monitor-row>span{text-align:left;max-width:none}}
+
 </style>
 </head>
 
@@ -1138,6 +1177,11 @@
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
     <div id="dailyMatches" class="daily-grid"></div>
+    <details id="monitoredMatches" class="monitor-panel">
+      <summary><span>ALTRE PARTITE MONITORATE</span><span id="monitorCount" class="monitor-count">Caricamento...</span></summary>
+      <p class="monitor-info">Incontri ufficiali rilevati da API-Football per i quali BETLAB non ha ancora un pronostico quotato con dati sufficienti. Non sono consigli di giocata.</p>
+      <div id="monitorList" class="monitor-grid"></div>
+    </details>
     <section class="control-panel">
       <div class="inputs">
         <div class="field">
@@ -1349,6 +1393,8 @@
   const selectedMatchIds = new Set();
   let dailyRecommendations = [];
   const nowEpoch = () => Math.floor(Date.now() / 1000);
+  const MIN_QUOTA = 1.10; // Soglia richiesta: 1,10 ammessa, valori inferiori esclusi.
+
 
   const BETS_STORAGE_KEY = "betlab_saved_bets_v1";
 
@@ -1357,6 +1403,8 @@
     document.getElementById("stake");
 
   const dailyMatches = document.getElementById("dailyMatches");
+  const monitorList = document.getElementById("monitorList");
+  const monitorCount = document.getElementById("monitorCount");
   const refreshButton = document.getElementById("refreshButton");
 
   const createButton =
@@ -1494,7 +1542,7 @@
     const p = Number(candidate.modelProbability);
     const homeGames = Number(match?.home?.form?.played || 0);
     const awayGames = Number(match?.away?.form?.played || 0);
-    if (!(odd > 1 && Number.isFinite(odd) && p > 0 && p < 1)) return null;
+    if (!(Number.isFinite(odd) && odd >= MIN_QUOTA && p > 0 && p < 1)) return null;
     if (homeGames < 5 || awayGames < 5) return null;
     const exact = candidate.market === "Risultato Esatto";
     if (exact && (homeGames < 8 || awayGames < 8 || candidate.model !== "poisson")) return null;
@@ -1555,7 +1603,7 @@
     const rows = dailyRecommendations;
     if (!rows.length) {
       dailyMatches.innerHTML = `<div class="daily-empty">Nessun incontro supera oggi i controlli di dati e quota. BETLAB non forza un pronostico per riempire la schedina.</div>`;
-      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate`;
+      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate · quota minima 1,10`;
       return;
     }
     dailyMatches.innerHTML = rows.map(row => {
@@ -1586,7 +1634,28 @@
       createBet(false);
     }));
     const today = new Date(betlabData?.generatedAt || Date.now());
-    availability.textContent = `${rows.length} incontri consigliati · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
+    availability.textContent = `${rows.length} consigliati su ${getMatches().filter(validFixture).length} incontri futuri analizzati · Quota minima 1,10 · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
+  }
+
+  // Distinguiamo partite disponibili e pronostici che superano i controlli.
+  // Non presentiamo come giocabili eventi senza quote e stime adeguate.
+  function renderMonitoredMatches() {
+    const recommended = new Set(dailyRecommendations.map(r => String(r.match.fixtureId)));
+    const remaining = getMatches().filter(m => validFixture(m) && !recommended.has(String(m.fixtureId)));
+    remaining.sort((a,b) => {
+      const amin = Math.min(Number(a.home?.form?.played || 0),Number(a.away?.form?.played || 0));
+      const bmin = Math.min(Number(b.home?.form?.played || 0),Number(b.away?.form?.played || 0));
+      return bmin-amin || Number(b.priority || 0)-Number(a.priority || 0) || Number(a.timestamp)-Number(b.timestamp);
+    });
+    const visible = remaining.slice(0,16);
+    monitorCount.textContent = remaining.length + " senza consiglio · " + visible.length + " visualizzate";
+    monitorList.innerHTML = visible.length ? visible.map(m => {
+      const h = Number(m.home?.form?.played || 0), a = Number(m.away?.form?.played || 0);
+      const reason = Math.min(h,a) < 3 ? "Storico insufficiente" :
+        (Array.isArray(m.candidates) && m.candidates.length ? "Nessun mercato supera i controlli" : "Quote o dati insufficienti");
+      return `<div class="monitor-row"><div><b>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</b>
+        <small>${safeText(m.league)} · ${formatDate(m)} · ${h}+${a} partite nello storico</small></div><span>${safeText(reason)}</span></div>`;
+    }).join("") : '<p class="monitor-info">Nessun altro incontro futuro presente nel feed.</p>';
   }
 
   function combinationScore(picks, stake) {
@@ -1805,7 +1874,10 @@
     savedCount.textContent = archived.length + (archived.length === 1 ? " archiviata" : " archiviate");
     pendingBetsList.innerHTML = pending.length ? pending.map(bet => `
       <div class="pending-ticket"><strong>Biglietto #${safeText(ticketNumber(bet))} · IN ATTESA</strong>
-      <div class="mini">${(bet.picks||[]).map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}${p.finalScore ? " · " + safeText(p.finalScore) + " " + safeText(p.result) : ""}`).join("<br>")}</div>
+      <div class="pending-picks">${(bet.picks||[]).map(p => {
+        const status = p.result === "VINTA" ? "won" : p.result === "PERSA" ? "lost" : "waiting";
+        return `<div class="pending-pick ${status}"><b>${safeText(p.home)} – ${safeText(p.away)}</b><span>${safeText(p.selection)}${p.betlabOdd ? " quota "+oddText(p.betlabOdd) : ""}${p.finalScore ? " · "+safeText(p.finalScore) : ""}${p.result ? " · "+safeText(p.result) : ""}</span></div>`;
+      }).join("")}</div>
       <div class="mini"><b>Quota Sisal ${oddText(bet.sisalOdd)}</b> · ${money(bet.stake)} → ${money(bet.potentialReturn)}</div>
       <button class="delete-pending-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA GIOCATA</button></div>`).join("") : '<div class="empty-slip">Nessuna giocata in corso.</div>';
     pendingBetsList.querySelectorAll(".delete-pending-ticket").forEach(button => button.addEventListener("click", async () => {
@@ -1819,9 +1891,21 @@
       const ticket = document.createElement("article");
       const modelStatus = bet.kind === "manual" ? "SOLO REALE" : bet.status;
       ticket.className = "ticket " + (modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : "");
-      const picksHtml = (bet.picks||[]).map(pick => `<div class="ticket-pick"><div class="ticket-teams">${safeText(pick.home)} – ${safeText(pick.away)}</div><div class="ticket-selection">${safeText(pick.selection)} · ${safeText(pick.market)} · Quota BETLAB ${pick.betlabOdd ? oddText(pick.betlabOdd) : "n.d."} · Indice ${Number(pick.index||0).toFixed(1)}%</div>${pick.finalScore ? `<div class="result-score">Risultato: ${safeText(pick.finalScore)} · ${safeText(pick.result)}</div>` : ""}</div>`).join("");
+      const picksHtml = (bet.picks||[]).map(pick => {
+        const status = pick.result === "VINTA" ? "won" : pick.result === "PERSA" ? "lost" : "waiting";
+        const label = status === "won" ? "PRESA" : status === "lost" ? "PERSA" : "IN ATTESA";
+        const quota = Number(pick.betlabOdd);
+        return `<div class="ticket-pick result-${status}">
+          <div class="ticket-teams">${safeText(pick.home)} – ${safeText(pick.away)}</div>
+          <div class="ticket-pick-row"><span class="ticket-selection">${safeText(pick.selection)}${Number.isFinite(quota) && quota > 1 ? " quota "+oddText(quota) : ""}</span><strong class="pick-outcome ${status}">${label}</strong></div>
+          ${pick.finalScore ? `<div class="result-score">Risultato finale: ${safeText(pick.finalScore)}</div>` : ""}
+        </div>`;
+      }).join("");
+      const wonPicks = (bet.picks||[]).filter(p=>p.result==="VINTA").length;
+      const lostPicks = (bet.picks||[]).filter(p=>p.result==="PERSA").length;
+      const openPicks = (bet.picks||[]).length - wonPicks - lostPicks;
       ticket.innerHTML = `<div class="ticket-head"><div><div class="ticket-title">${bet.kind === "manual" ? "Giocata reale" : "Biglietto #"+safeText(ticketNumber(bet))}</div><div class="ticket-date">${safeText(bet.createdAtLabel||"")}</div></div><div class="ticket-status ${modelStatus === "VINTA" ? "won" : modelStatus === "PERSA" ? "lost" : ""}">${safeText(modelStatus)}</div></div>
-      ${picksHtml ? `<details class="ticket-details"><summary>VEDI ${bet.picks.length} PRONOSTICI</summary>${picksHtml}</details>` : ""}
+      ${picksHtml ? `<details class="ticket-details" open><summary>ESITI: <span class="archive-win">${wonPicks} PRESE</span> · <span class="archive-loss">${lostPicks} PERSE</span>${openPicks ? ` · ${openPicks} IN ATTESA` : ""}</summary>${picksHtml}</details>` : ""}
       <div class="ticket-stats"><div><div class="ticket-stat-label">PUNTATA REALE</div><div class="ticket-stat-value">${money(bet.stake)}</div></div><div><div class="ticket-stat-label">INCASSATO</div><div class="ticket-stat-value">${bet.realStatus === "VINTA" ? money(bet.realReceived||0) : bet.realStatus === "PERSA" ? money(0) : "DA INSERIRE"}</div></div></div>
       <div class="real-outcome"><label>Esito reale <select class="real-status" data-bet-id="${safeText(bet.id)}"><option value="" ${!bet.realStatus?"selected":""}>Da indicare</option><option value="VINTA" ${bet.realStatus==="VINTA"?"selected":""}>Vinta</option><option value="PERSA" ${bet.realStatus==="PERSA"?"selected":""}>Persa</option></select></label><input class="real-received" data-bet-id="${safeText(bet.id)}" type="number" min="0" step="0.01" placeholder="Incassato €" value="${bet.realReceived ?? ""}" aria-label="Incassato reale"><button class="update-real" data-bet-id="${safeText(bet.id)}" type="button">SALVA ESITO</button></div>
       <button class="delete-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA DALL'ARCHIVIO</button>`;
@@ -2036,6 +2120,7 @@
       } catch(error) { console.warn("Storico risultati non disponibile",error); }
       prepareDailyRecommendations();
       renderDailyRecommendations();
+      renderMonitoredMatches();
       await refreshBetStatuses();
       renderSavedBets();
       createBet(false);
