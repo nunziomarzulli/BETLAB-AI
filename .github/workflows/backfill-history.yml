@@ -1,186 +1,214 @@
-name: BETLAB Import storico V3 sicuro
+name: BETLAB Import storico V4 - Football Data
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 4 * * *"
+    - cron: '45 3 * * *'
 
 permissions:
   contents: write
+
+concurrency:
+  group: betlab-import-history
+  cancel-in-progress: false
 
 jobs:
   import-history:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Scarica repository
         uses: actions/checkout@v4
-      - name: Arricchisci storico senza eliminare dati precedenti
+      - name: Importa risultati verificati 2026-27
         run: |
           python3 <<'PY'
+          import csv
           import hashlib
+          import io
           import json
           import os
           import re
           import unicodedata
           import urllib.request
-          from datetime import datetime
+          from datetime import date, datetime
           from zoneinfo import ZoneInfo
 
-          PATH = "data/betlab-history.json"
-          BASE = "https://raw.githubusercontent.com/openfootball/football.json/master"
-          TODAY = datetime.now(ZoneInfo("Europe/Rome")).date()
-          SEASON = "2026-27"
+          HISTORY_FILE = 'data/betlab-history.json'
+          SEASON = '2026-27'
+          BASE = 'https://www.football-data.co.uk/mmz4281/2627'
+          TODAY = datetime.now(ZoneInfo('Europe/Rome')).date()
+
+          # CSV dei principali campionati pubblicati da Football-Data.co.uk.
           DATASETS = [
-              (SEASON, "en.1.json", "England", "Premier League"),
-              (SEASON, "en.2.json", "England", "Championship"),
-              (SEASON, "it.1.json", "Italy", "Serie A"),
-              (SEASON, "it.2.json", "Italy", "Serie B"),
-              (SEASON, "es.1.json", "Spain", "La Liga"),
-              (SEASON, "es.2.json", "Spain", "Segunda Division"),
-              (SEASON, "de.1.json", "Germany", "Bundesliga"),
-              (SEASON, "de.2.json", "Germany", "2. Bundesliga"),
-              (SEASON, "fr.1.json", "France", "Ligue 1"),
-              (SEASON, "fr.2.json", "France", "Ligue 2"),
-              (SEASON, "pt.1.json", "Portugal", "Primeira Liga"),
-              (SEASON, "nl.1.json", "Netherlands", "Eredivisie"),
-              (SEASON, "be.1.json", "Belgium", "Jupiler Pro League"),
-              (SEASON, "tr.1.json", "Turkey", "Super Lig"),
-              (SEASON, "sco.1.json", "Scotland", "Premiership"),
-              (SEASON, "at.1.json", "Austria", "Bundesliga"),
-              (SEASON, "gr.1.json", "Greece", "Super League 1"),
-              ("2026", "br.1.json", "Brazil", "Serie A"),
+              ('E0', 'England', 'Premier League'),
+              ('E1', 'England', 'Championship'),
+              ('E2', 'England', 'League One'),
+              ('E3', 'England', 'League Two'),
+              ('SC0', 'Scotland', 'Premiership'),
+              ('SC1', 'Scotland', 'Championship'),
+              ('D1', 'Germany', 'Bundesliga'),
+              ('D2', 'Germany', '2. Bundesliga'),
+              ('I1', 'Italy', 'Serie A'),
+              ('I2', 'Italy', 'Serie B'),
+              ('SP1', 'Spain', 'La Liga'),
+              ('SP2', 'Spain', 'Segunda Division'),
+              ('F1', 'France', 'Ligue 1'),
+              ('F2', 'France', 'Ligue 2'),
+              ('N1', 'Netherlands', 'Eredivisie'),
+              ('B1', 'Belgium', 'Jupiler Pro League'),
+              ('P1', 'Portugal', 'Primeira Liga'),
+              ('T1', 'Turkey', 'Super Lig'),
+              ('G1', 'Greece', 'Super League 1'),
           ]
 
-          def norm(value):
-              value = unicodedata.normalize("NFKD", str(value or ""))
-              value = "".join(c for c in value if not unicodedata.combining(c))
-              return " ".join(re.sub(r"[^a-z0-9]+", " ", value.lower()).split())
+          def normalize(value):
+              value = unicodedata.normalize('NFKD', str(value or ''))
+              value = ''.join(c for c in value if not unicodedata.combining(c))
+              return ' '.join(re.sub(r'[^a-z0-9]+', ' ', value.lower()).split())
 
-          def team_name(row, side):
-              value = row.get(side)
-              return value.get("name") if isinstance(value, dict) else value
+          def team_name(record, side):
+              value = record.get(side)
+              if isinstance(value, dict):
+                  return value.get('name')
+              return value
 
-          def result_goals(score):
-              if isinstance(score, dict):
-                  score = score.get("ft")
-              if isinstance(score, list) and len(score) >= 2:
-                  a, b = score[:2]
-                  if type(a) is int and type(b) is int and a >= 0 and b >= 0:
-                      return a, b
+          def parse_date(value):
+              value = str(value or '').strip()
+              for fmt in ('%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d'):
+                  try:
+                      return datetime.strptime(value, fmt).date()
+                  except ValueError:
+                      continue
               return None
 
-          if not os.path.isfile(PATH):
-              raise RuntimeError("Storico BETLAB non trovato: per sicurezza non creo un archivio sostitutivo")
-          with open(PATH, encoding="utf-8") as f:
-              payload = json.load(f)
-          if isinstance(payload, list):
-              history = payload
-          elif isinstance(payload, dict) and isinstance(payload.get("matches"), list):
-              history = payload["matches"]
-          elif isinstance(payload, dict) and isinstance(payload.get("history"), list):
-              history = payload["history"]
-          else:
-              raise RuntimeError("Formato storico inatteso: nessuna modifica effettuata")
+          def nonnegative_int(value):
+              value = str(value or '').strip()
+              if not re.fullmatch(r'\d+', value):
+                  return None
+              return int(value)
 
-          previous_count = len(history)
+          if not os.path.isfile(HISTORY_FILE):
+              raise RuntimeError('Storico originale assente: nessun file creato per sicurezza')
+          with open(HISTORY_FILE, encoding='utf-8') as file:
+              root = json.load(file)
+          if isinstance(root, list):
+              history = root
+              key = None
+          elif isinstance(root, dict) and isinstance(root.get('matches'), list):
+              history = root['matches']
+              key = 'matches'
+          elif isinstance(root, dict) and isinstance(root.get('history'), list):
+              history = root['history']
+              key = 'history'
+          else:
+              raise RuntimeError('Formato storico non riconosciuto: archivio lasciato intatto')
+          initial_size = len(history)
           existing = {
-              (str(row.get("date") or "")[:10], norm(team_name(row, "home")), norm(team_name(row, "away")))
+              (str(row.get('date') or '')[:10], normalize(team_name(row, 'home')), normalize(team_name(row, 'away')))
               for row in history if isinstance(row, dict)
           }
-          new_records = []
-          succeeded = failed = 0
-          for season, filename, country, league in DATASETS:
+
+          additions = []
+          successful = failed = scored = 0
+          for code, country, league in DATASETS:
+              url = f'{BASE}/{code}.csv'
               try:
-                  url = f"{BASE}/{season}/{filename}"
-                  request = urllib.request.Request(url, headers={"User-Agent": "BETLAB-AI-historical-import/3.0"})
+                  request = urllib.request.Request(
+                      url,
+                      headers={'User-Agent': 'BETLAB-AI/4.0 (historical football results)', 'Accept': 'text/csv'},
+                  )
                   with urllib.request.urlopen(request, timeout=30) as response:
-                      data = json.load(response)
-                  matches = data.get("matches", [])
-                  if not isinstance(matches, list):
-                      raise ValueError("elenco incontri mancante")
-                  succeeded += 1
-                  count = 0
-                  for row in matches:
+                      raw = response.read(3_000_001)
+                  if len(raw) > 3_000_000:
+                      raise ValueError('CSV troppo grande')
+                  decoded = raw.decode('utf-8-sig', errors='replace')
+                  reader = csv.DictReader(io.StringIO(decoded))
+                  headers = set(reader.fieldnames or [])
+                  required = {'Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG'}
+                  if not required.issubset(headers):
+                      raise ValueError('Colonne risultato mancanti: ' + str(sorted(headers)[:12]))
+                  successful += 1
+                  imported_here = completed_here = 0
+                  for row in reader:
                       if not isinstance(row, dict):
                           continue
-                      date = str(row.get("date") or "")[:10]
-                      try:
-                          match_day = datetime.strptime(date, "%Y-%m-%d").date()
-                      except ValueError:
+                      match_date = parse_date(row.get('Date'))
+                      if match_date is None or match_date >= TODAY:
                           continue
-                      # Mai caricare in storico partite odierne/future (potenzialmente non concluse).
-                      if match_day >= TODAY:
+                      home = str(row.get('HomeTeam') or '').strip()
+                      away = str(row.get('AwayTeam') or '').strip()
+                      hg = nonnegative_int(row.get('FTHG'))
+                      ag = nonnegative_int(row.get('FTAG'))
+                      if not home or not away or normalize(home) == normalize(away) or hg is None or ag is None:
                           continue
-                      home, away = row.get("team1"), row.get("team2")
-                      goals = result_goals(row.get("score"))
-                      if not home or not away or norm(home) == norm(away) or goals is None:
+                      completed_here += 1
+                      date_text = match_date.isoformat()
+                      identifier = (date_text, normalize(home), normalize(away))
+                      if identifier in existing:
                           continue
-                      key = (date, norm(home), norm(away))
-                      if key in existing:
-                          continue
-                      digest = hashlib.sha1(f"{season}|{country}|{league}|{date}|{home}|{away}".encode()).hexdigest()[:16]
-                      new_records.append({
-                          "fixtureId": "OF-" + digest,
-                          "source": "OpenFootball",
-                          "date": date,
-                          "timestamp": 0,
-                          "status": "FT",
-                          "country": country,
-                          "league": league,
-                          "season": season,
-                          "home": {"id": None, "name": home},
-                          "away": {"id": None, "name": away},
-                          "goals": {"home": goals[0], "away": goals[1]}
+                      token = hashlib.sha256(f'FD|{code}|{date_text}|{home}|{away}'.encode()).hexdigest()[:20]
+                      additions.append({
+                          'fixtureId': 'FD-' + token,
+                          'source': 'Football-Data.co.uk',
+                          'date': date_text,
+                          'timestamp': 0,
+                          'status': 'FT',
+                          'country': country,
+                          'league': league,
+                          'season': SEASON,
+                          'home': {'name': home},
+                          'away': {'name': away},
+                          'homeGoals': hg,
+                          'awayGoals': ag,
+                          'goals': {'home': hg, 'away': ag},
                       })
-                      existing.add(key)
-                      count += 1
-                  print(f"{league}: +{count} risultati completati")
-              except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+                      existing.add(identifier)
+                      imported_here += 1
+                  scored += completed_here
+                  print(f'{code} {league}: {completed_here} risultati completi | +{imported_here} nuovi')
+              except (OSError, ValueError, UnicodeError, csv.Error) as error:
                   failed += 1
-                  print(f"{league}: fonte non disponibile - {exc}")
+                  print(f'{code} {league}: NON DISPONIBILE ({error})')
 
-          print(f"Fonti riuscite: {succeeded} | non disponibili: {failed}")
-          print(f"Storico prima: {previous_count} | nuovi risultati: {len(new_records)}")
-          if succeeded == 0:
-              raise RuntimeError("Nessuna fonte leggibile: storico originale conservato")
-          if not new_records:
-              print("Nessun nuovo risultato: storico lasciato invariato")
+          print(f'Fonti disponibili: {successful} | fonti non disponibili: {failed}')
+          print(f'Risultati completi nelle fonti: {scored}')
+          print(f'Storico iniziale: {initial_size} | nuovi risultati: {len(additions)}')
+          if successful == 0:
+              raise RuntimeError('Nessuna fonte CSV valida: archivio originale non modificato')
+          if not additions:
+              print('Nessun risultato nuovo: storico originale conservato invariato')
           else:
-              history.extend(new_records)
-              history.sort(key=lambda x: str(x.get("date") or ""))
-              if len(history) < previous_count:
-                  raise RuntimeError("Protezione archivio: diminuzione dei record vietata")
-              # Conserva la struttura del file esistente (lista oppure dizionario).
-              if isinstance(payload, list):
-                  updated = history
+              merged = history + additions
+              merged.sort(key=lambda entry: str(entry.get('date') or ''))
+              if len(merged) < initial_size:
+                  raise RuntimeError('Protezione archivio: dimensione inattesa')
+              if key is None:
+                  output = merged
               else:
-                  updated = dict(payload)
-                  field = "matches" if "matches" in payload else "history"
-                  updated[field] = history
-                  if "total" in updated:
-                      updated["total"] = len(history)
-                  updated["updatedAt"] = datetime.now(ZoneInfo("Europe/Rome")).isoformat()
-              temp_path = PATH + ".new"
-              with open(temp_path, "w", encoding="utf-8") as f:
-                  json.dump(updated, f, ensure_ascii=False, indent=2)
-              with open(temp_path, encoding="utf-8") as f:
-                  check = json.load(f)
-              recovered = check if isinstance(check, list) else check.get("matches", check.get("history", []))
-              if len(recovered) < previous_count:
-                  raise RuntimeError("Controllo finale fallito: archivio originale conservato")
-              os.replace(temp_path, PATH)
-              print(f"Storico salvato: {len(history)} risultati, nessun record precedente rimosso")
+                  output = dict(root)
+                  output[key] = merged
+                  if 'total' in output:
+                      output['total'] = len(merged)
+                  output['updatedAt'] = datetime.now(ZoneInfo('Europe/Rome')).isoformat()
+              temporary = HISTORY_FILE + '.tmp'
+              with open(temporary, 'w', encoding='utf-8') as file:
+                  json.dump(output, file, ensure_ascii=False, indent=2)
+              with open(temporary, encoding='utf-8') as file:
+                  verification = json.load(file)
+              restored = verification if isinstance(verification, list) else verification[key]
+              if len(restored) != len(merged):
+                  raise RuntimeError('Validazione fallita, originale non modificato')
+              os.replace(temporary, HISTORY_FILE)
+              print(f'Storico aggiornato: {len(merged)} incontri, nessun dato precedente rimosso')
           PY
-
-      - name: Registra nuovi risultati nel repository
+      - name: Commit solo se ci sono risultati nuovi
         run: |
-          git config user.name "BETLAB AI Bot"
-          git config user.email "actions@github.com"
+          git config user.name 'BETLAB AI Bot'
+          git config user.email 'actions@github.com'
           git add data/betlab-history.json
           if git diff --cached --quiet; then
-            echo "Nessun nuovo dato"
+            echo 'Nessun aggiornamento da salvare'
             exit 0
           fi
-          git commit -m "BETLAB: integra risultati storici recenti"
+          git commit -m 'BETLAB: importa risultati 2026-27 da Football-Data'
           git pull --rebase origin main
           git push origin main
