@@ -806,6 +806,41 @@
       background: #fff4f2;
     }
 
+
+    /* BETLAB: analisi giornaliera con selezione manuale */
+    .daily-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;margin-bottom:13px}
+    .daily-head h2{margin:0;font-size:22px}
+    .daily-head p{color:var(--muted);font-size:12px;margin:6px 0 0;line-height:1.5}
+    .refresh-button{padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:#14253a;color:var(--text);font-weight:800;cursor:pointer}
+    .daily-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-top:14px}
+    .daily-card{padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--panel);color:var(--text);min-width:0}
+    .daily-card.selected{border-color:#49df91;background:#122636}
+    .daily-card-top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+    .daily-league{font-size:10px;color:var(--muted);letter-spacing:.4px;line-height:1.45}
+    .daily-teams{font-weight:900;font-size:15px;margin:7px 0 12px}
+    .daily-pick{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px;background:#081521;border-radius:9px}
+    .daily-pick strong{color:var(--green);font-size:16px}
+    .daily-odd{text-align:right;font-weight:900;font-size:18px}
+    .daily-stats{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:11px;color:#bdcbd4;flex-wrap:wrap}
+    .daily-reason{font-size:11px;line-height:1.55;color:#afbecc;margin:12px 0}
+    .daily-actions{display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)}
+    .daily-actions label{font-size:12px;color:var(--text);letter-spacing:0;margin:0;cursor:pointer}
+    .daily-actions input{width:18px;height:18px;accent-color:#49df91;cursor:pointer;padding:0}
+    .daily-empty{padding:18px;border:1px solid var(--border);background:#102030;border-radius:12px;font-size:13px;color:var(--muted);line-height:1.5}
+    .daily-muted{font-size:11px;color:var(--muted)}
+    .daily-flag{font-size:10px;font-weight:900;color:#d6dfe6;padding:6px;border:1px solid var(--border);border-radius:8px;white-space:nowrap}
+    .daily-flag.low{color:#ffd69e}
+    .control-panel{margin-top:0}
+    .control-panel .inputs{grid-template-columns:minmax(0,1fr)}
+    .control-panel .stake-tip{color:var(--muted);font-size:11px;line-height:1.55;margin-top:9px}
+    .results .summary{display:block}
+    .results .summary-message{line-height:1.5}
+    .pending-result{font-size:10px;margin-top:3px}
+    .pending-result.good{color:#126c39}
+    .pending-result.bad{color:#b42318}
+    .pending-result.wait{color:#65756b}
+    @media(max-width:700px){.daily-grid{grid-template-columns:1fr}.daily-head{align-items:flex-start}}
+
 </style>
 </head>
 
@@ -835,129 +870,34 @@
     </div>
 
     <h1>
-      Cosa giochiamo?
+      Pronostici del giorno
     </h1>
 
     <div class="subtitle">
-      Inserisci la puntata e, se vuoi, l'obiettivo.
-      BETLAB confronta i mercati disponibili e costruisce
-      una combinazione utilizzando un solo pronostico per incontro.
+      BETLAB analizza ogni incontro e confronta probabilità, quota e qualità dei dati.
+      Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
     </div>
 
 
+    <div class="daily-head">
+      <div><h2>Analisi delle partite</h2><p>Un solo pronostico principale per incontro. Le stime sono sperimentali: nessuna vincita è garantita.</p></div>
+      <button id="refreshButton" class="refresh-button" type="button">AGGIORNA DATI</button>
+    </div>
+    <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
+    <div id="dailyMatches" class="daily-grid"></div>
     <section class="control-panel">
-
       <div class="inputs">
-
         <div class="field">
-
-          <label for="stake">
-            QUANTO VUOI GIOCARE?
-          </label>
-
+          <label for="stake">IMPORTO DELLA GIOCATA</label>
           <div class="input-wrap">
-
-            <input
-              id="stake"
-              type="number"
-              min="0.01"
-              step="0.50"
-              value="5"
-            >
-
+            <input id="stake" type="number" min="0.01" step="0.50" value="5">
             <span class="euro">€</span>
-
           </div>
-
         </div>
-
-
-        <div class="field">
-
-          <label for="target">
-            QUANTO VORRESTI VINCERE? · FACOLTATIVO
-          </label>
-
-          <div class="input-wrap">
-
-            <input
-              id="target"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="es. 100"
-            >
-
-            <span class="euro">€</span>
-
-          </div>
-
-        </div>
-
       </div>
-
-
-      <div class="match-control">
-
-        <label>
-          NUMERO INCONTRI
-        </label>
-
-        <div class="match-row">
-
-          <button
-            id="autoButton"
-            class="auto-button"
-            type="button"
-          >
-            AUTO
-          </button>
-
-          <input
-            id="matchCount"
-            type="number"
-            min="1"
-            max="20"
-            step="1"
-            value="4"
-            disabled
-            placeholder="Numero incontri"
-          >
-
-        </div>
-
-        <div
-          id="matchHelp"
-          class="match-help"
-        >
-          AUTO: BETLAB decide quanti incontri utilizzare.
-        </div>
-
-      </div>
-
-
-      <button
-        id="createButton"
-        class="create-button"
-        type="button"
-      >
-        CREA LA GIOCATA
-      </button>
-
-
-      <div
-        id="availability"
-        class="availability"
-      >
-        Caricamento pronostici...
-      </div>
-
-
-      <div
-        id="error"
-        class="error"
-      ></div>
-
+      <div class="stake-tip">Spunta gli incontri che vuoi inserire. Il sistema calcolerà automaticamente la quota totale e la vincita potenziale, senza cercare una somma prefissata.</div>
+      <button id="createButton" class="create-button" type="button">AGGIORNA SCHEDINA SELEZIONATA</button>
+      <div id="error" class="error" role="alert"></div>
     </section>
 
 
@@ -973,7 +913,7 @@
         <div>
 
           <h2>
-            La tua giocata
+            La tua selezione
             <span
               id="modeBadge"
               class="mode-badge"
@@ -987,15 +927,10 @@
 
         </div>
 
-        <div
-          id="targetLabel"
-          class="target-label"
-        ></div>
-
       </div>
 
 
-      <div id="cards"><div class="empty-slip">Crea una giocata: il biglietto BETLAB apparirà qui.</div></div>
+      <div id="cards"><div class="empty-slip">Seleziona un pronostico dalle analisi: il riepilogo apparirà qui.</div></div>
 
 
       <div class="summary">
@@ -1059,7 +994,7 @@
 
       </div>
 
-      <button id="saveBetButton" class="save-bet-button" type="button">
+      <button id="saveBetButton" class="save-bet-button" type="button" style="display:none">
         REGISTRA GIOCATA EFFETTUATA
       </button>
 
@@ -1155,11 +1090,12 @@
   let betlabData = null;
   let betlabHistory = [];
 
-  let autoMode = true;
-
   let currentResult = null;
   let currentStake = null;
-  let currentTarget = null;
+  let currentTarget = null; // conservato solo per compatibilità con vecchie schede
+  const selectedMatchIds = new Set();
+  let dailyRecommendations = [];
+  const nowEpoch = () => Math.floor(Date.now() / 1000);
 
   const BETS_STORAGE_KEY = "betlab_saved_bets_v1";
 
@@ -1167,17 +1103,8 @@
   const stakeInput =
     document.getElementById("stake");
 
-  const targetInput =
-    document.getElementById("target");
-
-  const matchCountInput =
-    document.getElementById("matchCount");
-
-  const autoButton =
-    document.getElementById("autoButton");
-
-  const matchHelp =
-    document.getElementById("matchHelp");
+  const dailyMatches = document.getElementById("dailyMatches");
+  const refreshButton = document.getElementById("refreshButton");
 
   const createButton =
     document.getElementById("createButton");
@@ -1292,584 +1219,124 @@
   }
 
 
-  function getUsableMatches() {
+  // Preserviamo solo fixture API identificabili e non iniziate.
+  function validFixture(match) {
+    const id = Number(match?.fixtureId);
+    const home = String(match?.home?.name || "").trim();
+    const away = String(match?.away?.name || "").trim();
+    const timestamp = Number(match?.timestamp || 0);
+    return Number.isSafeInteger(id) && id > 0 && home && away &&
+      normalizeTeam(home) !== normalizeTeam(away) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(String(match?.date || "")) &&
+      Number.isFinite(timestamp) && timestamp > nowEpoch();
+  }
 
-    return getMatches()
-      .map(match => {
+  function readablePercent(p) {
+    return (Number(p) * 100).toLocaleString("it-IT", {maximumFractionDigits: 1}) + "%";
+  }
 
-        const candidates =
-          Array.isArray(match.candidates)
-            ? match.candidates
-            : [];
+  function getCandidateAssessment(candidate, match) {
+    if (candidate?.oddAvailable !== true) return null;
+    const odd = Number(candidate.odd);
+    const p = Number(candidate.modelProbability);
+    const homeGames = Number(match?.home?.form?.played || 0);
+    const awayGames = Number(match?.away?.form?.played || 0);
+    if (!(odd > 1 && Number.isFinite(odd) && p > 0 && p < 1)) return null;
+    if (homeGames < 5 || awayGames < 5) return null;
+    const exact = candidate.market === "Risultato Esatto";
+    if (exact && (homeGames < 8 || awayGames < 8 || candidate.model !== "poisson")) return null;
+    const implied = 1 / odd;
+    // Se modello e prezzo differiscono troppo non dichiariamo un vantaggio.
+    // Limite prudenziale: probabile disallineamento, feed quote o modello non validato.
+    if (p / implied > 2.4) return null;
+    const volume = Math.min(homeGames, awayGames, 10) / 10;
+    // La stima grezza si avvicina prudentemente alla probabilità implicita
+    // del prezzo. NON e' una calibrazione scientificamente validata.
+    const shrink = (exact ? 0.45 : 0.60) * volume;
+    const conservativeP = implied + shrink * (p - implied);
+    const conservativeEdge = conservativeP * odd - 1;
+    // Richiediamo un vantaggio minimo stimato, non semplicemente una quota bassa.
+    if (conservativeEdge < 0.06) return null;
+    const score = conservativeEdge * Math.sqrt(conservativeP) /
+      (1 + 0.35 * Math.log(odd)) * (exact ? 0.80 : 1);
+    return { candidate, odd, rawP: p, implied, conservativeP,
+      conservativeEdge, score, homeGames, awayGames, exact };
+  }
 
-        const usableCandidates =
-          candidates.filter(candidate => {
+  function chooseRecommendation(match) {
+    if (!validFixture(match)) return null;
+    const assessments = (Array.isArray(match.candidates) ? match.candidates : [])
+      .map(candidate => getCandidateAssessment(candidate, match))
+      .filter(Boolean).sort((a,b) => b.score-a.score);
+    if (!assessments.length) return null;
+    return {match, candidate: assessments[0].candidate, assessment: assessments[0]};
+  }
 
-            const odd =
-              Number(candidate.odd);
-
-            return (
-              candidate.oddAvailable === true &&
-              Number.isFinite(odd) &&
-              odd > 1
-            );
-
-          });
-
-        return {
-          ...match,
-          usableCandidates
-        };
-
+  function prepareDailyRecommendations() {
+    const seen = new Set();
+    dailyRecommendations = getMatches()
+      .filter(validFixture)
+      .sort((a,b) => Number(a.timestamp)-Number(b.timestamp))
+      .filter(match => {
+        const key = String(match.fixtureId);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
       })
-      .filter(
-        match =>
-          match.usableCandidates.length > 0
-      );
-
+      .map(chooseRecommendation).filter(Boolean);
+    // Se il feed cambia, non perpetuiamo selezioni non più disponibili.
+    const availableIds = new Set(dailyRecommendations.map(p => String(p.match.fixtureId)));
+    for (const id of [...selectedMatchIds]) if (!availableIds.has(id)) selectedMatchIds.delete(id);
+    return dailyRecommendations;
   }
 
-
-  function candidateQuality(candidate) {
-
-    const index =
-      Number(candidate.index) || 0;
-
-    const probability =
-      Number(candidate.modelProbability) || 0;
-
-    const odd =
-      Number(candidate.odd) || 1;
-
-    /*
-      Il punteggio NON considera soltanto la quota.
-
-      Premia prima la qualità statistica.
-      La quota serve successivamente per avvicinarsi
-      all'obiettivo economico.
-    */
-
-    let quality =
-      index * 1.0;
-
-    if (
-      candidate.market ===
-      "Risultato Esatto"
-    ) {
-
-      /*
-        Penalizzazione prudenziale del risultato esatto.
-
-        Il modello Poisson è ancora sperimentale:
-        non vogliamo che una quota enorme domini
-        automaticamente la selezione.
-      */
-
-      quality *= 0.72;
-
-      if (probability < 0.05) {
-        quality *= 0.75;
-      }
-
-    }
-
-    /*
-      Piccola penalizzazione delle quote estreme.
-      Non le vietiamo.
-    */
-
-    if (odd >= 20) {
-      quality *= 0.92;
-    }
-
-    if (odd >= 50) {
-      quality *= 0.82;
-    }
-
-    return quality;
-
+  function recommendationReason(row) {
+    const a = row.assessment;
+    const details = a.exact && Number.isFinite(Number(row.candidate.expectedHomeGoals))
+      ? ` Poisson: gol attesi ${Number(row.candidate.expectedHomeGoals).toFixed(2)} - ${Number(row.candidate.expectedAwayGoals).toFixed(2)}.` : "";
+    return `Campione: ${a.homeGames} e ${a.awayGames} gare. Stima del modello ${readablePercent(a.rawP)}; quota equivalente a ${readablePercent(a.implied)}. ` +
+      `Margine prudenziale teorico +${(a.conservativeEdge*100).toFixed(1)}%.${details} Stima non calibrata: possibile errore del modello o della quota.`;
   }
 
-
-  function candidateIsAllowed(candidate) {
-
-    const odd =
-      Number(candidate.odd);
-
-    const index =
-      Number(candidate.index);
-
-    const probability =
-      Number(
-        candidate.modelProbability
-      );
-
-
-    if (
-      !Number.isFinite(odd) ||
-      odd <= 1
-    ) {
-      return false;
+  function renderDailyRecommendations() {
+    const rows = dailyRecommendations;
+    if (!rows.length) {
+      dailyMatches.innerHTML = `<div class="daily-empty">Nessun incontro supera oggi i controlli di dati e quota. BETLAB non forza un pronostico per riempire la schedina.</div>`;
+      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate`;
+      return;
     }
-
-
-    if (
-      !Number.isFinite(index)
-    ) {
-      return false;
-    }
-
-
-    if (
-      candidate.market ===
-      "Risultato Esatto"
-    ) {
-
-      /*
-        Per ora il risultato esatto deve avere
-        almeno il 5% di probabilità modello.
-
-        Evitiamo 2%, 3% ecc. soltanto perché
-        hanno quota molto alta.
-      */
-
-      return (
-        Number.isFinite(probability) &&
-        probability >= 0.05
-      );
-
-    }
-
-
-    return index >= 55;
-
+    dailyMatches.innerHTML = rows.map(row => {
+      const m = row.match, c = row.candidate, a = row.assessment;
+      const id = String(m.fixtureId);
+      const checked = selectedMatchIds.has(id);
+      return `<article class="daily-card ${checked ? "selected" : ""}" data-fixture-id="${safeText(id)}">
+        <div class="daily-card-top"><div class="daily-league">${safeText(m.country)} · ${safeText(m.league)} · ${formatDate(m)}</div>
+          <span class="daily-flag ${a.exact ? "low" : ""}">${a.exact ? "RISCHIO ALTO" : "ANALISI"}</span></div>
+        <div class="daily-teams">${safeText(m.home.name)} – ${safeText(m.away.name)}</div>
+        <div class="daily-pick"><div><span class="daily-muted">SCELTA BETLAB</span><div><strong>${safeText(c.selection)}</strong></div><div class="daily-muted">${safeText(c.market)}</div></div>
+          <div class="daily-odd"><span class="daily-muted">QUOTA</span><div>${oddText(a.odd)}</div></div></div>
+        <div class="daily-stats"><span>Prob. modello: <b>${readablePercent(a.rawP)}</b></span><span>Valore prudenziale: <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
+        <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
+        <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
+          <label for="pick-${safeText(id)}">${checked ? "INSERITA NELLA SCHEDINA" : "AGGIUNGI ALLA SCHEDINA"}</label></div>
+      </article>`;
+    }).join("");
+    dailyMatches.querySelectorAll('input[type="checkbox"]').forEach(input => input.addEventListener("change", () => {
+      const id = input.dataset.fixtureId;
+      if (input.checked) selectedMatchIds.add(id); else selectedMatchIds.delete(id);
+      renderDailyRecommendations();
+      createBet(false);
+    }));
+    const today = new Date(betlabData?.generatedAt || Date.now());
+    availability.textContent = `${rows.length} incontri consigliati · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
   }
 
-
-  function prepareOptions() {
-
-    const matches =
-      getUsableMatches();
-
-    const options = [];
-
-
-    for (const match of matches) {
-
-      const allowed =
-        match.usableCandidates
-          .filter(candidateIsAllowed)
-          .sort(
-            (a, b) =>
-              candidateQuality(b) -
-              candidateQuality(a)
-          );
-
-
-      if (!allowed.length) {
-        continue;
-      }
-
-
-      /*
-        Non servono decine di mercati della stessa partita
-        durante la ricerca.
-
-        Prendiamo al massimo i 10 candidati migliori.
-      */
-
-      options.push({
-
-        match,
-
-        candidates:
-          allowed.slice(0, 10)
-
-      });
-
-    }
-
-
-    return options;
-
+  function combinationScore(picks, stake) {
+    const totalOdd = picks.reduce((v,p) => v * Number(p.candidate.odd), 1);
+    const probabilityProduct = picks.reduce((v,p) => v * Number(p.assessment?.conservativeP || p.candidate.modelProbability), 1);
+    return { totalOdd, potential: stake * totalOdd, probabilityProduct,
+      averageQuality: picks.reduce((v,p) => v + Number(p.candidate.index || 0), 0) / Math.max(1,picks.length) };
   }
-
-
-  function combinationScore(picks, stake, target) {
-    let totalOdd = 1;
-    let qualitySum = 0;
-    let probabilityProduct = 1;
-    let exactScoreCount = 0;
-
-    for (const pick of picks) {
-      const candidate = pick.candidate;
-      totalOdd *= Number(candidate.odd);
-      qualitySum += candidateQuality(candidate);
-      const rawProbability = Number(candidate.modelProbability);
-      const fallbackProbability = Number(candidate.index) / 100;
-      const p = Number.isFinite(rawProbability) && rawProbability > 0 && rawProbability <= 1
-        ? rawProbability : fallbackProbability;
-      probabilityProduct *= Number.isFinite(p) && p > 0 && p <= 1 ? p : 0.01;
-      if (candidate.market === "Risultato Esatto") exactScoreCount++;
-    }
-
-    const potential = stake * totalOdd;
-    const averageQuality = qualitySum / picks.length;
-    const hasTarget = Number.isFinite(target) && target > 0 && stake > 0;
-
-    // La probabilità totale pesa, ma non deve obbligare AUTO a scegliere
-    // sempre un solo incontro. La qualità media resta una componente importante.
-    let score = averageQuality * 0.65
-      + 6 * Math.log(Math.max(probabilityProduct, 1e-100))
-      - exactScoreCount * 4;
-
-    if (hasTarget) {
-      // Un obiettivo enorme non deve trascinare il sistema verso jackpot
-      // con probabilità trascurabile: massimo rapporto-obiettivo 50x.
-      const requestedOdd = Math.max(target / stake, 1.0001);
-      const workingTargetOdd = Math.min(requestedOdd, 50);
-      const distance = Math.abs(
-        Math.log(Math.max(totalOdd, 1.0001) / workingTargetOdd)
-      );
-      score -= 10 * distance;
-    }
-
-    return {
-      score,
-      totalOdd,
-      potential,
-      averageQuality,
-      probabilityProduct
-    };
-  }
-
-  function isBetterResult(
-    candidateResult,
-    currentBest,
-    stake,
-    target
-  ) {
-
-    if (!currentBest) {
-      return true;
-    }
-
-
-    /*
-      Se esiste un obiettivo, prima scegliamo
-      la combinazione col punteggio complessivo
-      più alto.
-    */
-
-    if (
-      candidateResult.metrics.score >
-      currentBest.metrics.score
-    ) {
-      return true;
-    }
-
-
-    if (
-      candidateResult.metrics.score <
-      currentBest.metrics.score
-    ) {
-      return false;
-    }
-
-
-    /*
-      Pareggio:
-      qualità media più alta.
-    */
-
-    if (
-      candidateResult.metrics.averageQuality >
-      currentBest.metrics.averageQuality
-    ) {
-      return true;
-    }
-
-
-    return false;
-
-  }
-
-
-  function searchFixedCount(
-    options,
-    requestedCount,
-    stake,
-    target
-  ) {
-
-    if (
-      requestedCount < 1 ||
-      requestedCount > options.length
-    ) {
-      return null;
-    }
-
-
-    /*
-      Ricerca beam.
-
-      Evita di generare milioni di combinazioni
-      quando aumentano incontri e mercati.
-    */
-
-    const BEAM_WIDTH = 3500;
-
-    let states = [
-      {
-        picks: [],
-        usedMatches: new Set()
-      }
-    ];
-
-
-    for (
-      let depth = 0;
-      depth < requestedCount;
-      depth++
-    ) {
-
-      const nextStates = [];
-
-
-      for (const state of states) {
-
-        for (
-          let matchIndex = 0;
-          matchIndex < options.length;
-          matchIndex++
-        ) {
-
-          if (
-            state.usedMatches.has(
-              matchIndex
-            )
-          ) {
-            continue;
-          }
-
-
-          /*
-            Impedisce permutazioni duplicate:
-            gli incontri devono essere aggiunti
-            in ordine crescente.
-          */
-
-          const lastMatchIndex =
-            state.picks.length
-              ? state.picks[
-                  state.picks.length - 1
-                ].matchIndex
-              : -1;
-
-
-          if (
-            matchIndex <=
-            lastMatchIndex
-          ) {
-            continue;
-          }
-
-
-          const option =
-            options[matchIndex];
-
-
-          for (
-            const candidate
-            of option.candidates
-          ) {
-
-            const newPicks = [
-              ...state.picks,
-              {
-                matchIndex,
-                match:
-                  option.match,
-                candidate
-              }
-            ];
-
-
-            const metrics =
-              combinationScore(
-                newPicks,
-                stake,
-                target
-              );
-
-
-            const newUsed =
-              new Set(
-                state.usedMatches
-              );
-
-            newUsed.add(
-              matchIndex
-            );
-
-
-            nextStates.push({
-
-              picks:
-                newPicks,
-
-              usedMatches:
-                newUsed,
-
-              metrics
-
-            });
-
-          }
-
-        }
-
-      }
-
-
-      if (!nextStates.length) {
-        return null;
-      }
-
-
-      nextStates.sort(
-        (a, b) =>
-          b.metrics.score -
-          a.metrics.score
-      );
-
-
-      states =
-        nextStates.slice(
-          0,
-          BEAM_WIDTH
-        );
-
-    }
-
-
-    let best = null;
-
-
-    for (const state of states) {
-
-      const result = {
-
-        picks:
-          state.picks,
-
-        metrics:
-          combinationScore(
-            state.picks,
-            stake,
-            target
-          )
-
-      };
-
-
-      if (
-        isBetterResult(
-          result,
-          best,
-          stake,
-          target
-        )
-      ) {
-
-        best = result;
-
-      }
-
-    }
-
-
-    return best;
-
-  }
-
-
-  function searchAuto(
-    options,
-    stake,
-    target
-  ) {
-
-    /*
-      AUTO può utilizzare da 1 fino al massimo
-      degli incontri disponibili.
-
-      Limite tecnico 20 per evitare combinazioni
-      prive di utilità pratica.
-    */
-
-    const maxCount =
-      Math.min(
-        options.length,
-        20
-      );
-
-
-    let best = null;
-
-
-    for (
-      let count = 1;
-      count <= maxCount;
-      count++
-    ) {
-
-      const result =
-        searchFixedCount(
-          options,
-          count,
-          stake,
-          target
-        );
-
-
-      if (!result) {
-        continue;
-      }
-
-
-      /*
-        Piccola penalizzazione per ogni incontro
-        aggiuntivo.
-
-        A parità di risultato preferiamo una
-        schedina più corta.
-      */
-
-      result.metrics.score -=
-        (count - 1) * 1.5;
-
-
-      if (
-        isBetterResult(
-          result,
-          best,
-          stake,
-          target
-        )
-      ) {
-
-        best = result;
-
-      }
-
-    }
-
-
-    return best;
-
-  }
-
 
   function formatDate(match) {
 
@@ -1903,315 +1370,46 @@
   }
 
 
-  function renderResult(
-    result,
-    stake,
-    target
-  ) {
-
-    if (
-      !result ||
-      !result.picks ||
-      !result.picks.length
-    ) {
-
-      showError(
-        "BETLAB non ha trovato una combinazione valida con i parametri richiesti."
-      );
-
-      cards.innerHTML = '<div class="empty-slip">Nessuna combinazione disponibile.</div>';
-
-      return;
-
-    }
-
-
+  function renderResult(result, stake) {
     currentResult = result;
     currentStake = stake;
-    currentTarget = target;
+    currentTarget = null;
     betForm.classList.remove("open");
-    saveBetButton.style.display = "block";
-
     cards.innerHTML = "";
-
-
-    for (const pick of result.picks) {
-
-      const match =
-        pick.match;
-
-      const candidate =
-        pick.candidate;
-
-
-      const card =
-        document.createElement(
-          "article"
-        );
-
-      card.className =
-        "match-card";
-
-
-      card.innerHTML = `
-
-        <div class="match-meta">
-
-          <span>
-            ${safeText(match.country)}
-            ·
-            ${safeText(match.league)}
-          </span>
-
-          <span>
-            ${formatDate(match)}
-          </span>
-
-        </div>
-
-
-        <div class="teams">
-
-          ${safeText(match.home?.name)}
-          –
-          ${safeText(match.away?.name)}
-
-        </div>
-
-
-        <div class="pick-box">
-
-          <div>
-
-            <div class="pick-label">
-              PRONOSTICO BETLAB
-            </div>
-
-            <div class="selection">
-              ${safeText(candidate.selection)}
-            </div>
-
-            <div class="market">
-              ${safeText(candidate.market)}
-            </div>
-
-          </div>
-
-
-          <div class="odd-box">
-
-            <div class="small-label">
-              QUOTA BETLAB
-            </div>
-
-            <div class="odd">
-              ${oddText(candidate.odd)}
-            </div>
-
-          </div>
-
-
-          <div class="index-box">
-
-            <div class="index-value">
-              ${Number(candidate.index).toFixed(1)}%
-            </div>
-
-            <div class="index-label">
-              INDICE
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="bookmaker">
-
-          Fonte quota BETLAB:
-          ${safeText(
-            candidate.bookmaker ||
-            "n.d."
-          )}
-
-        </div>
-
-      `;
-
-
-      cards.appendChild(
-        card
-      );
-
-    }
-
-
-    const metrics =
-      combinationScore(
-        result.picks,
-        stake,
-        target
-      );
-
-
-    document.getElementById(
-      "resultsSub"
-    ).textContent =
-      result.picks.length
-      +
-      (
-        result.picks.length === 1
-          ? " incontro selezionato"
-          : " incontri selezionati"
-      )
-      +
-      " · qualità media "
-      +
-      metrics.averageQuality.toFixed(1);
-
-
-    document.getElementById(
-      "modeBadge"
-    ).textContent =
-      autoMode
-        ? "AUTO"
-        : "PERSONALIZZATA";
-
-
-    const targetLabel =
-      document.getElementById(
-        "targetLabel"
-      );
-
-
-    if (
-      Number.isFinite(target) &&
-      target > 0
-    ) {
-
-      targetLabel.textContent =
-        "Obiettivo "
-        +
-        money(target);
-
-    } else {
-
-      targetLabel.textContent =
-        "";
-
-    }
-
-
-    document.getElementById(
-      "summaryStake"
-    ).textContent =
-      money(stake);
-
-
-    document.getElementById(
-      "summaryMatches"
-    ).textContent =
-      result.picks.length;
-
-
-    document.getElementById(
-      "summaryOdd"
-    ).textContent =
-      oddText(
-        metrics.totalOdd
-      );
-
-
-    document.getElementById(
-      "summaryReturn"
-    ).textContent =
-      money(
-        metrics.potential
-      );
-
-
-    const message =
-      document.getElementById(
-        "summaryMessage"
-      );
-
-
-    if (
-      Number.isFinite(target) &&
-      target > 0
-    ) {
-
-      const requiredOdd =
-        target / stake;
-
-
-      const difference =
-        metrics.potential -
-        target;
-
-
-      if (
-        Math.abs(difference)
-        <
-        Math.max(
-          1,
-          target * 0.03
-        )
-      ) {
-
-        message.innerHTML =
-          "Per l'obiettivo di <strong>"
-          +
-          money(target)
-          +
-          "</strong> servirebbe quota circa <strong>"
-          +
-          oddText(requiredOdd)
-          +
-          "</strong>. BETLAB ha trovato una combinazione molto vicina all'obiettivo.";
-
-      } else if (
-        difference > 0
-      ) {
-
-        message.innerHTML =
-          "L'obiettivo richiede quota circa <strong>"
-          +
-          oddText(requiredOdd)
-          +
-          "</strong>. La combinazione selezionata arriva a una vincita potenziale superiore all'obiettivo.";
-
-      } else {
-
-        message.innerHTML =
-          "L'obiettivo richiede quota circa <strong>"
-          +
-          oddText(requiredOdd)
-          +
-          "</strong>. BETLAB bilancia l’obiettivo con la qualità e la probabilità complessiva; per obiettivi estremi limita la ricerca di quote jackpot.";
-
+    if (!result?.picks?.length) {
+      cards.innerHTML = '<div class="empty-slip">Spunta uno o più pronostici nelle analisi. Nessun evento viene aggiunto automaticamente.</div>';
+      saveBetButton.style.display = "none";
+      for (const id of ["summaryStake","summaryMatches","summaryOdd","summaryReturn"]) {
+        document.getElementById(id).textContent = id === "summaryStake" ? money(stake) : "—";
       }
-
-    } else {
-
-      message.textContent =
-        "Nessun obiettivo economico impostato: BETLAB ha privilegiato la qualità e la probabilità complessiva dei pronostici.";
-
+      document.getElementById("resultsSub").textContent = "Nessun incontro selezionato";
+      document.getElementById("modeBadge").textContent = "LIBERA";
+      document.getElementById("summaryMessage").textContent = "Seleziona i pronostici che ritieni opportuni. La vincita non influisce sull'analisi.";
+      return;
     }
-
-
-    results.style.display =
-      "block";
-
-
-    results.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
+    saveBetButton.style.display = "block";
+    for (const pick of result.picks) {
+      const m = pick.match, c = pick.candidate;
+      const card = document.createElement("article");
+      card.className = "match-card";
+      card.innerHTML = `<div class="match-meta"><span>${safeText(m.country)} · ${safeText(m.league)}</span><span>${formatDate(m)}</span></div>
+        <div class="teams">${safeText(m.home.name)} – ${safeText(m.away.name)}</div>
+        <div class="pick-box"><div><div class="pick-label">PRONOSTICO SELEZIONATO</div><div class="selection">${safeText(c.selection)}</div>
+        <div class="market">${safeText(c.market)}</div></div>
+        <div class="odd-box"><div class="small-label">QUOTA BETLAB</div><div class="odd">${oddText(c.odd)}</div></div>
+        <div class="index-box"><div class="index-value">${Number(c.index).toFixed(1)}%</div><div class="index-label">STIMA MODELLO</div></div></div>
+        <div class="bookmaker">Fonte: ${safeText(c.bookmaker || "n.d.")}</div>`;
+      cards.appendChild(card);
+    }
+    const metrics = combinationScore(result.picks, stake);
+    document.getElementById("resultsSub").textContent = `${result.picks.length} incontri selezionati`;
+    document.getElementById("modeBadge").textContent = "LIBERA";
+    document.getElementById("summaryStake").textContent = money(stake);
+    document.getElementById("summaryMatches").textContent = result.picks.length;
+    document.getElementById("summaryOdd").textContent = oddText(metrics.totalOdd);
+    document.getElementById("summaryReturn").textContent = money(metrics.potential);
+    document.getElementById("summaryMessage").textContent = "Quota e vincita potenziale sono calcoli matematici, non previsioni di incasso. Le stime BETLAB non sono ancora calibrate.";
   }
-
-
 
   function loadSavedBets() {
     if (currentUser) return cloudBets;
@@ -2246,12 +1444,21 @@
   }
 
   function historyGoals(row) {
-    const home = Number(row.homeGoals ?? row.home_goals ?? row.goals?.home ?? row.score?.fulltime?.home ?? row.score?.home);
-    const away = Number(row.awayGoals ?? row.away_goals ?? row.goals?.away ?? row.score?.fulltime?.away ?? row.score?.away);
-    return Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null;
+    const homeRaw = row.homeGoals ?? row.home_goals ?? row.goals?.home ?? row.score?.fulltime?.home ?? row.score?.home;
+    const awayRaw = row.awayGoals ?? row.away_goals ?? row.goals?.away ?? row.score?.fulltime?.away ?? row.score?.away;
+    if (homeRaw === null || homeRaw === undefined || homeRaw === "" || awayRaw === null || awayRaw === undefined || awayRaw === "") return null;
+    const home = Number(homeRaw), away = Number(awayRaw);
+    return Number.isInteger(home) && Number.isInteger(away) && home >= 0 && away >= 0 ? {home,away} : null;
   }
 
   function findFinalResult(pick) {
+    // Prima verifica l'identificativo immutabile della fixture API.
+    const fixtureId = pick.fixtureId == null ? "" : String(pick.fixtureId);
+    if (fixtureId) {
+      const match = betlabHistory.find(row => String(row.fixtureId ?? row.fixture?.id ?? "") === fixtureId && historyGoals(row));
+      if (match) return match;
+    }
+    // Compatibilità con i vecchi biglietti, privi di fixtureId.
     const d = String(pick.date || "").slice(0,10);
     const h = normalizeTeam(pick.home), a = normalizeTeam(pick.away);
     return betlabHistory.find(row => {
@@ -2290,22 +1497,37 @@
     const bets = loadSavedBets();
     let changed = false;
     const updated = bets.map(bet => {
-      if (bet.kind === "manual" || bet.status === "VINTA" || bet.status === "PERSA") return bet;
-      let allFinal = true, allWon = true;
+      if (bet.kind === "manual" || !Array.isArray(bet.picks) || !bet.picks.length) return bet;
+      let allFinal = true, anyLost = false;
       const picks = bet.picks.map(pick => {
+        // Non sovrascriviamo mai i pronostici originali.
         const row = findFinalResult(pick);
         if (!row) { allFinal = false; return pick; }
         const g = historyGoals(row);
+        if (!g) { allFinal = false; return pick; }
         const won = settleSelection(pick.selection, pick.market, g.home, g.away);
         if (won === null) { allFinal = false; return pick; }
-        if (!won) allWon = false;
-        return { ...pick, finalScore: `${g.home}-${g.away}`, result: won ? "VINTA" : "PERSA" };
+        if (!won) anyLost = true;
+        const newScore = `${g.home}-${g.away}`;
+        const newResult = won ? "VINTA" : "PERSA";
+        if (pick.finalScore === newScore && pick.result === newResult) return pick;
+        return {...pick, finalScore:newScore, result:newResult};
       });
-      if (!allFinal) return { ...bet, picks };
+      // Se era gia' noto un pronostico perso, il biglietto e' perso
+      // anche se gli altri incontri sono ancora in corso.
+      anyLost = anyLost || picks.some(p => p.result === "PERSA");
+      const status = anyLost ? "PERSA" : allFinal ? "VINTA" : "IN ATTESA";
+      const scoresChanged = picks.some((p,i) => p !== bet.picks[i]);
+      const statusChanged = status !== bet.status;
+      if (!scoresChanged && !statusChanged) return bet;
       changed = true;
-      return { ...bet, picks, status: allWon ? "VINTA" : "PERSA", settledAt: new Date().toISOString() };
+      return {...bet, picks, status,
+        ...(allFinal ? {settledAt:bet.settledAt || new Date().toISOString()} : {})};
     });
-    if (changed) await writeSavedBets(updated);
+    if (changed) {
+      await writeSavedBets(updated);
+      if (!currentUser) renderSavedBets();
+    }
   }
 
   function renderSavedBets() {
@@ -2325,7 +1547,7 @@
     savedCount.textContent = archived.length + (archived.length === 1 ? " archiviata" : " archiviate");
     pendingBetsList.innerHTML = pending.length ? pending.map(bet => `
       <div class="pending-ticket"><strong>Biglietto #${safeText(ticketNumber(bet))} · IN ATTESA</strong>
-      <div class="mini">${(bet.picks||[]).map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}`).join("<br>")}</div>
+      <div class="mini">${(bet.picks||[]).map(p => `${safeText(p.home)} – ${safeText(p.away)} · ${safeText(p.selection)} @ ${p.betlabOdd ? oddText(p.betlabOdd) : "n.d."}${p.finalScore ? " · " + safeText(p.finalScore) + " " + safeText(p.result) : ""}`).join("<br>")}</div>
       <div class="mini"><b>Quota Sisal ${oddText(bet.sisalOdd)}</b> · ${money(bet.stake)} → ${money(bet.potentialReturn)}</div>
       <button class="delete-pending-ticket" type="button" data-bet-id="${safeText(bet.id)}">ELIMINA GIOCATA</button></div>`).join("") : '<div class="empty-slip">Nessuna giocata in corso.</div>';
     pendingBetsList.querySelectorAll(".delete-pending-ticket").forEach(button => button.addEventListener("click", async () => {
@@ -2372,11 +1594,7 @@
     clearError();
 
     const metrics =
-      combinationScore(
-        currentResult.picks,
-        currentStake,
-        currentTarget
-      );
+      combinationScore(currentResult.picks, currentStake);
 
     realStakeInput.value =
       Number(currentStake).toFixed(2);
@@ -2482,6 +1700,9 @@
     betForm.classList.remove("open");
     saveBetButton.style.display = "none";
     currentResult = null;
+    selectedMatchIds.clear();
+    renderDailyRecommendations();
+    createBet(false);
     sisalOddInput.value = "";
     realStakeInput.value = "";
     realReturnInput.value = "";
@@ -2496,205 +1717,22 @@
   }
 
 
-  function createBet() {
-
+  function createBet(scrollToSlip = true) {
     clearError();
-
-
-    const stake =
-      Number(
-        stakeInput.value
-      );
-
-
-    const targetRaw =
-      targetInput.value.trim();
-
-
-    const target =
-      targetRaw === ""
-        ? NaN
-        : Number(targetRaw);
-
-
-    if (
-      !Number.isFinite(stake) ||
-      stake <= 0
-    ) {
-
-      showError(
-        "Inserisci una puntata valida."
-      );
-
+    const stake = Number(stakeInput.value);
+    if (!Number.isFinite(stake) || stake <= 0) {
+      showError("Inserisci un importo valido.");
       return;
-
     }
-
-
-    if (
-      targetRaw !== ""
-      &&
-      (
-        !Number.isFinite(target)
-        ||
-        target <= 0
-      )
-    ) {
-
-      showError(
-        "Inserisci un obiettivo valido oppure lascia il campo vuoto."
-      );
-
-      return;
-
+    const picks = dailyRecommendations.filter(row => selectedMatchIds.has(String(row.match.fixtureId)));
+    const result = {picks, metrics: combinationScore(picks, stake)};
+    renderResult(result, stake);
+    if (scrollToSlip && picks.length) {
+      document.getElementById("results").scrollIntoView({behavior:"smooth",block:"start"});
     }
-
-
-    const options =
-      prepareOptions();
-
-
-    if (!options.length) {
-
-      showError(
-        "Non ci sono pronostici con quota utilizzabili."
-      );
-
-      return;
-
-    }
-
-
-    let result = null;
-
-
-    if (autoMode) {
-
-      result =
-        searchAuto(
-          options,
-          stake,
-          target
-        );
-
-    } else {
-
-      let requestedCount =
-        Number(
-          matchCountInput.value
-        );
-
-
-      requestedCount =
-        Math.floor(
-          requestedCount
-        );
-
-
-      if (
-        !Number.isFinite(
-          requestedCount
-        )
-        ||
-        requestedCount < 1
-      ) {
-
-        showError(
-          "Inserisci il numero di incontri desiderato."
-        );
-
-        return;
-
-      }
-
-
-      if (
-        requestedCount >
-        options.length
-      ) {
-
-        showError(
-          "Hai richiesto "
-          +
-          requestedCount
-          +
-          " incontri, ma BETLAB dispone attualmente di "
-          +
-          options.length
-          +
-          " incontri utilizzabili."
-        );
-
-        return;
-
-      }
-
-
-      result =
-        searchFixedCount(
-          options,
-          requestedCount,
-          stake,
-          target
-        );
-
-    }
-
-
-    renderResult(
-      result,
-      stake,
-      target
-    );
-
   }
 
-
-  autoButton.addEventListener(
-    "click",
-    () => {
-
-      autoMode =
-        !autoMode;
-
-
-      if (autoMode) {
-
-        autoButton.classList.remove(
-          "off"
-        );
-
-        autoButton.textContent =
-          "AUTO";
-
-        matchCountInput.disabled =
-          true;
-
-        matchHelp.textContent =
-          "AUTO: BETLAB decide quanti incontri utilizzare.";
-
-      } else {
-
-        autoButton.classList.add(
-          "off"
-        );
-
-        autoButton.textContent =
-          "PERSONALIZZATO";
-
-        matchCountInput.disabled =
-          false;
-
-        matchCountInput.focus();
-
-        matchHelp.textContent =
-          "Scrivi direttamente quanti incontri vuoi utilizzare.";
-
-      }
-
-    }
-  );
-
+  stakeInput.addEventListener("change", () => createBet(false));
 
   saveBetButton.addEventListener(
     "click",
@@ -2721,99 +1759,36 @@
 
 
   async function loadData() {
-
+    clearError();
+    refreshButton.disabled = true;
+    availability.textContent = "Aggiornamento analisi in corso...";
     try {
-
-      const response =
-        await fetch(
-          DATA_URL,
-          {
-            cache: "no-store"
-          }
-        );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "HTTP "
-          +
-          response.status
-        );
-
-      }
-
-
-      betlabData =
-        await response.json();
-
+      const response = await fetch("data/betlab-analysis.json?v="+Date.now(), {cache:"no-store"});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      betlabData = await response.json();
+      if (!Array.isArray(betlabData?.analysis)) throw new Error("Struttura analisi non valida");
       try {
-        const historyResponse = await fetch(HISTORY_URL, { cache: "no-store" });
+        const historyResponse = await fetch("data/betlab-history.json?v="+Date.now(), {cache:"no-store"});
         if (historyResponse.ok) {
           const historyJson = await historyResponse.json();
-          betlabHistory = Array.isArray(historyJson) ? historyJson : (Array.isArray(historyJson.history) ? historyJson.history : (Array.isArray(historyJson.matches) ? historyJson.matches : []));
+          betlabHistory = Array.isArray(historyJson) ? historyJson :
+            (Array.isArray(historyJson.history) ? historyJson.history :
+              (Array.isArray(historyJson.matches) ? historyJson.matches : []));
         }
-      } catch (historyError) {
-        console.warn("Storico risultati non disponibile", historyError);
-      }
-
+      } catch(error) { console.warn("Storico risultati non disponibile",error); }
+      prepareDailyRecommendations();
+      renderDailyRecommendations();
       await refreshBetStatuses();
       renderSavedBets();
-
-
-      const options =
-        prepareOptions();
-
-
-      const candidateCount =
-        options.reduce(
-          (sum, option) =>
-            sum +
-            option.candidates.length,
-          0
-        );
-
-
-      availability.textContent =
-        options.length
-        +
-        (
-          options.length === 1
-            ? " incontro"
-            : " incontri"
-        )
-        +
-        " · "
-        +
-        candidateCount
-        +
-        " pronostici con quota utilizzabili";
-
-
-      if (!options.length) {
-
-        availability.textContent =
-          "Nessun pronostico disponibile.";
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-      availability.textContent =
-        "Errore caricamento dati BETLAB.";
-
-      showError(
-        "Non è stato possibile caricare betlab-analysis.json."
-      );
-
-    }
-
+      createBet(false);
+    } catch(error) {
+      console.error(error);
+      availability.textContent = "Dati BETLAB non disponibili.";
+      dailyMatches.innerHTML = '<div class="daily-empty">Impossibile caricare le analisi. Riprova con AGGIORNA DATI.</div>';
+      showError("Errore di caricamento: " + String(error.message || error));
+    } finally {refreshButton.disabled = false;}
   }
-
+  refreshButton.addEventListener("click", loadData);
 
   authButton.addEventListener("click", async () => {
     clearError();
