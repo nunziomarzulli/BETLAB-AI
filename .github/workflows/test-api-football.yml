@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V9.1 - Contesto verificabile
+      - name: BETLAB Prediction Engine V9.2 - Contesto verificabile
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -52,6 +52,12 @@ jobs:
 
           MAX_HISTORY = 10
           MAX_SCORE_GOALS = 5
+
+          # Qualita' della forma recente: le partite del 2025 non possono
+          # determinare da sole un pronostico dell'ottobre 2026.
+          RECENT_WINDOW_DAYS = 90
+          MIN_RECENT_GAMES = 3
+          MAX_LAST_GAME_AGE_DAYS = 30
 
           MIN_MARKET_INDEX = 55.0
           MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
@@ -1013,6 +1019,54 @@ jobs:
 
 
           # ==========================================================
+          # FRESCHEZZA DELLO STORICO: BLOCCA PRONOSTICI CON DATI DATATI
+          # ==========================================================
+          # Non e' una calibrazione della probabilita': e' un controllo
+          # preliminare per evitare stime fondate soltanto su dati vecchi.
+          # Richiediamo almeno 3 incontri negli ultimi 90 giorni, con
+          # l'ultimo incontro registrato non piu' vecchio di 30 giorni.
+          # La mancata copertura comporta NESSUN PRONOSTICO, non una
+          # confidenza inventata. La partita resta visibile nell'analisi.
+          def history_freshness(games, match_date):
+              try:
+                  target = datetime.fromisoformat(str(match_date)[:10]).date()
+              except (TypeError, ValueError):
+                  return {"eligible": False, "reason": "data_non_valida",
+                          "recentGames": 0, "lastRecorded": None,
+                          "lastAgeDays": None}
+              valid = []
+              for game in games:
+                  try:
+                      played = datetime.fromisoformat(str(game.get("date") or "")[:10]).date()
+                  except (ValueError, TypeError, AttributeError):
+                      continue
+                  age = (target - played).days
+                  if age > 0:
+                      valid.append((played, age))
+              valid.sort(reverse=True)
+              recent = sum(1 for _day, age in valid if age <= RECENT_WINDOW_DAYS)
+              last_day = valid[0][0] if valid else None
+              last_age = valid[0][1] if valid else None
+              if len(valid) < MIN_TEAM_HISTORY:
+                  reason = "storico_insufficiente"
+              elif last_age is None or last_age > MAX_LAST_GAME_AGE_DAYS:
+                  reason = "storico_non_recente"
+              elif recent < MIN_RECENT_GAMES:
+                  reason = "poche_gare_recenti"
+              else:
+                  reason = "ok"
+              return {
+                  "eligible": reason == "ok",
+                  "reason": reason,
+                  "recentGames": recent,
+                  "lastRecorded": last_day.isoformat() if last_day else None,
+                  "lastAgeDays": last_age,
+                  "windowDays": RECENT_WINDOW_DAYS,
+                  "requiredRecentGames": MIN_RECENT_GAMES,
+                  "maxLastAgeDays": MAX_LAST_GAME_AGE_DAYS
+              }
+
+          # ==========================================================
           # ARRICCHIMENTO PROGRESSIVO DELLO STORICO (BUDGET LIMITATO)
           # ==========================================================
           # Il feed iniziale puo' includere centinaia di fixture, ma solo
@@ -1065,7 +1119,11 @@ jobs:
                   if not isinstance(team_id, int) or team_id <= 0 or not team_name:
                       continue
                   key = str(team_id)
-                  if key in requested_teams or len(team_games(team_name, date_limit)) >= 5:
+                  # Anche uno storico con 10 gare puo' essere vecchio di mesi.
+                  # In quel caso tentiamo comunque il recupero delle ultime
+                  # partite, rispettando il budget di 4 chiamate per run.
+                  if key in requested_teams or history_freshness(
+                          team_games(team_name, date_limit), date_limit)["eligible"]:
                       continue
                   requested_teams.add(key)
                   if now_ts - int(last_attempt.get(key) or 0) < LOOKUP_COOLDOWN_SECONDS:
@@ -2585,6 +2643,13 @@ jobs:
                   len(away_games)
               )
 
+              # Una forma storica quantitativamente ampia puo' comunque
+              # essere inadatta per un pronostico se manca l'ultimo mese.
+              home_freshness = history_freshness(home_games, date)
+              away_freshness = history_freshness(away_games, date)
+              history_eligible = (home_freshness["eligible"]
+                                  and away_freshness["eligible"])
+
 
               candidate_matches.append({
 
@@ -2629,7 +2694,15 @@ jobs:
                       away_games,
 
                   "historyScore":
-                      history_score
+                      history_score,
+
+                  "historyEligible":
+                      history_eligible,
+
+                  "historyQuality": {
+                      "home": home_freshness,
+                      "away": away_freshness
+                  }
 
               })
 
@@ -2689,63 +2762,29 @@ jobs:
           total_market_candidates = 0
           total_candidates_with_odds = 0
           exact_scores_with_odds = 0
+          stale_or_insufficient_matches = 0
+          recent_eligible_matches = 0
 
 
           # ==========================================================
           # DATI CONTESTUALI PRE-PARTITA - SOLO FONTI VERIFICABILI
           # ==========================================================
-          # La chiamata injuries accetta fino a 20 fixture IDs per volta.
-          # Limitiamo il numero di richieste per rispettare il piano API.
-          # Se non e' disponibile NON registriamo "nessun infortunato".
+          # Il piano API-Football Free non consente /injuries?ids=.
+          # Non inviamo richieste vietate e non deduciamo la rosa completa.
           # Le assenze non cambiano probabilita' senza dati sull'impatto.
 
-          MAX_CONTEXT_FIXTURES = 20
-          # I dati mancanti non equivalgono a un'infermeria vuota.
+          # Piano API-Football Free: il parametro "ids" di /injuries e'
+          # stato rifiutato dal provider. Evitiamo chiamate note come vietate
+          # e non trasformiamo mai la mancanza di dati in "rosa completa".
           injuries_by_fixture = {}
           requested_injury_ids = set()
-          injuries_api_status = "non_consultata"
-          injury_fetch_note = "Nessuna richiesta effettuata"
+          injuries_api_status = "non_disponibile_piano"
+          injury_fetch_note = (
+              "Indisponibilita' non verificabili con il piano API attuale: "
+              "endpoint /injuries con parametro ids non autorizzato. "
+              "Controllare fonti ufficiali prima della partita."
+          )
           injury_records = 0
-
-          eligible_context = [m for m in candidate_matches
-                              if len(m["homeGames"]) >= MIN_TEAM_HISTORY
-                              and len(m["awayGames"]) >= MIN_TEAM_HISTORY]
-          context_fixtures = eligible_context[:MAX_CONTEXT_FIXTURES]
-          context_ids = [int(m["fixtureId"]) for m in context_fixtures]
-          if context_ids:
-              requested_injury_ids = set(context_ids)
-              try:
-                  response = api_get("injuries", {"ids": "-".join(map(str, context_ids))})
-                  rows = response.get("response")
-                  if not isinstance(rows, list):
-                      raise ValueError("Formato risposta /injuries non valido")
-                  injuries_api_status = "consultata"
-                  for record in rows:
-                      if not isinstance(record, dict):
-                          continue
-                      fixture_id = (record.get("fixture") or {}).get("id")
-                      if not isinstance(fixture_id, int) or fixture_id not in requested_injury_ids:
-                          continue
-                      team = record.get("team") or {}
-                      player = record.get("player") or {}
-                      if not isinstance(team.get("id"), int) or not player.get("name"):
-                          continue
-                      item = {
-                          "teamId": team["id"],
-                          "name": str(player["name"])[:100],
-                          "playerId": player.get("id"),
-                          "type": str(player.get("type") or "Non specificato")[:60],
-                          "reason": str(player.get("reason") or "Motivo non riportato")[:120]
-                      }
-                      injuries_by_fixture.setdefault(fixture_id, []).append(item)
-                      injury_records += 1
-                  injury_fetch_note = ("/injuries: " + str(len(rows)) +
-                                       " righe API; " + str(injury_records) +
-                                       " segnalazioni con fixture e squadra verificate")
-              except Exception as exc:
-                  injuries_api_status = "errore"
-                  injury_fetch_note = "API /injuries non disponibile: " + str(exc)[:180]
-                  print("NOTA: indisponibilita' non verificabili:", exc)
 
           def venue_summary(games, is_home):
               subset = [g for g in games if g.get("home") is is_home]
@@ -2816,7 +2855,7 @@ jobs:
               if not valid_ids:
                   injury_note = "Identificativi delle squadre incoerenti: assenze non verificabili"
               elif not fetched:
-                  injury_note = injury_fetch_note if fid in requested_injury_ids else "Incontro non ancora consultato nell'endpoint /injuries"
+                  injury_note = injury_fetch_note
               elif not has_reports:
                   injury_note = "Endpoint consultato, ma nessuna segnalazione ricevuta per questa partita: non equivale a rosa completa"
               else:
@@ -2828,7 +2867,7 @@ jobs:
                   "source": "API-Football + storico BETLAB",
                   "generatedAt": datetime.now(ROME).isoformat(),
                   "injuriesStatus": "disponibile" if has_reports else "non_verificato",
-                  "injuriesRequestStatus": injuries_api_status if fetched else "non_consultata_o_errore",
+                  "injuriesRequestStatus": injuries_api_status,
                   "injuriesNote": injury_note,
                   "homeInjuries": by_side(h_id) if has_reports else [],
                   "awayInjuries": by_side(a_id) if has_reports else [],
@@ -2842,6 +2881,8 @@ jobs:
                   "awayLastRecorded": away_gap["lastRecorded"],
                   "homeHistoryAgeDays": home_gap["ageDays"],
                   "awayHistoryAgeDays": away_gap["ageDays"],
+                  "historyEligible": match["historyEligible"],
+                  "historyQuality": match["historyQuality"],
                   "venue": {"name": str(venue.get("name") or "")[:120],
                             "city": str(venue.get("city") or "")[:100]},
                   "homeTeamId": h_id,
@@ -2871,12 +2912,16 @@ jobs:
               )
 
 
-              candidates = (
-                  build_market_candidates(
-                      home_games,
-                      away_games
-                  )
-              )
+              # La scelta e' esplicitamente disabilitata se la forma di
+              # almeno una squadra e' datata o poco documentata.
+              # Queste fixture restano nell'array analysis ma senza quote
+              # utilizzabili; nessun ticket storico viene modificato.
+              if match["historyEligible"]:
+                  recent_eligible_matches += 1
+                  candidates = build_market_candidates(home_games, away_games)
+              else:
+                  stale_or_insufficient_matches += 1
+                  candidates = []
 
 
               # scarta mercati ordinari sotto indice minimo
@@ -3132,6 +3177,9 @@ jobs:
                           "historyScore"
                       ],
 
+                  "historyEligible": match["historyEligible"],
+                  "historyQuality": match["historyQuality"],
+
                   "context": fixture_context(match),
 
                   "prediction":
@@ -3146,6 +3194,8 @@ jobs:
           print("Contesto indisponibili:", len(requested_injury_ids),
                 "fixture richieste |", injury_fetch_note,
                 "| stato:", injuries_api_status)
+          print("Storico recente idoneo:", recent_eligible_matches,
+                "| esclusi per date/campione:", stale_or_insufficient_matches)
 
           # ==========================================================
           # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
@@ -3284,7 +3334,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V9.1 CONTEXT MULTI-MARKET",
+                  "BETLAB V9.2 CONTEXT MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
@@ -3302,6 +3352,14 @@ jobs:
 
               "matchesWithCandidates":
                   matches_with_candidates,
+
+              "matchesHistoryRecent": recent_eligible_matches,
+              "matchesHistoryUnreliable": stale_or_insufficient_matches,
+              "historyPolicy": {
+                  "recentWindowDays": RECENT_WINDOW_DAYS,
+                  "minRecentGamesPerTeam": MIN_RECENT_GAMES,
+                  "maxDaysFromLastMatch": MAX_LAST_GAME_AGE_DAYS
+              },
 
               "marketCandidates":
                   total_market_candidates,
@@ -3502,7 +3560,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V7 OK")
+          print("BETLAB MULTI-MARKET ENGINE V9.2 OK")
           print("==============================================")
 
           PY
@@ -3519,7 +3577,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V7.3 multi-market"
+          git commit -m "Aggiorna BETLAB V9.2 - controllo storico recente"
 
           git pull --rebase origin main
 
