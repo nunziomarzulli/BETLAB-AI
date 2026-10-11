@@ -963,6 +963,137 @@
     }
     @media(min-width:981px){.results{max-height:calc(100dvh - 20px)}}
 
+
+    /* BETLAB 8.2 — gerarchia leggibile: cartellini chiari, evidenza su partita e pronostico.
+       Soltanto presentazione; nessuna modifica ai dati o ai criteri del motore. */
+    .page { width:min(1470px,calc(100% - 38px)); padding:24px 0 55px; }
+    header { margin-bottom:23px; }
+    h1 { font-size:clamp(32px,3.1vw,42px); letter-spacing:-1.5px; }
+    .subtitle { font-size:13px; line-height:1.55; color:#b1bdcc; max-width:875px; }
+    .main-grid { grid-template-columns:minmax(0,1fr) 320px; gap:22px; }
+    .daily-head { margin:22px 0 12px; align-items:end; }
+    .daily-head h2 { font-size:20px; letter-spacing:-.4px; }
+    .daily-head p { font-size:11px; line-height:1.4; margin-top:4px; }
+    .refresh-button { font-size:11px; padding:9px 12px; }
+    .availability { font-size:11px; margin:7px 0 10px; color:#b4c5d1; }
+    .daily-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:8px; align-items:stretch; }
+    .daily-card {
+      display:flex; flex-direction:column; min-width:0; padding:16px 16px 14px;
+      border:1px solid #d2e0d8; border-radius:13px; background:#f8fbf9;
+      color:#1a3024; box-shadow:0 4px 12px rgba(0,0,0,.08);
+    }
+    .daily-card:hover { border-color:#93bdab; box-shadow:0 7px 22px rgba(0,0,0,.13); }
+    .daily-card.selected { background:#fff; border:2px solid #26b879; padding:15px 15px 13px; box-shadow:0 0 0 2px rgba(38,184,121,.11); }
+    .daily-card-top { gap:8px; align-items:flex-start; min-height:24px; }
+    .daily-league { font-size:10px; line-height:1.35; color:#697c72; letter-spacing:0; }
+    .daily-flag { flex:none; font-size:9px; font-weight:850; padding:4px 7px; background:#e5f2ea; border:1px solid #c3dfce; color:#176c46; border-radius:6px; }
+    .daily-flag.low { color:#935015; background:#fff0dd; border-color:#f1d2a5; }
+    .daily-teams { font-size:19px; line-height:1.24; margin:10px 0 13px; min-height:48px; color:#172a20; font-weight:900; letter-spacing:-.25px; overflow-wrap:anywhere; }
+    .daily-pick { gap:12px; min-height:88px; padding:12px; border:1px solid #cce4d6; border-radius:10px; background:#e9f5ee; color:#173d2a; align-items:center; }
+    .daily-pick-main { display:flex; flex-direction:column; gap:3px; min-width:0; }
+    .daily-pick .daily-muted { color:#5b7466; font-size:9px; letter-spacing:.7px; font-weight:800; }
+    .daily-pick strong { color:#087443; font-size:24px; line-height:1.13; letter-spacing:-.45px; overflow-wrap:anywhere; }
+    .daily-pick-market { font-size:11px; color:#4f6758; line-height:1.25; }
+    .daily-odd { min-width:73px; text-align:right; padding-left:11px; border-left:1px solid #bdd8c7; font-size:23px; line-height:1.15; color:#153e2a; }
+    .daily-odd .daily-muted { display:block; margin-bottom:5px; font-size:9px; }
+    .daily-pick.market-goals { background:#eaf3fc; border-color:#c5d9f0; }
+    .daily-pick.market-goals strong { color:#145ba9; }
+    .daily-pick.market-goals .daily-muted,.daily-pick.market-goals .daily-pick-market { color:#516b83; }
+    .daily-pick.market-goals .daily-odd { border-color:#c7d7ea; color:#143c69; }
+    .daily-pick.market-exact { background:#fff2e7; border-color:#f1d4b5; }
+    .daily-pick.market-exact strong { color:#a94e14; }
+    .daily-pick.market-exact .daily-muted,.daily-pick.market-exact .daily-pick-market { color:#87654b; }
+    .daily-pick.market-exact .daily-odd { color:#84400f; border-color:#eed2b4; }
+    .daily-pick.market-btts { background:#ecf0ff; border-color:#d3dbf8; }
+    .daily-pick.market-btts strong { color:#4e42a6; }
+    .daily-pick.market-btts .daily-muted,.daily-pick.market-btts .daily-pick-market { color:#68638e; }
+    .daily-pick.market-btts .daily-odd { color:#40387a; border-color:#c8cced; }
+    .daily-stats { margin:11px 0 5px; gap:5px 14px; font-size:11px; line-height:1.35; color:#677b70; }
+    .daily-stats b { color:#183b29; font-size:12.5px; font-weight:900; white-space:nowrap; }
+    .daily-details { margin:9px 0 0; border-top:1px solid #dce8df; padding-top:9px; }
+    .daily-details summary { color:#355e49; font-size:12px; font-weight:800; }
+    .daily-details summary::before { color:#108553; font-size:14px; }
+    .daily-details summary span { color:#84958a; font-size:10px; }
+    .daily-reason { color:#506659; font-size:11.5px; line-height:1.6; margin:9px 0 3px; }
+    .daily-actions { margin-top:auto; padding:13px 0 0; border-top:0; gap:10px; }
+    .daily-actions input { accent-color:#14885a; width:20px; height:20px; }
+    .daily-actions label { color:#145e3b; font-size:12px; font-weight:900; letter-spacing:.05px; }
+    .daily-card.selected .daily-actions label { color:#08683c; }
+    .control-panel { margin-top:18px; padding:16px 18px; }
+    .control-panel label { font-size:11px; }
+    .control-panel input { height:47px; font-size:16px; }
+    .control-panel .stake-tip { font-size:11px; line-height:1.55; }
+    .create-button { height:44px; font-size:12px; }
+    .results { border-color:#d4e5db; background:#f6faf7; border-radius:15px; max-height:calc(100dvh - 32px); }
+    .results::before { font-size:10px; color:#1e9559; padding:10px 14px 0; }
+    .results-header { padding:14px; }
+    .results h2 { font-size:17px; }
+    .results-sub { font-size:11px; }
+    #cards { padding:0 12px; }
+    .match-card { padding:11px 2px; }
+    .teams { font-size:14px; font-weight:850; }
+    .pick-box { padding:10px; }
+    .selection { font-size:17px; }
+    .odd { font-size:17px; }
+    .summary-grid { padding:13px 14px; gap:11px; }
+    .summary-value { font-size:18px; }
+    .summary-message { font-size:10px; line-height:1.5; }
+    .pending-wrap { padding:0 12px 12px; }
+    .pending-ticket { padding:11px; }
+    .pending-ticket strong { font-size:12px; }
+    .pending-ticket .mini { font-size:10px; line-height:1.5; }
+    .delete-pending-ticket { font-size:11px; }
+    .saved-bets { margin-top:29px; }
+    .saved-bets-head h2 { font-size:22px; }
+    .finance-panel { padding:16px 18px; }
+    .finance-panel h3 { font-size:16px; }
+    .finance-numbers strong { font-size:20px; }
+    .archive-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+    .ticket { padding:15px!important; border-radius:12px; }
+    .ticket-title { font-size:15px!important; }
+    .ticket-date { font-size:10px; }
+    .ticket-status { font-size:9px; }
+    .ticket-details summary { font-size:12px; }
+    .ticket-stat-value { font-size:15px!important; }
+    .real-outcome { gap:8px; }
+    .real-outcome label { font-size:11px; }
+    .real-outcome select { width:98px; max-width:98px; font-size:11px; }
+    .real-outcome input { width:100px; max-width:100px; font-size:11px; }
+    .real-outcome .update-real { font-size:10px; }
+    .delete-ticket { height:34px; font-size:10px; }
+    @media (max-width:1470px) {
+      .daily-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .archive-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+    @media (max-width:1060px) {
+      .main-grid { grid-template-columns:minmax(0,1fr) 295px; gap:15px; }
+      .daily-teams { font-size:17px; }
+      .daily-pick strong { font-size:21px; }
+      .daily-grid { gap:10px; }
+    }
+    @media (max-width:980px) {
+      .main-grid { grid-template-columns:1fr; }
+      .results { position:static; max-height:none; }
+      .daily-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .archive-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:700px) {
+      .page { width:calc(100% - 22px); padding:16px 0 32px; }
+      header { margin-bottom:15px; }
+      h1 { font-size:32px; }
+      .subtitle { font-size:12px; }
+      .daily-head { align-items:flex-start; gap:8px; margin-top:20px; }
+      .daily-head h2 { font-size:19px; }
+      .refresh-button { font-size:10px; padding:8px; }
+      .daily-grid { grid-template-columns:1fr; gap:10px; }
+      .daily-card { padding:16px; }
+      .daily-card.selected { padding:15px; }
+      .daily-teams { font-size:19px; min-height:0; margin:10px 0 13px; }
+      .daily-pick strong { font-size:23px; }
+      .daily-stats { font-size:11px; }
+      .archive-grid { grid-template-columns:1fr; }
+    }
+
 </style>
 </head>
 
@@ -1431,14 +1562,17 @@
       const m = row.match, c = row.candidate, a = row.assessment;
       const id = String(m.fixtureId);
       const checked = selectedMatchIds.has(id);
+      const marketClass = c.market === "Risultato Esatto" ? "market-exact" :
+        c.market === "Totale Gol" ? "market-goals" :
+        c.market === "Goal/No Goal" ? "market-btts" : "market-regular";
       return `<article class="daily-card ${checked ? "selected" : ""}" data-fixture-id="${safeText(id)}">
         <div class="daily-card-top"><div class="daily-league">${safeText(m.country)} · ${safeText(m.league)} · ${formatDate(m)}</div>
           <span class="daily-flag ${a.exact ? "low" : ""}">${a.exact ? "RISCHIO ALTO" : "ANALISI"}</span></div>
         <div class="daily-teams">${safeText(m.home.name)} – ${safeText(m.away.name)}</div>
-        <div class="daily-pick"><div><span class="daily-muted">SCELTA BETLAB</span><div><strong>${safeText(c.selection)}</strong></div><div class="daily-muted">${safeText(c.market)}</div></div>
+        <div class="daily-pick ${marketClass}"><div class="daily-pick-main"><span class="daily-muted">PRONOSTICO BETLAB</span><strong>${safeText(c.selection)}</strong><span class="daily-pick-market">${safeText(c.market)}</span></div>
           <div class="daily-odd"><span class="daily-muted">QUOTA</span><div>${oddText(a.odd)}</div></div></div>
-        <div class="daily-stats"><span>Prob. modello: <b>${readablePercent(a.rawP)}</b></span><span>Valore prudenziale: <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
-        <details class="daily-details"><summary>Dettagli dell’analisi <span>Campione ${a.homeGames}+${a.awayGames}</span></summary>
+        <div class="daily-stats"><span>Probabilità stimata <b>${readablePercent(a.rawP)}</b></span><span>Vantaggio teorico <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
+        <details class="daily-details"><summary>Mostra analisi <span>${a.homeGames}+${a.awayGames} partite</span></summary>
           <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
         </details>
         <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
