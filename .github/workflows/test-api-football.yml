@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V7.2
+      - name: BETLAB Prediction Engine V7.3
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -54,6 +54,7 @@ jobs:
           MAX_SCORE_GOALS = 5
 
           MIN_MARKET_INDEX = 55.0
+          MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
           MIN_EXACT_SCORE_PROBABILITY = 0.025
 
 
@@ -326,7 +327,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V7")
+          print("BETLAB MULTI-MARKET ENGINE V7.3")
           print("==============================================")
           print("")
 
@@ -1010,6 +1011,115 @@ jobs:
                   -limit:
               ]
 
+
+          # ==========================================================
+          # ARRICCHIMENTO PROGRESSIVO DELLO STORICO (BUDGET LIMITATO)
+          # ==========================================================
+          # Il feed iniziale puo' includere centinaia di fixture, ma solo
+          # poche con almeno 5 risultati recenti per ciascuna squadra.
+          # NON abbassiamo la soglia di affidabilita': recuperiamo pochi
+          # risultati reali alla volta, usando le ID squadra API-Football.
+          # Il piano Free puo' negare alcune richieste: nessun blocco del feed.
+
+          LOOKUPS_PER_RUN = 4
+          LOOKUP_COOLDOWN_SECONDS = 20 * 3600
+          BACKFILL_STATE_FILE = "data/betlab-history-enrichment-state.json"
+          enrichment_state = load_json(BACKFILL_STATE_FILE, {})
+          if not isinstance(enrichment_state, dict):
+              enrichment_state = {}
+          last_attempt = enrichment_state.get("attempted", {})
+          if not isinstance(last_attempt, dict):
+              last_attempt = {}
+
+          now_ts = int(datetime.now(ROME).timestamp())
+          future_fixtures = []
+          for item in all_api_matches:
+              f = item.get("fixture") or {}
+              lg = item.get("league") or {}
+              ts = int(f.get("timestamp") or 0)
+              if ((f.get("status") or {}).get("short") not in {"NS", "TBD"}
+                  or ts <= now_ts or league_priority(lg.get("country"), lg.get("name")) <= 0):
+                  continue
+              future_fixtures.append(item)
+
+          future_fixtures.sort(key=lambda item: (
+              -league_priority((item.get("league") or {}).get("country"),
+                               (item.get("league") or {}).get("name")),
+              int((item.get("fixture") or {}).get("timestamp") or 0)
+          ))
+          requested_teams = set()
+          attempted_requests = 0
+          enrichment_added = 0
+          historical_keys = {logical_history_key(record) for record in history}
+
+          for item in future_fixtures:
+              if attempted_requests >= LOOKUPS_PER_RUN:
+                  break
+              date_limit = str((item.get("fixture") or {}).get("date") or "")[:10]
+              teams = item.get("teams") or {}
+              for side in ("home", "away"):
+                  if attempted_requests >= LOOKUPS_PER_RUN:
+                      break
+                  obj = teams.get(side) or {}
+                  team_id, team_name = obj.get("id"), obj.get("name")
+                  if not isinstance(team_id, int) or team_id <= 0 or not team_name:
+                      continue
+                  key = str(team_id)
+                  if key in requested_teams or len(team_games(team_name, date_limit)) >= 5:
+                      continue
+                  requested_teams.add(key)
+                  if now_ts - int(last_attempt.get(key) or 0) < LOOKUP_COOLDOWN_SECONDS:
+                      continue
+
+                  attempted_requests += 1
+                  last_attempt[key] = now_ts
+                  try:
+                      result = api_get("fixtures", {"team": team_id, "last": MAX_HISTORY})
+                      for record in result.get("response") or []:
+                          fixture = record.get("fixture") or {}
+                          status = (fixture.get("status") or {}).get("short")
+                          if status not in {"FT", "AET", "PEN"}:
+                              continue
+                          date = str(fixture.get("date") or "")[:10]
+                          if not date or date >= date_limit:
+                              continue
+                          clubs = record.get("teams") or {}
+                          home = (clubs.get("home") or {}).get("name")
+                          away = (clubs.get("away") or {}).get("name")
+                          goals = record.get("goals") or {}
+                          hg, ag = goals.get("home"), goals.get("away")
+                          if (not home or not away or canonical(home) == canonical(away)
+                              or hg is None or ag is None):
+                              continue
+                          record_key = (date, canonical(home), canonical(away))
+                          if record_key in historical_keys:
+                              continue
+                          league = record.get("league") or {}
+                          history.append({
+                              "source": "api-football",
+                              "fixtureId": fixture.get("id"),
+                              "date": date,
+                              "timestamp": fixture.get("timestamp", 0),
+                              "country": league.get("country"),
+                              "league": league.get("name"),
+                              "home": home,
+                              "away": away,
+                              "homeGoals": int(hg),
+                              "awayGoals": int(ag)
+                          })
+                          historical_keys.add(record_key)
+                          enrichment_added += 1
+                  except Exception as exc:
+                      print("Recupero storico non disponibile per", team_name, ":", exc)
+
+          enrichment_state["attempted"] = last_attempt
+          enrichment_state["updatedAt"] = datetime.now(ROME).isoformat()
+          save_json(BACKFILL_STATE_FILE, enrichment_state)
+          if enrichment_added:
+              history.sort(key=lambda r: str(r.get("date") or ""))
+              save_json("data/betlab-history.json", history)
+          print("Ricerche storico supplementari:", attempted_requests,
+                "| Risultati aggiunti:", enrichment_added)
 
           # ==========================================================
           # STATISTICHE
@@ -2643,13 +2753,10 @@ jobs:
 
               # solo candidati con quota
               quoted_candidates = [
-
-                  c
-                  for c in candidates
-                  if c[
-                      "oddAvailable"
-                  ]
-
+                  c for c in candidates
+                  if c.get("oddAvailable")
+                  and safe_float(c.get("odd")) is not None
+                  and safe_float(c.get("odd")) >= MIN_ODD
               ]
 
 
@@ -2986,7 +3093,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V7.2 MULTI-MARKET",
+                  "BETLAB V7.3 MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
@@ -3088,7 +3195,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("RISULTATO BETLAB V7")
+          print("RISULTATO BETLAB V7.3")
           print("==============================================")
 
           print(
@@ -3216,7 +3323,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V7 multi-market"
+          git commit -m "Aggiorna BETLAB V7.3 multi-market"
 
           git pull --rebase origin main
 
