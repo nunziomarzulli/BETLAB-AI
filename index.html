@@ -1611,30 +1611,39 @@
       `Margine prudenziale teorico +${(a.conservativeEdge*100).toFixed(1)}%.${details} Stima non calibrata: possibile errore del modello o della quota.`;
   }
 
-  // Dati contestuali riferiti alla fixture API (mai ricavati dal solo nome).
+  // Contesto per fixture API. Un calendario storico incompleto non prova
+  // quanti giorni una squadra abbia effettivamente riposato.
   function renderContext(match) {
     const ctx = match?.context;
     if (!ctx) return '<div class="context-note">Contesto non disponibile nel feed. La valutazione usa solo dati storici.</div>';
-    const fmtDays = (n) => Number.isInteger(n) && n >= 0 ? `${n} giorni liberi` : 'n.d.';
+    const fmtRest = (days, status, lastDate, age) => {
+      if (status === 'storico_non_recente') {
+        return `storico non recente (ultima gara registrata ${safeText(lastDate || 'n.d.')}, ${Number(age) || '?'} giorni prima)`;
+      }
+      if (status === 'storico_insufficiente' || !Number.isInteger(days) || days < 0) return 'storico insufficiente';
+      return `${days} giorni dall’ultima gara registrata (dato indicativo)`;
+    };
     const h = ctx.homeVenueForm || {}, a = ctx.awayVenueForm || {};
     const report = (stats, place) => Number(stats.played) > 0 ?
       `${Number(stats.played)} gare ${place} · ${Number(stats.wins)}V ${Number(stats.draws)}N ${Number(stats.losses)}P · ${Number(stats.avgGF).toFixed(1)} fatti / ${Number(stats.avgGA).toFixed(1)} subiti` :
       `Nessuna gara ${place} nello storico`;
-    const verified = ctx.injuriesStatus === 'disponibile';
     const injuryList = (items) => Array.isArray(items) && items.length ? items.slice(0,8).map(item =>
       `<li>${safeText(item.name)} · ${safeText(item.type)}${item.reason ? ' (' + safeText(item.reason) + ')' : ''}</li>`).join('') :
-      '<li>Nessuna indisponibilità segnalata dalla fonte (non garantisce rosa completa).</li>';
+      '<li>Nessuna segnalazione per questa squadra: elenco non esaustivo.</li>';
+    const verified = ctx.injuriesStatus === 'disponibile';
     const venueText = [ctx.venue?.name, ctx.venue?.city].filter(Boolean).join(' · ');
+    const stale = [ctx.homeRestStatus, ctx.awayRestStatus].includes('storico_non_recente');
     return `<div class="context-section">
       <strong>Contesto pre-partita</strong>
-      <div class="context-line"><b>Casa:</b> ${safeText(report(h,'in casa'))}</div>
-      <div class="context-line"><b>Trasferta:</b> ${safeText(report(a,'in trasferta'))}</div>
-      <div class="context-line"><b>Riposo:</b> casa ${safeText(fmtDays(ctx.homeRestDays))} · ospiti ${safeText(fmtDays(ctx.awayRestDays))}</div>
+      ${stale ? '<div class="context-line" style="color:#a24516;font-weight:800">Attenzione: uno o entrambi gli storici sono datati. Rendimento e probabilità potrebbero non rappresentare la forma attuale.</div>' : ''}
+      <div class="context-line"><b>Casa (storico):</b> ${safeText(report(h,'in casa'))}</div>
+      <div class="context-line"><b>Trasferta (storico):</b> ${safeText(report(a,'in trasferta'))}</div>
+      <div class="context-line"><b>Ultima gara:</b> casa ${fmtRest(ctx.homeRestDays,ctx.homeRestStatus,ctx.homeLastRecorded,ctx.homeHistoryAgeDays)} · ospiti ${fmtRest(ctx.awayRestDays,ctx.awayRestStatus,ctx.awayLastRecorded,ctx.awayHistoryAgeDays)}</div>
       ${venueText ? `<div class="context-line"><b>Stadio:</b> ${safeText(venueText)}</div>` : ''}
-      <div class="context-line"><b>Indisponibili:</b> ${verified ? 'fonte API-Football' : 'non verificati'}</div>
-      ${verified ? `<div class="context-injuries"><div><b>${safeText(match.home?.name)}</b><ul>${injuryList(ctx.homeInjuries)}</ul></div><div><b>${safeText(match.away?.name)}</b><ul>${injuryList(ctx.awayInjuries)}</ul></div></div>` :
-       `<div class="context-note">${safeText(ctx.injuriesNote || 'Endpoint non disponibile')}</div>`}
-      <div class="context-note">Dati aggiornati ${safeText(ctx.generatedAt || 'n.d.')}. Assenze e riposo non cambiano automaticamente i gol attesi: l’impatto non è calibrato. Verificare le formazioni ufficiali vicino all’inizio.</div>
+      <div class="context-line"><b>Indisponibili:</b> ${verified ? 'segnalazioni API-Football disponibili' : 'non verificati'}</div>
+      ${verified ? `<div class="context-injuries"><div><b>${safeText(match.home?.name)}</b><ul>${injuryList(ctx.homeInjuries)}</ul></div><div><b>${safeText(match.away?.name)}</b><ul>${injuryList(ctx.awayInjuries)}</ul></div></div>` : ''}
+      <div class="context-note">${safeText(ctx.injuriesNote || 'Le assenze non sono confermate.')}</div>
+      <div class="context-note">Dati aggiornati ${safeText(ctx.generatedAt || 'n.d.')}. Le assenze e il riposo non modificano automaticamente le probabilità. Consultare le formazioni ufficiali prima della partita.</div>
     </div>`;
   }
 
