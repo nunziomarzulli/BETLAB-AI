@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V9.2 - Contesto verificabile
+      - name: BETLAB Prediction Engine V9.2.1 - Fix storico
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -57,6 +57,7 @@ jobs:
           # determinare da sole un pronostico dell'ottobre 2026.
           RECENT_WINDOW_DAYS = 90
           MIN_RECENT_GAMES = 3
+          MIN_TEAM_HISTORY = 3
           MAX_LAST_GAME_AGE_DAYS = 30
 
           MIN_MARKET_INDEX = 55.0
@@ -1304,7 +1305,6 @@ jobs:
           # Smussamento bayesiano: ogni squadra contribuisce in base
           # al proprio campione; il prior evita percentuali estreme.
           PRIOR_STRENGTH = 8.0
-          MIN_TEAM_HISTORY = 3
 
           def combined_probability(
               home_games,
@@ -3334,7 +3334,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V9.2 CONTEXT MULTI-MARKET",
+                  "BETLAB V9.2.1 CONTEXT MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
@@ -3560,7 +3560,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V9.2 OK")
+          print("BETLAB MULTI-MARKET ENGINE V9.2.1 OK")
           print("==============================================")
 
           PY
@@ -3577,7 +3577,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V9.2 - controllo storico recente"
+          git commit -m "Aggiorna BETLAB V9.2.1 - fix NameError storico"
 
           git pull --rebase origin main
 
