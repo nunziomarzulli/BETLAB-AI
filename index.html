@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BETLAB AI</title>
+  <title>BETLAB AI · Analisi V9</title>
 
   <style>
     * {
@@ -1133,6 +1133,18 @@
 .pending-pick.lost{border-left:3px solid #dc4b52;padding-left:5px;background:#ffe6e6}
 @media(max-width:700px){.monitor-grid{grid-template-columns:1fr}.monitor-row{align-items:start;flex-direction:column}.monitor-row>span{text-align:left;max-width:none}}
 
+
+    /* BETLAB V9: contesto verificabile e dettagli on demand */
+    .context-section{margin-top:12px;padding:12px;border:1px solid #cdded5;border-radius:9px;background:#f0f7f3;color:#294337;font-size:12px;line-height:1.5}
+    .context-section>strong{display:block;font-size:13px;margin-bottom:7px;color:#123a27}
+    .context-line{margin:4px 0}
+    .context-injuries{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+    .context-injuries>div{min-width:0}
+    .context-injuries ul{margin:5px 0 0;padding-left:16px}
+    .context-injuries li{margin-bottom:4px;overflow-wrap:anywhere}
+    .context-note{font-size:10px;color:#64786c;line-height:1.45;margin-top:8px}
+    @media(max-width:700px){.context-injuries{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -1172,7 +1184,7 @@
 
 
     <div class="daily-head">
-      <div><h2>Analisi delle partite</h2><p>Un solo pronostico principale per incontro. Le stime sono sperimentali: nessuna vincita è garantita.</p></div>
+      <div><h2>Analisi delle partite</h2><p>Un solo pronostico principale per incontro. Le stime sono sperimentali; nei dettagli trovi anche casa/trasferta, riposo e indisponibili quando disponibili.</p></div>
       <button id="refreshButton" class="refresh-button" type="button">AGGIORNA DATI</button>
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
@@ -1599,6 +1611,33 @@
       `Margine prudenziale teorico +${(a.conservativeEdge*100).toFixed(1)}%.${details} Stima non calibrata: possibile errore del modello o della quota.`;
   }
 
+  // Dati contestuali riferiti alla fixture API (mai ricavati dal solo nome).
+  function renderContext(match) {
+    const ctx = match?.context;
+    if (!ctx) return '<div class="context-note">Contesto non disponibile nel feed. La valutazione usa solo dati storici.</div>';
+    const fmtDays = (n) => Number.isInteger(n) && n >= 0 ? `${n} giorni liberi` : 'n.d.';
+    const h = ctx.homeVenueForm || {}, a = ctx.awayVenueForm || {};
+    const report = (stats, place) => Number(stats.played) > 0 ?
+      `${Number(stats.played)} gare ${place} · ${Number(stats.wins)}V ${Number(stats.draws)}N ${Number(stats.losses)}P · ${Number(stats.avgGF).toFixed(1)} fatti / ${Number(stats.avgGA).toFixed(1)} subiti` :
+      `Nessuna gara ${place} nello storico`;
+    const verified = ctx.injuriesStatus === 'disponibile';
+    const injuryList = (items) => Array.isArray(items) && items.length ? items.slice(0,8).map(item =>
+      `<li>${safeText(item.name)} · ${safeText(item.type)}${item.reason ? ' (' + safeText(item.reason) + ')' : ''}</li>`).join('') :
+      '<li>Nessuna indisponibilità segnalata dalla fonte (non garantisce rosa completa).</li>';
+    const venueText = [ctx.venue?.name, ctx.venue?.city].filter(Boolean).join(' · ');
+    return `<div class="context-section">
+      <strong>Contesto pre-partita</strong>
+      <div class="context-line"><b>Casa:</b> ${safeText(report(h,'in casa'))}</div>
+      <div class="context-line"><b>Trasferta:</b> ${safeText(report(a,'in trasferta'))}</div>
+      <div class="context-line"><b>Riposo:</b> casa ${safeText(fmtDays(ctx.homeRestDays))} · ospiti ${safeText(fmtDays(ctx.awayRestDays))}</div>
+      ${venueText ? `<div class="context-line"><b>Stadio:</b> ${safeText(venueText)}</div>` : ''}
+      <div class="context-line"><b>Indisponibili:</b> ${verified ? 'fonte API-Football' : 'non verificati'}</div>
+      ${verified ? `<div class="context-injuries"><div><b>${safeText(match.home?.name)}</b><ul>${injuryList(ctx.homeInjuries)}</ul></div><div><b>${safeText(match.away?.name)}</b><ul>${injuryList(ctx.awayInjuries)}</ul></div></div>` :
+       `<div class="context-note">${safeText(ctx.injuriesNote || 'Endpoint non disponibile')}</div>`}
+      <div class="context-note">Dati aggiornati ${safeText(ctx.generatedAt || 'n.d.')}. Assenze e riposo non cambiano automaticamente i gol attesi: l’impatto non è calibrato. Verificare le formazioni ufficiali vicino all’inizio.</div>
+    </div>`;
+  }
+
   function renderDailyRecommendations() {
     const rows = dailyRecommendations;
     if (!rows.length) {
@@ -1622,6 +1661,7 @@
         <div class="daily-stats"><span>Probabilità stimata <b>${readablePercent(a.rawP)}</b></span><span>Vantaggio teorico <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
         <details class="daily-details"><summary>Mostra analisi <span>${a.homeGames}+${a.awayGames} partite</span></summary>
           <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
+          ${renderContext(m)}
         </details>
         <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
           <label for="pick-${safeText(id)}">${checked ? "INSERITA NELLA SCHEDINA" : "AGGIUNGI ALLA SCHEDINA"}</label></div>
