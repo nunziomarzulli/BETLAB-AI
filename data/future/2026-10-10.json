@@ -99768,8 +99768,8 @@
         "date": "2026-10-10T20:00:00+00:00",
         "timestamp": 1791662400,
         "periods": {
-          "first": null,
-          "second": null
+          "first": 1791662400,
+          "second": 1791666000
         },
         "venue": {
           "id": null,
@@ -99777,9 +99777,9 @@
           "city": null
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -99798,18 +99798,18 @@
           "id": 23495,
           "name": "Ipojuca U20",
           "logo": "https://media.api-sports.io/football/teams/23495.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 13029,
           "name": "Nautico U20",
           "logo": "https://media.api-sports.io/football/teams/13029.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 4,
+        "away": 0
       },
       "score": {
         "halftime": {
@@ -99817,8 +99817,8 @@
           "away": null
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 4,
+          "away": 0
         },
         "extratime": {
           "home": null,
