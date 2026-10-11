@@ -841,6 +841,128 @@
     .pending-result.wait{color:#65756b}
     @media(max-width:700px){.daily-grid{grid-template-columns:1fr}.daily-head{align-items:flex-start}}
 
+
+    /* BETLAB 8.1 - layout compatto (nessuna modifica ai calcoli e ai dati) */
+    .page {width:min(1540px,calc(100% - 32px));padding:18px 0 42px}
+    header{margin-bottom:18px}
+    .logo{font-size:21px}
+    .status{font-size:11px}
+    .auth-button{padding:7px 10px;font-size:11px}
+    .eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:5px}
+    h1{font-size:clamp(29px,3vw,37px);letter-spacing:-1.2px;line-height:1.07}
+    .subtitle{font-size:12px;line-height:1.45;margin-top:7px;max-width:890px}
+    .main-grid{grid-template-columns:minmax(0,1fr) 316px;gap:17px}
+    .daily-head{margin:17px 0 6px;gap:10px}
+    .daily-head h2{font-size:16px;letter-spacing:-.25px}
+    .daily-head p{font-size:10px;line-height:1.35;margin:3px 0 0}
+    .refresh-button{font-size:10px;padding:7px 10px;border-radius:7px;white-space:nowrap}
+    .availability{font-size:10px;margin:4px 0 6px}
+    .daily-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:7px}
+    .daily-card{padding:10px 11px;border-radius:10px}
+    .daily-card-top{gap:5px;align-items:center}
+    .daily-league{font-size:9px;line-height:1.25;letter-spacing:0}
+    .daily-flag{padding:3px 5px;border-radius:5px;font-size:8px}
+    .daily-teams{font-size:12px;line-height:1.3;min-height:30px;margin:5px 0 6px}
+    .daily-pick{gap:6px;padding:7px;border-radius:7px;align-items:center}
+    .daily-pick strong{font-size:13px}
+    .daily-odd{font-size:15px}
+    .daily-muted{font-size:9px}
+    .daily-stats{font-size:9.5px;line-height:1.3;margin-top:6px;gap:4px}
+    .daily-details{margin:7px 0 0;border-top:1px solid var(--border);padding-top:6px}
+    .daily-details summary{display:flex;align-items:center;justify-content:space-between;gap:5px;cursor:pointer;font-size:10px;color:#b5c7d3;font-weight:700;list-style:none}
+    .daily-details summary::-webkit-details-marker{display:none}
+    .daily-details summary::before{content:'▸';color:var(--green);font-size:11px}
+    .daily-details[open] summary::before{content:'▾'}
+    .daily-details summary span{margin-left:auto;color:var(--muted);font-weight:500;font-size:9px}
+    .daily-reason{font-size:10px;line-height:1.4;margin:6px 0 2px}
+    .daily-actions{gap:7px;padding-top:7px;margin-top:7px}
+    .daily-actions label{font-size:10px;font-weight:750}
+    .daily-actions input{width:15px;height:15px;flex:none}
+    .control-panel{padding:12px 14px;margin-top:14px;border-radius:12px}
+    .control-panel label{font-size:10px;margin-bottom:5px}
+    .control-panel input{height:40px;font-size:15px;padding-left:11px}
+    .control-panel .stake-tip{font-size:10px;line-height:1.4;margin-top:6px}
+    .create-button{height:38px;margin-top:9px;font-size:11px;border-radius:8px}
+    .results{top:10px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,.14)}
+    .results::before{font-size:9px;padding:7px 10px 0;margin-bottom:5px}
+    .results-header{padding:10px 11px}
+    .results h2{font-size:14px}
+    .results-sub{font-size:10px}
+    #cards{padding:0 9px}
+    .match-card{padding:9px 2px}
+    .teams{font-size:12px;line-height:1.3;margin-top:5px}
+    .pick-box{padding:7px;gap:6px;margin-top:6px}
+    .selection{font-size:14px}
+    .odd{font-size:15px}
+    .index-value{font-size:14px}
+    .index-box{min-width:50px;padding:6px}
+    .small-label,.pick-label,.index-label{font-size:8px}
+    .bookmaker{font-size:9px;margin-top:4px}
+    .summary-grid{padding:9px 11px;gap:8px}
+    .summary-value{font-size:14px;margin-top:3px}
+    .summary-label{font-size:9px}
+    .summary-message{padding:8px 11px;font-size:9px}
+    .save-bet-button{height:39px;font-size:10px;margin:9px;width:calc(100% - 18px)}
+    .pending-wrap{padding:0 9px 9px}
+    .pending-title{padding:9px 0 5px;font-size:9px}
+    .pending-ticket{padding:8px;margin-top:6px}
+    .pending-ticket strong{font-size:11px}
+    .pending-ticket .mini{font-size:9px;line-height:1.35}
+    .delete-pending-ticket{font-size:10px;padding:6px 8px;margin-top:7px}
+    .empty-slip{padding:16px 10px;font-size:11px}
+    .bet-form{margin:0 9px 9px;padding:11px}
+    .bet-form h3{font-size:15px}
+    .bet-form-grid{gap:7px}
+    .bet-form-grid input{height:37px;font-size:13px}
+    .bet-form .form-actions button{height:36px;font-size:10px}
+    .saved-bets{margin-top:24px}
+    .saved-bets-head{margin-bottom:6px}
+    .saved-bets-head h2{font-size:20px;margin-bottom:2px}
+    .sync-note{font-size:10px;margin:3px 0 5px}
+    .finance-panel{margin:10px 0 12px;padding:10px 13px;border-radius:10px}
+    .finance-panel h3{font-size:14px;margin:0 0 8px}
+    .finance-numbers{gap:8px}
+    .finance-numbers div{font-size:10px}
+    .finance-numbers strong{font-size:17px;margin-top:2px}
+    #financeMessage{font-size:9px;margin-top:4px!important}
+    .archive-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+    .ticket{padding:10px!important;border-radius:10px;margin-bottom:0}
+    .ticket-title{font-size:12px!important}
+    .ticket-head{margin-bottom:6px!important;gap:6px}
+    .ticket-date{font-size:9px;margin-top:2px}
+    .ticket-status{font-size:8px;padding:4px 6px}
+    .ticket-details{margin:6px 0}
+    .ticket-details summary{font-size:10px}
+    .ticket-stats{gap:5px;margin-top:6px!important;padding-top:8px}
+    .ticket-stat-label{font-size:8px}
+    .ticket-stat-value{font-size:12px!important}
+    .real-outcome{gap:5px;margin-top:7px;font-size:10px}
+    .real-outcome label{font-size:10px;margin:0}
+    .real-outcome select{width:80px;max-width:80px;padding:4px;font-size:10px}
+    .real-outcome input{width:74px;max-width:74px;height:30px;padding:4px;font-size:10px}
+    .real-outcome .update-real{font-size:9px;padding:5px 7px}
+    .delete-ticket{height:31px;margin-top:8px;font-size:9px;border-radius:7px}
+    .ticket-pick{padding:7px 0}
+    .ticket-teams{font-size:11px}
+    .ticket-selection{font-size:10px}
+    @media(max-width:1450px){.daily-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.archive-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    @media(max-width:1180px){.daily-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.archive-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:980px){.main-grid{grid-template-columns:1fr}.results{position:static;max-height:none}.daily-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:700px){
+      .page{width:calc(100% - 18px);padding:12px 0 25px}
+      header{margin-bottom:14px;gap:7px;flex-wrap:wrap}
+      .logo{font-size:19px}
+      h1{font-size:29px}
+      .subtitle{font-size:11px}
+      .daily-head h2{font-size:15px}
+      .daily-grid{grid-template-columns:1fr;gap:7px}
+      .daily-teams{min-height:0;font-size:13px}
+      .daily-card{padding:10px}
+      .archive-grid{grid-template-columns:1fr}
+      .finance-numbers strong{font-size:15px}
+    }
+    @media(min-width:981px){.results{max-height:calc(100dvh - 20px)}}
+
 </style>
 </head>
 
@@ -1316,7 +1438,9 @@
         <div class="daily-pick"><div><span class="daily-muted">SCELTA BETLAB</span><div><strong>${safeText(c.selection)}</strong></div><div class="daily-muted">${safeText(c.market)}</div></div>
           <div class="daily-odd"><span class="daily-muted">QUOTA</span><div>${oddText(a.odd)}</div></div></div>
         <div class="daily-stats"><span>Prob. modello: <b>${readablePercent(a.rawP)}</b></span><span>Valore prudenziale: <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
-        <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
+        <details class="daily-details"><summary>Dettagli dell’analisi <span>Campione ${a.homeGames}+${a.awayGames}</span></summary>
+          <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
+        </details>
         <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
           <label for="pick-${safeText(id)}">${checked ? "INSERITA NELLA SCHEDINA" : "AGGIUNGI ALLA SCHEDINA"}</label></div>
       </article>`;
