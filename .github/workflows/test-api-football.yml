@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V7
+      - name: BETLAB Prediction Engine V7.2
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -40,9 +40,12 @@ jobs:
           ROME = ZoneInfo("Europe/Rome")
 
           TODAY = datetime.now(ROME).date()
+          YESTERDAY = TODAY - timedelta(days=1)
           TOMORROW = TODAY + timedelta(days=1)
 
+          # Recupera anche ieri per chiudere le schedine dopo la mezzanotte.
           DAYS = [
+              YESTERDAY.isoformat(),
               TODAY.isoformat(),
               TOMORROW.isoformat()
           ]
@@ -342,10 +345,8 @@ jobs:
                   error_text = str(exc)
 
                   if (
-                      day == TOMORROW.isoformat()
-                      and
-                      "Free plans do not have access to this date"
-                      in error_text
+                      day in {TOMORROW.isoformat(), YESTERDAY.isoformat()}
+                      and "Free plans do not have access to this date" in error_text
                   ):
                       print(
                           day,
@@ -2412,7 +2413,15 @@ jobs:
               ).get("name")
 
 
-              if not home or not away:
+              # Un incontro valido deve avere due squadre DISTINTE e ID API.
+              # Le quote sono poi cercate esclusivamente per fixtureId.
+              fixture_id = fixture.get("id")
+              h_id = (teams.get("home") or {}).get("id")
+              a_id = (teams.get("away") or {}).get("id")
+              if (not home or not away or canonical(home) == canonical(away)
+                  or not isinstance(fixture_id, int) or fixture_id <= 0
+                  or (h_id is not None and a_id is not None and h_id == a_id)):
+                  print("ESCLUSA FIXTURE CON DATI NON COERENTI:", fixture_id, home, away)
                   continue
 
 
@@ -2977,7 +2986,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V7.1 MULTI-MARKET",
+                  "BETLAB V7.2 MULTI-MARKET",
 
               "generatedAt":
                   datetime.now(
