@@ -1203,7 +1203,7 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.1 · Sperimentale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.2 · Sperimentale</button>
       <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
@@ -1218,7 +1218,7 @@
     </h1>
 
     <div class="subtitle">
-      BETLAB V10.1 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
+      BETLAB V10.2 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
       Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
     </div>
 
@@ -1677,7 +1677,7 @@
   }
 
   function getCandidateAssessment(candidate, match) {
-    if (!String(betlabData?.engine || "").includes("V10.1")) return null;
+    if (!String(betlabData?.engine || "").includes("V10.2")) return null;
     if (candidate?.oddAvailable !== true) return null;
     const odd = Number(candidate.odd);
     const p = Number(candidate.modelProbability);
@@ -1691,6 +1691,22 @@
     // una verifica storica della calibrazione del modello.
     if (candidate.market === "Risultato Esatto") return null;
     const selection = String(candidate.selection || "").toUpperCase();
+    if (["1X2", "Doppia Chance"].includes(candidate.market)) {
+      const consensus = risk.market1X2 || {};
+      if (!consensus.available || Number(consensus.sourceCount) < 3) return null;
+      const ps = consensus.probabilities || {};
+      const fair = candidate.market === "1X2" ? Number(ps[selection]) :
+        selection === "1X" ? Number(ps["1"]) + Number(ps["X"]) :
+        selection === "X2" ? Number(ps["X"]) + Number(ps["2"]) :
+        selection === "12" ? Number(ps["1"]) + Number(ps["2"]) : NaN;
+      if (!Number.isFinite(fair) || p - fair > 0.075) return null;
+      const formDifference = Number(risk.relativeFormPPG || 0);
+      const ph = Number(ps["1"]), pa = Number(ps["2"]);
+      if (candidate.market === "Doppia Chance" && (
+        (selection === "X2" && formDifference >= 0.70 && ph >= 0.51 && ph-pa >= 0.22) ||
+        (selection === "1X" && formDifference <= -0.70 && pa >= 0.51 && pa-ph >= 0.22)
+      )) return null;
+    }
     if (candidate.market === "1X2") {
       // Regola concordata: dopo 6 vittorie consecutive non scegliere
       // la vittoria secca della squadra. Gli altri mercati restano validi.
@@ -1749,8 +1765,19 @@
     const a = row.assessment;
     const details = a.exact && Number.isFinite(Number(row.candidate.expectedHomeGoals))
       ? ` Poisson: gol attesi ${Number(row.candidate.expectedHomeGoals).toFixed(2)} - ${Number(row.candidate.expectedAwayGoals).toFixed(2)}.` : "";
+    const risk = row.match?.riskSignals || {};
+    const consensus = risk.market1X2 || {};
+    const fair = consensus.available ? consensus.probabilities : null;
+    const market = fair ? ` Consenso 1X2 di ${Number(consensus.sourceCount)} bookmaker (senza margine): 1 ${readablePercent(fair["1"])}, X ${readablePercent(fair["X"])}, 2 ${readablePercent(fair["2"])}.` :
+      ` Consenso 1X2 non verificabile: ${String(consensus.status || "dati mancanti")}.`;
+    const strength = risk.opponentStrength || {};
+    const oH = strength.home?.opponentsAvgPPG, oA = strength.away?.opponentsAvgPPG;
+    const opponentInfo = Number.isFinite(Number(oH)) && oH != null && Number.isFinite(Number(oA)) && oA != null
+      ? ` Avversari recenti (media punti/partita): casa ${Number(oH).toFixed(2)}, trasferta ${Number(oA).toFixed(2)}; indicatore sperimentale, non classifica.`
+      : ` Forza avversari: dati insufficienti per la verifica.`;
     return `Campione: ${a.homeGames} e ${a.awayGames} gare. Stima del modello ${readablePercent(a.rawP)}; quota equivalente a ${readablePercent(a.implied)}. ` +
-      `Margine prudenziale teorico +${(a.conservativeEdge*100).toFixed(1)}%.${details} Stima non calibrata: possibile errore del modello o della quota.`;
+      `Margine prudenziale teorico +${(a.conservativeEdge*100).toFixed(1)}%.${details}${market}${opponentInfo} ` +
+      `Classifica ufficiale, motivazioni sportive e vicende societarie NON verificate automaticamente. Le stime non sono calibrate.`;
   }
 
   // Contesto per fixture API. Un calendario storico incompleto non prova
@@ -1880,10 +1907,18 @@
     monitorCount.textContent = remaining.length + " senza consiglio · " + visible.length + " visualizzate";
     monitorList.innerHTML = visible.length ? visible.map(m => {
       const h = Number(m.home?.form?.played || 0), a = Number(m.away?.form?.played || 0);
+      const risk = m.riskSignals || {};
+      const rejected = Array.isArray(risk.blockedSelections) ? risk.blockedSelections : [];
       const reason = Math.min(h,a) < 3 ? "Storico insufficiente" :
-        (Array.isArray(m.candidates) && m.candidates.length ? "Nessun mercato supera i controlli" : "Quote o dati insufficienti");
+        (rejected.length ? "Quote 1X2 non coerenti con modello" :
+        (Array.isArray(m.candidates) && m.candidates.length ? "Nessun mercato supera i controlli" : "Quote o dati insufficienti"));
+      const market = risk.market1X2?.available ? risk.market1X2.probabilities : null;
+      const explanation = rejected.length ? rejected.slice(0,2).join("; ") : "";
+      const summary = market ? `Mercato senza margine: 1 ${readablePercent(market["1"])}, X ${readablePercent(market["X"])}, 2 ${readablePercent(market["2"])}.` : "";
       return `<div class="monitor-row"><div><b>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</b>
-        <small>${safeText(m.league)} · ${formatDate(m)} · ${h}+${a} partite nello storico</small></div><span>${safeText(reason)}</span></div>`;
+        <small>${safeText(m.league)} · ${formatDate(m)} · ${h}+${a} partite nello storico</small>
+        ${explanation ? `<small>${safeText(explanation)}</small>` : ""}
+        ${summary ? `<small>${safeText(summary)}</small>` : ""}</div><span>${safeText(reason)}</span></div>`;
     }).join("") : '<p class="monitor-info">Nessun altro incontro futuro presente nel feed.</p>';
   }
 
