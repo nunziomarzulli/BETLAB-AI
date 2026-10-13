@@ -1196,7 +1196,7 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V9 · Attuale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10 · Sperimentale</button>
       <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
@@ -1211,7 +1211,7 @@
     </h1>
 
     <div class="subtitle">
-      BETLAB analizza ogni incontro e confronta probabilità, quota e qualità dei dati.
+      BETLAB V10 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
       Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
     </div>
 
@@ -1575,7 +1575,7 @@
           <div class="v7-card-teams">${safeText(m.match || "Incontro")}</div>
           <div class="v7-pick"><div><span class="v7-tag">SCELTA V7 · CRITERIO COMUNE</span><strong class="v7-bet">${p.selection ? safeText(p.selection) : "Nessuna"}</strong><span class="v7-market">${safeText(p.market || "Nessun mercato quotato")}</span></div>
           <div class="v7-price"><span class="v7-tag">QUOTA ARCHIVIATA</span><strong>${comparisonOdd(p.odd)}</strong></div></div>
-          <div class="v7-comparison"><strong>Probabilità stimata V7:</strong> ${prob}<br><strong>V9 sullo stesso incontro:</strong> ${v9Text}${same ? " · stesso pronostico" : ""}</div>
+          <div class="v7-comparison"><strong>Probabilità stimata V7:</strong> ${prob}<br><strong>Motore attuale nel confronto:</strong> ${v9Text}${same ? " · stesso pronostico" : ""}</div>
           <div class="v7-original"><strong>Pronostico principale originale V7:</strong> ${original}. Può differire dalla scelta del criterio comune.</div>
         </article>`;
       }).join("") : `<div class="v7-unavailable">In questo snapshot non ci sono mercati quotati confrontabili. Il test offline non inventa quote: riprova dopo il prossimo aggiornamento del feed.</div>`;
@@ -1659,31 +1659,44 @@
   }
 
   function getCandidateAssessment(candidate, match) {
+    if (!String(betlabData?.engine || "").includes("V10.0")) return null;
     if (candidate?.oddAvailable !== true) return null;
     const odd = Number(candidate.odd);
     const p = Number(candidate.modelProbability);
     const homeGames = Number(match?.home?.form?.played || 0);
     const awayGames = Number(match?.away?.form?.played || 0);
+    const risk = match?.riskSignals || {};
     if (!(Number.isFinite(odd) && odd >= MIN_QUOTA && p > 0 && p < 1)) return null;
-    if (homeGames < 5 || awayGames < 5) return null;
-    const exact = candidate.market === "Risultato Esatto";
-    if (exact && (homeGames < 8 || awayGames < 8 || candidate.model !== "poisson")) return null;
+    if (homeGames < 6 || awayGames < 6 || match.historyEligible !== true) return null;
+    // Risultati esatti esclusi dalle proposte finche' non esiste
+    // una verifica storica della calibrazione del modello.
+    if (candidate.market === "Risultato Esatto") return null;
+    const selection = String(candidate.selection || "").toUpperCase();
+    if (candidate.market === "1X2") {
+      // Regola concordata: dopo 6 vittorie consecutive non scegliere
+      // la vittoria secca della squadra. Gli altri mercati restano validi.
+      if (selection === "1" && Number(risk.homeWinStreak) >= 6) return null;
+      if (selection === "2" && Number(risk.awayWinStreak) >= 6) return null;
+      // X a 3.00 o meno: prudenza sulle vittorie secche, senza
+      // imporre PARI o doppia chance.
+      if ((selection === "1" || selection === "2") &&
+          Number(risk.drawOdd) > 1 && Number(risk.drawOdd) <= 3.00 && p < 0.63) return null;
+    }
+    // PARI viene valutato con una distribuzione di tutti i punteggi:
+    // ogni pareggio e' PARI, ma PARI include anche 2-0, 3-1, 4-2...
     const implied = 1 / odd;
-    // Se modello e prezzo differiscono troppo non dichiariamo un vantaggio.
-    // Limite prudenziale: probabile disallineamento, feed quote o modello non validato.
-    if (p / implied > 2.4) return null;
+    // Rigetta incongruenze come Cardiff 60% contro quota 2.71.
+    // Non sono probabilita' calibrate: niente grandi "value" fantasiosi.
+    if (p - implied > 0.12 || p / implied > 1.40) return null;
     const volume = Math.min(homeGames, awayGames, 10) / 10;
-    // La stima grezza si avvicina prudentemente alla probabilità implicita
-    // del prezzo. NON e' una calibrazione scientificamente validata.
-    const shrink = (exact ? 0.45 : 0.60) * volume;
+    const shrink = 0.40 * volume;
     const conservativeP = implied + shrink * (p - implied);
     const conservativeEdge = conservativeP * odd - 1;
-    // Richiediamo un vantaggio minimo stimato, non semplicemente una quota bassa.
     if (conservativeEdge < 0.06) return null;
     const score = conservativeEdge * Math.sqrt(conservativeP) /
-      (1 + 0.35 * Math.log(odd)) * (exact ? 0.80 : 1);
+      (1 + 0.50 * Math.log(odd));
     return { candidate, odd, rawP: p, implied, conservativeP,
-      conservativeEdge, score, homeGames, awayGames, exact };
+      conservativeEdge, score, homeGames, awayGames, exact: false };
   }
 
   function chooseRecommendation(match) {
@@ -1761,7 +1774,7 @@
     const rows = dailyRecommendations;
     if (!rows.length) {
       dailyMatches.innerHTML = `<div class="daily-empty">Nessun incontro supera oggi i controlli di dati e quota. BETLAB non forza un pronostico per riempire la schedina.</div>`;
-      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate · quota minima 1,10`;
+      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate · filtri prudenti attivi`;
       return;
     }
     dailyMatches.innerHTML = rows.map(row => {
@@ -1777,9 +1790,9 @@
         <div class="daily-teams">${safeText(m.home.name)} – ${safeText(m.away.name)}</div>
         <div class="daily-pick ${marketClass}"><div class="daily-pick-main"><span class="daily-muted">PRONOSTICO BETLAB</span><strong>${safeText(c.selection)}</strong><span class="daily-pick-market">${safeText(c.market)}</span></div>
           <div class="daily-odd"><span class="daily-muted">QUOTA</span><div>${oddText(a.odd)}</div></div></div>
-        <div class="daily-stats"><span>Probabilità stimata <b>${readablePercent(a.rawP)}</b></span><span>Vantaggio teorico <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
+        <div class="daily-stats"><span>Stima non calibrata <b>${readablePercent(a.rawP)}</b></span><span>Margine teorico <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
         <details class="daily-details"><summary>Mostra analisi <span>${a.homeGames}+${a.awayGames} partite</span></summary>
-          <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}</div>
+          <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}<br>Serie vittorie: casa ${Number(m.riskSignals?.homeWinStreak || 0)} · trasferta ${Number(m.riskSignals?.awayWinStreak || 0)}. Quota X: ${m.riskSignals?.drawOdd != null ? oddText(m.riskSignals.drawOdd) : "non disponibile"}.${m.riskSignals?.drawAttention ? " Analisi PARI e doppie chance approfondita." : ""}</div>
           ${renderContext(m)}
         </details>
         <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
@@ -1883,7 +1896,7 @@
         <div class="pick-box"><div><div class="pick-label">PRONOSTICO SELEZIONATO</div><div class="selection">${safeText(c.selection)}</div>
         <div class="market">${safeText(c.market)}</div></div>
         <div class="odd-box"><div class="small-label">QUOTA BETLAB</div><div class="odd">${oddText(c.odd)}</div></div>
-        <div class="index-box"><div class="index-value">${Number(c.index).toFixed(1)}%</div><div class="index-label">STIMA MODELLO</div></div></div>
+        <div class="index-box"><div class="index-value">${Number(c.index).toFixed(1)}%</div><div class="index-label">STIMA NON CALIBRATA</div></div></div>
         <div class="bookmaker">Fonte: ${safeText(c.bookmaker || "n.d.")}</div>`;
       cards.appendChild(card);
     }
