@@ -1,6 +1,6 @@
 {
-  "engine": "BETLAB V10.1 COHERENT POISSON EXPERIMENTAL",
-  "generatedAt": "2026-10-13T22:23:02.284151+02:00",
+  "engine": "BETLAB V10.2 POISSON MARKET CONSENSUS EXPERIMENTAL",
+  "generatedAt": "2026-10-13T22:48:52.236530+02:00",
   "days": [
     "2026-10-12",
     "2026-10-13",
@@ -19,13 +19,13 @@
     "2026-10-19"
   ],
   "calendarHorizonDays": 7,
-  "historyCount": 11437,
+  "historyCount": 11499,
   "matchesAnalyzed": 53,
   "matchesWithCandidates": 7,
   "matchesHistoryRecent": 7,
   "matchesHistoryUnreliable": 46,
   "selectionPolicy": {
-    "model": "poisson_coherent_uncalibrated",
+    "model": "poisson_coherent_uncalibrated_with_market_veto",
     "winStreakExcludeAt": 6,
     "drawAttentionAtOrBelow": 3.0,
     "maxProbabilityPriceGap": 0.12,
@@ -33,6 +33,11 @@
     "maximumRecommendedOdd": 3.0,
     "minimumRecommendedModelProbability": 0.5,
     "quoteSelection": "median_of_available_bookmakers",
+    "oneXTwoMarketMinimumBookmakers": 3,
+    "oneXTwoMaximumOvervaluationVsMarket": 0.075,
+    "oneXTwoMarketReference": "consensus_fair_probabilities_overround_removed",
+    "opponentQuality": "recent_opponents_points_proxy_not_official_rank",
+    "corporateAndTeamNews": "not_verified_no_news_provider",
     "exactScoresRecommended": false,
     "note": "Filtri sperimentali; non implicano redditivita' verificata"
   },
@@ -42,7 +47,7 @@
     "maxDaysFromLastMatch": 30
   },
   "marketCandidates": 232,
-  "candidatesWithOdds": 48,
+  "candidatesWithOdds": 46,
   "exactScoresWithOdds": 0,
   "injuriesApiStatus": "non_disponibile_piano",
   "injuriesApiNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -110,7 +115,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:53.268158+02:00",
+        "generatedAt": "2026-10-13T22:48:37.140742+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -173,6 +178,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 4,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.201,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 5,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.486,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -0.1,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 2,
         "awayWinStreak": 2,
         "drawOdd": null,
@@ -251,7 +279,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:54.413283+02:00",
+        "generatedAt": "2026-10-13T22:48:38.799803+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -314,6 +342,38 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.20162,
+            "X": 0.23555,
+            "2": 0.56283
+          },
+          "dispersion": 0.042,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 9,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.463,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 9,
+            "gamesExamined": 9,
+            "opponentsAvgPPG": 1.142,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -0.678,
+        "blockedSelections": [
+          "Doppia Chance 1X: modello 51.4% vs mercato 43.7%"
+        ],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": 4.0,
@@ -366,7 +426,9 @@
           "expectedAwayGoals": 1.615,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.76445,
+          "marketConsensusGap": -0.0116
         },
         {
           "market": "Doppia Chance",
@@ -384,7 +446,9 @@
           "expectedAwayGoals": 1.615,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.79838,
+          "marketConsensusGap": -0.06537
         },
         {
           "market": "Totale Gol",
@@ -434,24 +498,6 @@
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Over 2.5",
           "value": 0.849,
-          "expectedHomeGoals": 1.132,
-          "expectedAwayGoals": 1.615,
-          "oddsSources": 8,
-          "oddsObserved": 8,
-          "oddsQuality": "multi_source"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.51414,
-          "index": 51.4,
-          "model": "poisson_v10",
-          "oddAvailable": true,
-          "odd": 2.15,
-          "bookmaker": "Bet365",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Home/Draw",
-          "value": 1.105,
           "expectedHomeGoals": 1.132,
           "expectedAwayGoals": 1.615,
           "oddsSources": 8,
@@ -539,7 +585,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:55.708842+02:00",
+        "generatedAt": "2026-10-13T22:48:40.692126+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -602,6 +648,38 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.26289,
+            "X": 0.24045,
+            "2": 0.49666
+          },
+          "dispersion": 0.0401,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 9,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.39,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 8,
+            "gamesExamined": 8,
+            "opponentsAvgPPG": 1.357,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 0.35,
+        "blockedSelections": [
+          "Doppia Chance 1X: modello 70.9% vs mercato 50.3%"
+        ],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": 4.0,
@@ -636,7 +714,9 @@
           "expectedAwayGoals": 1.177,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.75955,
+          "marketConsensusGap": -0.0118
         },
         {
           "market": "Goal/No Goal",
@@ -672,7 +752,9 @@
           "expectedAwayGoals": 1.177,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.73711,
+          "marketConsensusGap": -0.19422
         },
         {
           "market": "Totale Gol",
@@ -773,7 +855,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:56.894303+02:00",
+        "generatedAt": "2026-10-13T22:48:41.798615+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -836,6 +918,36 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.39212,
+            "X": 0.25308,
+            "2": 0.3548
+          },
+          "dispersion": 0.0176,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 9,
+            "gamesExamined": 9,
+            "opponentsAvgPPG": 1.541,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 9,
+            "gamesExamined": 9,
+            "opponentsAvgPPG": 1.415,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -0.889,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": 3.76,
@@ -888,7 +1000,9 @@
           "expectedAwayGoals": 1.642,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.74692,
+          "marketConsensusGap": 0.01797
         },
         {
           "market": "Doppia Chance",
@@ -906,7 +1020,9 @@
           "expectedAwayGoals": 1.642,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.60788,
+          "marketConsensusGap": 0.03385
         },
         {
           "market": "Goal/No Goal",
@@ -978,7 +1094,9 @@
           "expectedAwayGoals": 1.642,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.6452,
+          "marketConsensusGap": -0.05182
         },
         {
           "market": "Pari/Dispari",
@@ -1061,7 +1179,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:57.929207+02:00",
+        "generatedAt": "2026-10-13T22:48:42.696902+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1124,6 +1242,38 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.56598,
+            "X": 0.24036,
+            "2": 0.19366
+          },
+          "dispersion": 0.0338,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 9,
+            "gamesExamined": 9,
+            "opponentsAvgPPG": 1.314,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 9,
+            "gamesExamined": 9,
+            "opponentsAvgPPG": 1.404,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 0.889,
+        "blockedSelections": [
+          "Doppia Chance X2: modello 54.0% vs mercato 43.4%"
+        ],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": 3.94,
@@ -1176,7 +1326,9 @@
           "expectedAwayGoals": 0.975,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.80634,
+          "marketConsensusGap": -0.07276
         },
         {
           "market": "Doppia Chance",
@@ -1194,7 +1346,9 @@
           "expectedAwayGoals": 0.975,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.75964,
+          "marketConsensusGap": -0.03281
         },
         {
           "market": "Totale Gol",
@@ -1226,24 +1380,6 @@
           "apiMarket": "Goals Over/Under",
           "apiSelection": "Under 2.5",
           "value": 1.167,
-          "expectedHomeGoals": 1.374,
-          "expectedAwayGoals": 0.975,
-          "oddsSources": 8,
-          "oddsObserved": 8,
-          "oddsQuality": "multi_source"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.5396,
-          "index": 54.0,
-          "model": "poisson_v10",
-          "oddAvailable": true,
-          "odd": 2.17,
-          "bookmaker": "Marathonbet",
-          "apiMarket": "Double Chance",
-          "apiSelection": "Draw/Away",
-          "value": 1.171,
           "expectedHomeGoals": 1.374,
           "expectedAwayGoals": 0.975,
           "oddsSources": 8,
@@ -1349,7 +1485,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:22:59.174730+02:00",
+        "generatedAt": "2026-10-13T22:48:44.433688+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1412,6 +1548,38 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.58115,
+            "X": 0.22982,
+            "2": 0.18903
+          },
+          "dispersion": 0.0413,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 6,
+            "gamesExamined": 6,
+            "opponentsAvgPPG": 1.48,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 8,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.212,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -1.367,
+        "blockedSelections": [
+          "Doppia Chance X2: modello 70.4% vs mercato 41.9%"
+        ],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 3,
         "drawOdd": 4.2,
@@ -1464,7 +1632,9 @@
           "expectedAwayGoals": 1.589,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.77018,
+          "marketConsensusGap": -0.01741
         },
         {
           "market": "Totale Gol",
@@ -1518,7 +1688,9 @@
           "expectedAwayGoals": 1.589,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.81097,
+          "marketConsensusGap": -0.26796
         },
         {
           "market": "Totale Gol",
@@ -1619,7 +1791,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:00.643870+02:00",
+        "generatedAt": "2026-10-13T22:48:46.356481+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1682,6 +1854,38 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.26994,
+            "X": 0.23028,
+            "2": 0.49978
+          },
+          "dispersion": 0.0458,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 8,
+            "gamesExamined": 8,
+            "opponentsAvgPPG": 1.0,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 7,
+            "gamesExamined": 7,
+            "opponentsAvgPPG": 1.429,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 0.786,
+        "blockedSelections": [
+          "Doppia Chance 1X: modello 82.0% vs mercato 50.0%"
+        ],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 4,
         "awayWinStreak": 0,
         "drawOdd": 4.1,
@@ -1716,7 +1920,9 @@
           "expectedAwayGoals": 0.927,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.76972,
+          "marketConsensusGap": 0.00967
         },
         {
           "market": "Totale Gol",
@@ -1835,7 +2041,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199084+02:00",
+        "generatedAt": "2026-10-13T22:48:47.989502+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1898,6 +2104,36 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": true,
+          "sourceCount": 10,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.44027,
+            "X": 0.24094,
+            "2": 0.31879
+          },
+          "dispersion": 0.0297,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 6,
+            "gamesExamined": 6,
+            "opponentsAvgPPG": 0.986,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 6,
+            "gamesExamined": 6,
+            "opponentsAvgPPG": 1.714,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 1.167,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 6,
         "awayWinStreak": 3,
         "drawOdd": 4.0,
@@ -1950,7 +2186,9 @@
           "expectedAwayGoals": 1.216,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.75906,
+          "marketConsensusGap": 0.00277
         },
         {
           "market": "Doppia Chance",
@@ -1968,7 +2206,9 @@
           "expectedAwayGoals": 1.216,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.68121,
+          "marketConsensusGap": 0.04714
         },
         {
           "market": "Totale Gol",
@@ -2040,7 +2280,9 @@
           "expectedAwayGoals": 1.216,
           "oddsSources": 8,
           "oddsObserved": 8,
-          "oddsQuality": "multi_source"
+          "oddsQuality": "multi_source",
+          "marketFairProbability": 0.55973,
+          "marketConsensusGap": -0.04991
         },
         {
           "market": "Pari/Dispari",
@@ -2123,7 +2365,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199157+02:00",
+        "generatedAt": "2026-10-13T22:48:48.608313+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2186,6 +2428,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 1,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 9,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.321,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 0.3,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -2264,7 +2529,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199195+02:00",
+        "generatedAt": "2026-10-13T22:48:49.106470+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2327,6 +2592,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 7,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.262,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": 0.8,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -2405,7 +2693,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199244+02:00",
+        "generatedAt": "2026-10-13T22:48:49.332157+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2468,6 +2756,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 4,
+            "gamesExamined": 10,
+            "opponentsAvgPPG": 1.433,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -0.2,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -2546,7 +2857,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199277+02:00",
+        "generatedAt": "2026-10-13T22:48:49.332297+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2609,6 +2920,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 8,
+            "gamesExamined": 8,
+            "opponentsAvgPPG": 1.351,
+            "status": "stimabile"
+          },
+          "away": {
+            "coverage": 1,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -2687,7 +3021,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199304+02:00",
+        "generatedAt": "2026-10-13T22:48:49.558182+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2750,6 +3084,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 6,
+            "gamesExamined": 6,
+            "opponentsAvgPPG": 1.25,
+            "status": "stimabile"
+          }
+        },
+        "relativeFormPPG": -1.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -2828,7 +3185,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199334+02:00",
+        "generatedAt": "2026-10-13T22:48:49.667999+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2891,6 +3248,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 1.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 2,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -2969,7 +3349,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199365+02:00",
+        "generatedAt": "2026-10-13T22:48:49.668064+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3032,6 +3412,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -0.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -3110,7 +3513,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199392+02:00",
+        "generatedAt": "2026-10-13T22:48:49.724708+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3173,6 +3576,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 1.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -3251,7 +3677,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199414+02:00",
+        "generatedAt": "2026-10-13T22:48:49.724773+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3314,6 +3740,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -3392,7 +3841,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199438+02:00",
+        "generatedAt": "2026-10-13T22:48:49.724805+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3455,6 +3904,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -0.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -3533,7 +4005,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199466+02:00",
+        "generatedAt": "2026-10-13T22:48:49.724859+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3596,6 +4068,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 2,
         "awayWinStreak": 2,
         "drawOdd": null,
@@ -3674,7 +4169,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199489+02:00",
+        "generatedAt": "2026-10-13T22:48:49.946188+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3737,6 +4232,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 1.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -3815,7 +4333,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199513+02:00",
+        "generatedAt": "2026-10-13T22:48:50.055592+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3878,6 +4396,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -3956,7 +4497,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199535+02:00",
+        "generatedAt": "2026-10-13T22:48:50.166857+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4019,6 +4560,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 2,
         "drawOdd": null,
@@ -4097,7 +4661,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199559+02:00",
+        "generatedAt": "2026-10-13T22:48:50.166930+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4160,6 +4724,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -4238,7 +4825,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199583+02:00",
+        "generatedAt": "2026-10-13T22:48:50.166960+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4301,6 +4888,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -1.5,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -4379,7 +4989,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199602+02:00",
+        "generatedAt": "2026-10-13T22:48:50.166990+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4442,6 +5052,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 2,
         "drawOdd": null,
@@ -4520,7 +5153,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199622+02:00",
+        "generatedAt": "2026-10-13T22:48:50.278434+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4583,6 +5216,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -4661,7 +5317,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199650+02:00",
+        "generatedAt": "2026-10-13T22:48:50.334989+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4724,6 +5380,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -4802,7 +5481,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199672+02:00",
+        "generatedAt": "2026-10-13T22:48:50.445268+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4865,6 +5544,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -4943,7 +5645,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199692+02:00",
+        "generatedAt": "2026-10-13T22:48:50.556340+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5006,6 +5708,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -5084,7 +5809,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199714+02:00",
+        "generatedAt": "2026-10-13T22:48:50.666362+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5147,6 +5872,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -5225,7 +5973,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199737+02:00",
+        "generatedAt": "2026-10-13T22:48:50.721827+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5288,6 +6036,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -5366,7 +6137,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199756+02:00",
+        "generatedAt": "2026-10-13T22:48:50.832349+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5429,6 +6200,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -5507,7 +6301,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199774+02:00",
+        "generatedAt": "2026-10-13T22:48:50.887805+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5570,6 +6364,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -5648,7 +6465,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199790+02:00",
+        "generatedAt": "2026-10-13T22:48:50.998456+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5711,6 +6528,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -5789,7 +6629,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199811+02:00",
+        "generatedAt": "2026-10-13T22:48:51.053811+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5852,6 +6692,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -5930,7 +6793,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199829+02:00",
+        "generatedAt": "2026-10-13T22:48:51.108930+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5993,6 +6856,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 1.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -6071,7 +6957,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199849+02:00",
+        "generatedAt": "2026-10-13T22:48:51.165452+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6134,6 +7020,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -6212,7 +7121,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199869+02:00",
+        "generatedAt": "2026-10-13T22:48:51.275610+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6275,6 +7184,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -6353,7 +7285,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199888+02:00",
+        "generatedAt": "2026-10-13T22:48:51.386870+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6416,6 +7348,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -6494,7 +7449,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199908+02:00",
+        "generatedAt": "2026-10-13T22:48:51.442264+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6557,6 +7512,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -6635,7 +7613,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199925+02:00",
+        "generatedAt": "2026-10-13T22:48:51.498217+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6698,6 +7676,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -6776,7 +7777,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199944+02:00",
+        "generatedAt": "2026-10-13T22:48:51.554155+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6839,6 +7840,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -6917,7 +7941,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199962+02:00",
+        "generatedAt": "2026-10-13T22:48:51.665807+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6980,6 +8004,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -7058,7 +8105,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199977+02:00",
+        "generatedAt": "2026-10-13T22:48:51.720119+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7121,6 +8168,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -7199,7 +8269,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.199997+02:00",
+        "generatedAt": "2026-10-13T22:48:51.775183+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7262,6 +8332,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -7340,7 +8433,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200018+02:00",
+        "generatedAt": "2026-10-13T22:48:51.829926+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7403,6 +8496,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -7481,7 +8597,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200056+02:00",
+        "generatedAt": "2026-10-13T22:48:51.829972+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7544,6 +8660,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -7622,7 +8761,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200076+02:00",
+        "generatedAt": "2026-10-13T22:48:51.830000+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7685,6 +8824,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -7763,7 +8925,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200092+02:00",
+        "generatedAt": "2026-10-13T22:48:51.885288+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7826,6 +8988,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -7904,7 +9089,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200113+02:00",
+        "generatedAt": "2026-10-13T22:48:51.996042+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7967,6 +9152,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": -2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
         "drawOdd": null,
@@ -8045,7 +9253,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200130+02:00",
+        "generatedAt": "2026-10-13T22:48:52.107869+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8108,6 +9316,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 2,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 0,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 2.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -8186,7 +9417,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200144+02:00",
+        "generatedAt": "2026-10-13T22:48:52.163741+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8249,6 +9480,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 0,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 3.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
         "drawOdd": null,
@@ -8327,7 +9581,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-10-13T22:23:02.200158+02:00",
+        "generatedAt": "2026-10-13T22:48:52.163787+02:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8390,6 +9644,29 @@
         "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
       },
       "riskSignals": {
+        "market1X2": {
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
+        },
+        "opponentStrength": {
+          "home": {
+            "coverage": 0,
+            "gamesExamined": 0,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          },
+          "away": {
+            "coverage": 0,
+            "gamesExamined": 1,
+            "opponentsAvgPPG": null,
+            "status": "non_verificabile"
+          }
+        },
+        "relativeFormPPG": 0.0,
+        "blockedSelections": [],
+        "newsStatus": "non_verificato_nessun_feed_notizie",
+        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
         "drawOdd": null,
