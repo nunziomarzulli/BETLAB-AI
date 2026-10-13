@@ -1,4 +1,4 @@
-name: BETLAB Confronto V7 e V9 (offline)
+name: BETLAB Confronto V7 e V10 (offline)
 
 on:
   workflow_dispatch:
@@ -257,11 +257,11 @@ jobs:
           v7_code=extract_python(get_original())
           v9_code=extract_python((ROOT/'.github/workflows/test-api-football.yml').read_text(encoding='utf-8'))
           if 'LOOKUPS_PER_RUN = 4' not in v9_code:
-              raise RuntimeError('V9 attesa con LOOKUPS_PER_RUN = 4; controllare la revisione del motore')
+              raise RuntimeError('V10 attesa con LOOKUPS_PER_RUN = 4; controllare la revisione del motore')
           v9_code=v9_code.replace('LOOKUPS_PER_RUN = 4','LOOKUPS_PER_RUN = 0',1)
           # IDENTICO storico iniziale per entrambi. Zero chiamate HTTP.
           r7=unpack(run_engine('V7_originale',v7_code,snapshot))
-          r9=unpack(run_engine('V9_corrente',v9_code,snapshot))
+          r9=unpack(run_engine('V10_corrente',v9_code,snapshot))
           ids=sorted(set(r7)|set(r9),key=lambda fid:((r7.get(fid) or r9.get(fid))['kickoff'],fid))
           rows=[]
           for fid in ids:
@@ -275,48 +275,48 @@ jobs:
                  'V7_selezione_comune':p7.get('selection') or '',
                  'V7_mercato_comune':p7.get('market') or '',
                  'V7_quota':p7.get('odd') or '', 'V7_probabilita':p7.get('probability') or '',
-                 'V9_originale':b.get('originalPrediction') or '',
-                 'V9_mercato_originale':b.get('originalMarket') or '',
-                 'V9_selezione_comune':p9.get('selection') or '',
-                 'V9_mercato_comune':p9.get('market') or '',
-                 'V9_quota':p9.get('odd') or '', 'V9_probabilita':p9.get('probability') or ''})
+                 'V10_originale':b.get('originalPrediction') or '',
+                 'V10_mercato_originale':b.get('originalMarket') or '',
+                 'V10_selezione_comune':p9.get('selection') or '',
+                 'V10_mercato_comune':p9.get('market') or '',
+                 'V10_quota':p9.get('odd') or '', 'V10_probabilita':p9.get('probability') or ''})
 
           fields=['fixtureId','data','partita','V7_originale','V7_mercato_originale',
                   'V7_selezione_comune','V7_mercato_comune','V7_quota','V7_probabilita',
-                  'V9_originale','V9_mercato_originale','V9_selezione_comune','V9_mercato_comune','V9_quota','V9_probabilita']
+                  'V10_originale','V10_mercato_originale','V10_selezione_comune','V10_mercato_comune','V10_quota','V10_probabilita']
           with (OUT/'confronto.csv').open('w',newline='',encoding='utf-8-sig') as f:
               writer=csv.DictWriter(f,fieldnames=fields,delimiter=';');writer.writeheader();writer.writerows(rows)
-          meta={'esecuzioneUTC':START.isoformat(),'V7_commit':ORIGINAL_SHA,'V9_commit':head_sha(),
+          meta={'esecuzioneUTC':START.isoformat(),'V7_commit':ORIGINAL_SHA,'V10_commit':head_sha(),
                 'quote_cache':coverage,'confrontate':len(rows),
                 'V7_con_pronostico':sum(bool(r['V7_selezione_comune']) for r in rows),
-                'V9_con_pronostico':sum(bool(r['V9_selezione_comune']) for r in rows),
+                'V10_con_pronostico':sum(bool(r['V10_selezione_comune']) for r in rows),
                 'nota':'Solo snapshot locali: il confronto include solo quote archiviate dal motore corrente. Non riproduce l’intero mercato delle quote. Selettore comune applicato a entrambi; i pronostici originali sono esposti a parte. Nessuna chiamata API, nessun esito reale o giocata.'}
           (OUT/'metadati.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
           public_rows=[]
           for r in rows:
-              if not (r['V7_selezione_comune'] or r['V9_selezione_comune']):
+              if not (r['V7_selezione_comune'] or r['V10_selezione_comune']):
                   continue
               public_rows.append({
                   'fixtureId':r['fixtureId'],'date':r['data'],'match':r['partita'],
                   'v7':{'selection':r['V7_selezione_comune'],'market':r['V7_mercato_comune'],
                         'odd':r['V7_quota'] or None,'probability':r['V7_probabilita'] or None,
                         'originalSelection':r['V7_originale'],'originalMarket':r['V7_mercato_originale']},
-                  'v9':{'selection':r['V9_selezione_comune'],'market':r['V9_mercato_comune'],
-                        'odd':r['V9_quota'] or None,'probability':r['V9_probabilita'] or None}
+                  'v9':{'selection':r['V10_selezione_comune'],'market':r['V10_mercato_comune'],
+                        'odd':r['V10_quota'] or None,'probability':r['V10_probabilita'] or None}
               })
           public={'schemaVersion':1,'generatedAt':START.isoformat(),
-                  'quoteSnapshotAt':coverage['date'],'source':'confronto offline V7/V9',
-                  'v7Commit':ORIGINAL_SHA,'v9Commit':meta['V9_commit'],
+                  'quoteSnapshotAt':coverage['date'],'source':'confronto offline V7/V10',
+                  'v7Commit':ORIGINAL_SHA,'v9Commit':meta['V10_commit'],
                   'caveat':'Quote archiviate dal feed corrente, applicazione di un selettore comune; non coincide con il generatore originale delle multiple.',
                   'matches':public_rows}
           (ROOT/'data/betlab-confronto.json').write_text(json.dumps(public,ensure_ascii=False,indent=2),encoding='utf-8')
           print('Schede V7 pubblicabili:',len(public_rows),flush=True)
 
-          summary=['# BETLAB: confronto V7 e V9 (solo dati archiviati)','',
-           '- V7: `'+ORIGINAL_SHA+'`','- V9: `'+meta['V9_commit']+'`',
+          summary=['# BETLAB: confronto V7 e V10 (solo dati archiviati)','',
+           '- V7: `'+ORIGINAL_SHA+'`','- V10: `'+meta['V10_commit']+'`',
            '- Incontri futuri confrontati: '+str(len(rows)),
            '- V7 con selezione comparabile: '+str(meta['V7_con_pronostico']),
-           '- V9 con selezione comparabile: '+str(meta['V9_con_pronostico']),
+           '- V10 con selezione comparabile: '+str(meta['V10_con_pronostico']),
            '- Fixture con quote in archivio: '+str(coverage['matchesWithQuotes']),
            '- Generazione feed quote: '+str(coverage['date']), '',
            '## Limiti essenziali','',
@@ -336,7 +336,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: BETLAB-confronto-V7-V9-offline
+          name: BETLAB-confronto-V7-V10-offline
           path: betlab_confronto_output/
           if-no-files-found: warn
           retention-days: 30
@@ -351,6 +351,6 @@ jobs:
             echo "Confronto invariato"
             exit 0
           fi
-          git commit -m "Aggiorna confronto V7 V9 per sito"
+          git commit -m "Aggiorna confronto V7 V10 per sito"
           git pull --rebase origin main
           git push origin HEAD:main
