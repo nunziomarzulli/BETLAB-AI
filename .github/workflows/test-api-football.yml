@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V9.2.1 - Fix storico
+      - name: BETLAB Prediction Engine V10.0 - Motore coerente e filtri rischio
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -56,11 +56,11 @@ jobs:
           # Qualita' della forma recente: le partite del 2025 non possono
           # determinare da sole un pronostico dell'ottobre 2026.
           RECENT_WINDOW_DAYS = 90
-          MIN_RECENT_GAMES = 3
-          MIN_TEAM_HISTORY = 3
+          MIN_RECENT_GAMES = 5
+          MIN_TEAM_HISTORY = 6
           MAX_LAST_GAME_AGE_DAYS = 30
 
-          MIN_MARKET_INDEX = 55.0
+          MIN_MARKET_INDEX = 0.0  # Conserva tutti i mercati per il controllo quote finale
           MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
           MIN_EXACT_SCORE_PROBABILITY = 0.025
 
@@ -1447,17 +1447,14 @@ jobs:
               away_xg *= 0.92
 
 
-              home_xg = clamp(
-                  home_xg,
-                  0.25,
-                  3.50
-              )
-
-              away_xg = clamp(
-                  away_xg,
-                  0.20,
-                  3.50
-              )
+              # Dati brevi -> forte incertezza. Riduzione verso una
+              # media neutra di riferimento, non una probabilita' calibrata.
+              n = min(len(home_games), len(away_games))
+              sample_weight = min(0.70, n / (n + 7.0))
+              home_xg = 1.35 + sample_weight * (home_xg - 1.35)
+              away_xg = 1.15 + sample_weight * (away_xg - 1.15)
+              home_xg = clamp(home_xg, 0.45, 2.80)
+              away_xg = clamp(away_xg, 0.40, 2.70)
 
 
               return (
@@ -1542,423 +1539,75 @@ jobs:
               }
 
 
-          def build_market_candidates(
-              home_games,
-              away_games
-          ):
+          def build_market_candidates(home_games, away_games):
+              """Tutti i mercati dalla STESSA distribuzione dei risultati.
+              Metodo sperimentale Poisson indipendente, non calibrato.
+              Evita che GOAL, PARI, Over e 1X2 si contraddicano.
+              """
+              if (len(home_games) < MIN_TEAM_HISTORY or
+                  len(away_games) < MIN_TEAM_HISTORY):
+                  return []
+              home_xg, away_xg = expected_goals(home_games, away_games)
+              if home_xg is None or away_xg is None:
+                  return []
 
-              candidates = []
+              # Coda trascurabile oltre 12 gol per squadra con lambda <= 2.8.
+              # Normalizziamo comunque la matrice a probabilita' totale 1.
+              outcomes = []
+              for hg in range(13):
+                  for ag in range(13):
+                      p = poisson_probability(hg, home_xg) * poisson_probability(ag, away_xg)
+                      outcomes.append((hg, ag, p))
+              mass = sum(p for _, _, p in outcomes)
+              outcomes = [(hg, ag, p / mass) for hg, ag, p in outcomes]
+              def prob(fn):
+                  return sum(p for hg,ag,p in outcomes if fn(hg,ag))
+              def candidate(market, selection, value, source="poisson_v10"):
+                  c = create_candidate(market, selection, value, source)
+                  c["expectedHomeGoals"] = round(home_xg, 3)
+                  c["expectedAwayGoals"] = round(away_xg, 3)
+                  return c
 
-              sample_size = (
-                  len(home_games)
-                  +
-                  len(away_games)
-              )
-
-
-              if (
-                  len(home_games) < MIN_TEAM_HISTORY
-                  or
-                  len(away_games) < MIN_TEAM_HISTORY
-              ):
-
-                  return candidates
-
-
-              # ------------------------------------------------------
-              # 1 / X / 2
-              # ------------------------------------------------------
-
-              home_win = contextual_probability(
-                  home_games,
-                  away_games,
-                  lambda g:
-                      g["gf"] > g["ga"],
-                  lambda g:
-                      g["gf"] < g["ga"],
-                  prior=0.43
-              )
-
-              draw = contextual_probability(
-                  home_games,
-                  away_games,
-                  lambda g:
-                      g["gf"] == g["ga"],
-                  lambda g:
-                      g["gf"] == g["ga"],
-                  prior=0.27
-              )
-
-              away_win = contextual_probability(
-                  home_games,
-                  away_games,
-                  lambda g:
-                      g["gf"] < g["ga"],
-                  lambda g:
-                      g["gf"] > g["ga"],
-                  prior=0.30
-              )
-
-
-              total_1x2 = (
-                  home_win
-                  +
-                  draw
-                  +
-                  away_win
-              )
-
-
-              if total_1x2 > 0:
-
-                  home_win /= total_1x2
-                  draw /= total_1x2
-                  away_win /= total_1x2
-
-
-              candidates.extend([
-
-                  create_candidate(
-                      "1X2",
-                      "1",
-                      home_win
-                  ),
-
-                  create_candidate(
-                      "1X2",
-                      "X",
-                      draw
-                  ),
-
-                  create_candidate(
-                      "1X2",
-                      "2",
-                      away_win
-                  )
-
-              ])
-
-
-              # ------------------------------------------------------
-              # DOPPIA CHANCE
-              # ------------------------------------------------------
-
-              candidates.extend([
-
-                  create_candidate(
-                      "Doppia Chance",
-                      "1X",
-                      clamp(
-                          home_win + draw,
-                          0,
-                          0.99
-                      )
-                  ),
-
-                  create_candidate(
-                      "Doppia Chance",
-                      "X2",
-                      clamp(
-                          draw + away_win,
-                          0,
-                          0.99
-                      )
-                  ),
-
-                  create_candidate(
-                      "Doppia Chance",
-                      "12",
-                      clamp(
-                          home_win + away_win,
-                          0,
-                          0.99
-                      )
-                  )
-
-              ])
-
-
-              # ------------------------------------------------------
-              # GOAL / NO GOAL
-              # ------------------------------------------------------
-
-              btts = contextual_probability(
-                  home_games,
-                  away_games,
-                  lambda g:
-                      g["gf"] > 0
-                      and
-                      g["ga"] > 0,
-                  lambda g:
-                      g["gf"] > 0
-                      and
-                      g["ga"] > 0
-              )
-
-
-              candidates.extend([
-
-                  create_candidate(
-                      "Goal/No Goal",
-                      "GOAL",
-                      btts
-                  ),
-
-                  create_candidate(
-                      "Goal/No Goal",
-                      "NO GOAL",
-                      1 - btts
-                  )
-
-              ])
-
-
-              # ------------------------------------------------------
-              # OVER / UNDER
-              # ------------------------------------------------------
-
-              for line in [
-                  1.5,
-                  2.5,
-                  3.5
-              ]:
-
-                  over = contextual_probability(
-                      home_games,
-                      away_games,
-                      lambda g, line=line:
-                          (
-                              g["gf"]
-                              +
-                              g["ga"]
-                          ) > line,
-                      lambda g, line=line:
-                          (
-                              g["gf"]
-                              +
-                              g["ga"]
-                          ) > line
-                  )
-
-
-                  candidates.extend([
-
-                      create_candidate(
-                          "Totale Gol",
-                          f"OVER {line}",
-                          over
-                      ),
-
-                      create_candidate(
-                          "Totale Gol",
-                          f"UNDER {line}",
-                          1 - over
-                      )
-
-                  ])
-
-
-              # ------------------------------------------------------
-              # PARI / DISPARI
-              # ------------------------------------------------------
-
-              even = contextual_probability(
-                  home_games,
-                  away_games,
-                  lambda g:
-                      (
-                          g["gf"]
-                          +
-                          g["ga"]
-                      ) % 2 == 0,
-                  lambda g:
-                      (
-                          g["gf"]
-                          +
-                          g["ga"]
-                      ) % 2 == 0
-              )
-
-
-              candidates.extend([
-
-                  create_candidate(
-                      "Pari/Dispari",
-                      "PARI",
-                      even
-                  ),
-
-                  create_candidate(
-                      "Pari/Dispari",
-                      "DISPARI",
-                      1 - even
-                  )
-
-              ])
-
-
-              # ------------------------------------------------------
-              # SOMMA GOL
-              # ------------------------------------------------------
-
-              ranges = [
-
-                  (
-                      "0-1",
-                      lambda total:
-                          total <= 1
-                  ),
-
-                  (
-                      "2-3",
-                      lambda total:
-                          2 <= total <= 3
-                  ),
-
-                  (
-                      "4-5",
-                      lambda total:
-                          4 <= total <= 5
-                  ),
-
-                  (
-                      "6+",
-                      lambda total:
-                          total >= 6
-                  )
-
+              home_win = prob(lambda h,a: h > a)
+              draw = prob(lambda h,a: h == a)
+              away_win = prob(lambda h,a: h < a)
+              candidates = [
+                  candidate("1X2", "1", home_win),
+                  candidate("1X2", "X", draw),
+                  candidate("1X2", "2", away_win),
+                  candidate("Doppia Chance", "1X", home_win + draw),
+                  candidate("Doppia Chance", "X2", draw + away_win),
+                  candidate("Doppia Chance", "12", home_win + away_win),
               ]
-
-
-              for label, condition in ranges:
-
-                  probability = (
-                      contextual_probability(
-                          home_games,
-                          away_games,
-                          lambda g, condition=condition:
-                              condition(
-                                  g["gf"]
-                                  +
-                                  g["ga"]
-                              ),
-                          lambda g, condition=condition:
-                              condition(
-                                  g["gf"]
-                                  +
-                                  g["ga"]
-                              )
-                      )
-                  )
-
-
-                  candidates.append(
-                      create_candidate(
-                          "Somma Gol",
-                          label,
-                          probability
-                      )
-                  )
-
-
-              # ------------------------------------------------------
-              # RISULTATI ESATTI
-              # ------------------------------------------------------
-
-              if (
-                  len(home_games) >= 5
-                  and
-                  len(away_games) >= 5
-              ):
-
-                  home_xg, away_xg = (
-                      expected_goals(
-                          home_games,
-                          away_games
-                      )
-                  )
-
-
-                  if (
-                      home_xg is not None
-                      and
-                      away_xg is not None
-                  ):
-
-                      for hg in range(
-                          MAX_SCORE_GOALS + 1
-                      ):
-
-                          for ag in range(
-                              MAX_SCORE_GOALS + 1
-                          ):
-
-                              probability = (
-
-                                  poisson_probability(
-                                      hg,
-                                      home_xg
-                                  )
-
-                                  *
-
-                                  poisson_probability(
-                                      ag,
-                                      away_xg
-                                  )
-
-                              )
-
-
-                              if (
-                                  probability
-                                  <
-                                  MIN_EXACT_SCORE_PROBABILITY
-                              ):
-                                  continue
-
-
-                              candidate = (
-                                  create_candidate(
-                                      "Risultato Esatto",
-                                      f"{hg}:{ag}",
-                                      probability,
-                                      "poisson"
-                                  )
-                              )
-
-
-                              candidate[
-                                  "expectedHomeGoals"
-                              ] = round(
-                                  home_xg,
-                                  3
-                              )
-
-                              candidate[
-                                  "expectedAwayGoals"
-                              ] = round(
-                                  away_xg,
-                                  3
-                              )
-
-
-                              candidates.append(
-                                  candidate
-                              )
-
-
-              # ------------------------------------------------------
-              # ORDINA
-              # ------------------------------------------------------
-
-              candidates.sort(
-                  key=lambda c:
-                      c["index"],
-                  reverse=True
-              )
-
-
+              goal = prob(lambda h,a: h > 0 and a > 0)
+              candidates.extend([
+                  candidate("Goal/No Goal", "GOAL", goal),
+                  candidate("Goal/No Goal", "NO GOAL", 1.0 - goal),
+              ])
+              for line in (1.5, 2.5, 3.5):
+                  over = prob(lambda h,a,line=line: h + a > line)
+                  candidates.extend([
+                      candidate("Totale Gol", f"OVER {line}", over),
+                      candidate("Totale Gol", f"UNDER {line}", 1 - over),
+                  ])
+              even = prob(lambda h,a: (h + a) % 2 == 0)
+              candidates.extend([
+                  candidate("Pari/Dispari", "PARI", even),
+                  candidate("Pari/Dispari", "DISPARI", 1.0 - even),
+              ])
+              for label, fn in [
+                  ("0-1", lambda h,a: h + a <= 1),
+                  ("2-3", lambda h,a: 2 <= h + a <= 3),
+                  ("4-5", lambda h,a: 4 <= h + a <= 5),
+                  ("6+", lambda h,a: h + a >= 6),
+              ]:
+                  candidates.append(candidate("Somma Gol", label, prob(fn)))
+              for hg in range(MAX_SCORE_GOALS + 1):
+                  for ag in range(MAX_SCORE_GOALS + 1):
+                      score_prob = next(p for h,a,p in outcomes if h == hg and a == ag)
+                      if score_prob >= MIN_EXACT_SCORE_PROBABILITY:
+                          candidates.append(candidate("Risultato Esatto", f"{hg}:{ag}", score_prob))
+              candidates.sort(key=lambda c: c["index"], reverse=True)
               return candidates
 
 
@@ -2538,6 +2187,37 @@ jobs:
               return candidates
 
 
+          def consecutive_wins(games):
+              streak = 0
+              for game in reversed(games):
+                  if game["gf"] > game["ga"]:
+                      streak += 1
+                  else:
+                      break
+              return streak
+
+
+          def draw_market_odd(fixture_id):
+              values = []
+              for block in odds_cache.get(fixture_id, []):
+                  for bookmaker in block.get("bookmakers") or []:
+                      for bet in bookmaker.get("bets") or []:
+                          m = normalize(bet.get("name"))
+                          if m not in {"match winner", "1x2", "full time result",
+                                       "fulltime result", "match result"}:
+                              continue
+                          for item in bet.get("values") or []:
+                              if normalize(item.get("value")) not in {"draw", "x"}:
+                                  continue
+                              odd = safe_float(item.get("odd"))
+                              if odd is not None and 1.01 < odd < 15:
+                                  values.append(odd)
+              if not values:
+                  return None
+              values.sort()
+              return round(values[len(values)//2], 3)
+
+
           # ==========================================================
           # COSTRUISCI CANDIDATE PARTITE
           # ==========================================================
@@ -2982,6 +2662,18 @@ jobs:
 
 
               # solo candidati con quota
+              risk_signals = {
+                  "homeWinStreak": consecutive_wins(home_games),
+                  "awayWinStreak": consecutive_wins(away_games),
+                  "drawOdd": draw_market_odd(match["fixtureId"]),
+                  "drawAttention": False,
+                  "engineModel": "poisson_v10_uncalibrated"
+              }
+              risk_signals["drawAttention"] = (
+                  risk_signals["drawOdd"] is not None
+                  and risk_signals["drawOdd"] <= 3.00
+              )
+
               quoted_candidates = [
                   c for c in candidates
                   if c.get("oddAvailable")
@@ -2989,6 +2681,30 @@ jobs:
                   and safe_float(c.get("odd")) >= MIN_ODD
               ]
 
+
+              # Controlli sul feed, indipendenti dalla pagina web.
+              # Non pubblicare consigli su un vantaggio apparente enorme:
+              # spesso e' un errore di stima o un prezzo non comparabile.
+              def passes_risk_controls(c):
+                  if c["market"] == "Risultato Esatto":
+                      return False
+                  selection = str(c.get("selection") or "").upper()
+                  if c["market"] == "1X2":
+                      if selection == "1" and risk_signals["homeWinStreak"] >= 6:
+                          return False
+                      if selection == "2" and risk_signals["awayWinStreak"] >= 6:
+                          return False
+                      if (selection in {"1", "2"} and risk_signals["drawAttention"]
+                          and c["modelProbability"] < 0.63):
+                          return False
+                  p_model = c["modelProbability"]
+                  p_odd = 1.0 / float(c["odd"])
+                  if p_model - p_odd > 0.12 or p_model / p_odd > 1.40:
+                      return False
+                  return True
+
+              quoted_candidates = [c for c in quoted_candidates
+                                   if passes_risk_controls(c)]
 
               quoted_candidates.sort(
                   key=lambda c: (
@@ -3181,6 +2897,7 @@ jobs:
                   "historyQuality": match["historyQuality"],
 
                   "context": fixture_context(match),
+                  "riskSignals": risk_signals,
 
                   "prediction":
                       prediction,
@@ -3334,7 +3051,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V9.2.1 CONTEXT MULTI-MARKET",
+                  "BETLAB V10.0 COHERENT POISSON EXPERIMENTAL",
 
               "generatedAt":
                   datetime.now(
@@ -3355,6 +3072,15 @@ jobs:
 
               "matchesHistoryRecent": recent_eligible_matches,
               "matchesHistoryUnreliable": stale_or_insufficient_matches,
+              "selectionPolicy": {
+                  "model": "poisson_coherent_uncalibrated",
+                  "winStreakExcludeAt": 6,
+                  "drawAttentionAtOrBelow": 3.0,
+                  "maxProbabilityPriceGap": 0.12,
+                  "maxProbabilityPriceRatio": 1.40,
+                  "exactScoresRecommended": False,
+                  "note": "Filtri sperimentali; non implicano redditivita' verificata"
+              },
               "historyPolicy": {
                   "recentWindowDays": RECENT_WINDOW_DAYS,
                   "minRecentGamesPerTeam": MIN_RECENT_GAMES,
