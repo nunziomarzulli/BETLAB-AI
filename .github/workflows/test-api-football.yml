@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V10.0 - Motore coerente e filtri rischio
+      - name: BETLAB Prediction Engine V10.1 - Quote robuste e calendario 7 giorni
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -42,12 +42,13 @@ jobs:
           TODAY = datetime.now(ROME).date()
           YESTERDAY = TODAY - timedelta(days=1)
           TOMORROW = TODAY + timedelta(days=1)
+          DAYS_AHEAD = 6
 
-          # Recupera anche ieri per chiudere le schedine dopo la mezzanotte.
-          DAYS = [
-              YESTERDAY.isoformat(),
-              TODAY.isoformat(),
-              TOMORROW.isoformat()
+          # Ieri per liquidare le schedine; oggi + sei giorni per il calendario.
+          # Le date non disponibili sul piano API vengono segnalate, non inventate.
+          DAYS = [YESTERDAY.isoformat()] + [
+              (TODAY + timedelta(days=offset)).isoformat()
+              for offset in range(DAYS_AHEAD + 1)
           ]
 
           MAX_HISTORY = 10
@@ -62,6 +63,8 @@ jobs:
 
           MIN_MARKET_INDEX = 0.0  # Conserva tutti i mercati per il controllo quote finale
           MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
+          MAX_RECOMMENDED_ODD = 3.00  # Protezione sperimentale dalle quote estreme.
+          MIN_RECOMMENDED_PROBABILITY = 0.50
           MIN_EXACT_SCORE_PROBABILITY = 0.025
 
 
@@ -327,69 +330,49 @@ jobs:
 
 
           # ==========================================================
-          # SCARICA OGGI + DOMANI
+          # SCARICA CALENDARIO OGGI + PROSSIMI 6 GIORNI
           # ==========================================================
 
           all_api_matches = []
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V9")
+          print("BETLAB MULTI-MARKET ENGINE V10.1")
           print("==============================================")
           print("")
 
 
+          unavailable_days = []
+          fixture_requests = 0
           for day in DAYS:
-
+              future_path = f"data/future/{day}.json"
+              payload = None
               try:
-                  payload = api_get(
-                      "fixtures",
-                      {
-                          "date": day
-                      }
-                  )
-
-              except RuntimeError as exc:
-                  error_text = str(exc)
-
-                  if (
-                      day in {TOMORROW.isoformat(), YESTERDAY.isoformat()}
-                      and "Free plans do not have access to this date" in error_text
-                  ):
-                      print(
-                          day,
-                          ": saltato - data non ancora disponibile",
-                          "nel piano Free API-Football"
-                      )
+                  fixture_requests += 1
+                  payload = api_get("fixtures", {"date": day})
+                  if not isinstance(payload, dict):
+                      raise RuntimeError("Risposta API non valida")
+                  save_json(future_path, payload)
+                  source = "API"
+              except Exception as exc:
+                  # Il piano Free puo' negare date future. Recupera SOLO dati
+                  # gia' salvati per quel giorno, mai risultati inventati.
+                  cached = load_json(future_path, None)
+                  if isinstance(cached, dict) and isinstance(cached.get("response"), list):
+                      payload = cached
+                      source = "cache"
+                  elif day == TODAY.isoformat():
+                      raise
+                  else:
+                      unavailable_days.append(day)
+                      print(f"{day}: calendario non disponibile ({str(exc)[:150]})")
                       continue
 
-                  raise
+              fixtures = payload.get("response") or []
+              all_api_matches.extend(fixtures)
+              print(f"{day}: {len(fixtures)} partite ({source})")
 
-              fixtures = (
-                  payload.get("response")
-                  or
-                  []
-              )
-
-              all_api_matches.extend(
-                  fixtures
-              )
-
-              future_path = (
-                  f"data/future/{day}.json"
-              )
-
-              save_json(
-                  future_path,
-                  payload
-              )
-
-              print(
-                  day,
-                  ":",
-                  len(fixtures),
-                  "partite"
-              )
+          print("Giorni senza calendario verificabile:", unavailable_days)
 
 
           # ==========================================================
@@ -2016,174 +1999,61 @@ jobs:
           # ASSOCIA MIGLIORE QUOTA
           # ==========================================================
 
-          def attach_best_odds(
-              fixture_id,
-              candidates
-          ):
-
-              blocks = get_fixture_odds(
-                  fixture_id
-              )
-
-
+          def attach_best_odds(fixture_id, candidates):
+              """Una quota rappresentativa, non il massimo isolato.
+              Mediana delle quote di bookmaker distinti sullo stesso mercato
+              e sulla stessa selezione. La quota pubblicata viene davvero
+              offerta da un bookmaker, non e' un prezzo costruito.
+              """
+              blocks = get_fixture_odds(fixture_id)
               for candidate in candidates:
-
-                  best = None
-
-
+                  offered = {}
                   for block in blocks:
-
-                      bookmakers = (
-                          block.get(
-                              "bookmakers"
-                          )
-                          or
-                          []
-                      )
-
-
-                      for bookmaker in bookmakers:
-
-                          bookmaker_name = (
-                              bookmaker.get(
-                                  "name"
-                              )
-                              or
-                              "Bookmaker"
-                          )
-
-
-                          for bet in (
-                              bookmaker.get(
-                                  "bets"
-                              )
-                              or
-                              []
-                          ):
-
-                              market_name = (
-                                  bet.get(
-                                      "name"
-                                  )
-                                  or
-                                  ""
-                              )
-
-
-                              for value in (
-                                  bet.get(
-                                      "values"
-                                  )
-                                  or
-                                  []
-                              ):
-
-                                  api_value = (
-                                      value.get(
-                                          "value"
-                                      )
-                                  )
-
-
-                                  if not selection_matches(
-                                      candidate,
-                                      market_name,
-                                      api_value
-                                  ):
+                      for bookmaker in block.get("bookmakers") or []:
+                          bookmaker_name = str(bookmaker.get("name") or "Bookmaker")
+                          for bet in bookmaker.get("bets") or []:
+                              market_name = bet.get("name") or ""
+                              for value in bet.get("values") or []:
+                                  api_value = value.get("value")
+                                  if not selection_matches(candidate, market_name, api_value):
                                       continue
-
-
-                                  odd = safe_float(
-                                      value.get(
-                                          "odd"
-                                      )
-                                  )
-
-
-                                  if (
-                                      odd is None
-                                      or
-                                      odd <= 1
-                                  ):
+                                  odd = safe_float(value.get("odd"))
+                                  if odd is None or not math.isfinite(odd) or odd <= 1.00 or odd > 1000:
                                       continue
-
-
-                                  if (
-                                      best is None
-                                      or
-                                      odd > best[
-                                          "odd"
-                                      ]
-                                  ):
-
-                                      best = {
-
-                                          "odd":
-                                              odd,
-
-                                          "bookmaker":
-                                              bookmaker_name,
-
-                                          "apiMarket":
-                                              market_name,
-
-                                          "apiSelection":
-                                              str(
-                                                  api_value
-                                              )
-
-                                      }
-
-
-                  if best is None:
+                                  # Una sola offerta per bookmaker e mercato.
+                                  # Non trasformare differenze di bookmaker in
+                                  # una ricerca sistematica del massimo prezzo.
+                                  key = (bookmaker_name.lower(), normalize(market_name))
+                                  datum = {
+                                      "odd": odd,
+                                      "bookmaker": bookmaker_name,
+                                      "apiMarket": market_name,
+                                      "apiSelection": str(api_value)
+                                  }
+                                  if key not in offered or odd < offered[key]["odd"]:
+                                      offered[key] = datum
+                  prices = sorted(offered.values(), key=lambda row: row["odd"])
+                  if not prices:
                       continue
-
-
-                  candidate[
-                      "oddAvailable"
-                  ] = True
-
-                  candidate[
-                      "odd"
-                  ] = round(
-                      best["odd"],
-                      3
-                  )
-
-                  candidate[
-                      "bookmaker"
-                  ] = best[
-                      "bookmaker"
-                  ]
-
-                  candidate[
-                      "apiMarket"
-                  ] = best[
-                      "apiMarket"
-                  ]
-
-                  candidate[
-                      "apiSelection"
-                  ] = best[
-                      "apiSelection"
-                  ]
-
-
-                  probability = candidate[
-                      "modelProbability"
-                  ]
-
-
-                  candidate[
-                      "value"
-                  ] = round(
-                      probability
-                      *
-                      best["odd"],
-                      3
-                  )
-
-
+                  # Scarta offerte fortemente divergenti se esiste un consenso.
+                  middle = prices[len(prices)//2]["odd"] if len(prices) % 2 else (
+                      prices[len(prices)//2-1]["odd"] + prices[len(prices)//2]["odd"]
+                  ) / 2
+                  inliers = [row for row in prices if 0.80 * middle <= row["odd"] <= 1.20 * middle]
+                  if not inliers:
+                      continue
+                  # Per un numero pari di fonti preferisci l'osservazione
+                  # inferiore: scegli una quota davvero quotata, conservativa.
+                  chosen = inliers[(len(inliers)-1)//2]
+                  candidate["oddAvailable"] = True
+                  candidate["odd"] = round(chosen["odd"], 3)
+                  candidate["bookmaker"] = chosen["bookmaker"]
+                  candidate["apiMarket"] = chosen["apiMarket"]
+                  candidate["apiSelection"] = chosen["apiSelection"]
+                  candidate["oddsSources"] = len(inliers)
+                  candidate["oddsObserved"] = len(prices)
+                  candidate["oddsQuality"] = "multi_source" if len(inliers) >= 2 else "single_source"
+                  candidate["value"] = round(candidate["modelProbability"] * chosen["odd"], 3)
               return candidates
 
 
@@ -2427,7 +2297,7 @@ jobs:
 
 
           print(
-              "Candidate oggi + domani:",
+              "Candidate calendario:",
               len(candidate_matches)
           )
 
@@ -2678,7 +2548,9 @@ jobs:
                   c for c in candidates
                   if c.get("oddAvailable")
                   and safe_float(c.get("odd")) is not None
-                  and safe_float(c.get("odd")) >= MIN_ODD
+                  and MIN_ODD <= safe_float(c.get("odd")) <= MAX_RECOMMENDED_ODD
+                  and safe_float(c.get("modelProbability")) is not None
+                  and safe_float(c.get("modelProbability")) >= MIN_RECOMMENDED_PROBABILITY
               ]
 
 
@@ -3051,7 +2923,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V10.0 COHERENT POISSON EXPERIMENTAL",
+                  "BETLAB V10.1 COHERENT POISSON EXPERIMENTAL",
 
               "generatedAt":
                   datetime.now(
@@ -3060,6 +2932,8 @@ jobs:
 
               "days":
                   DAYS,
+              "calendarDaysUnavailable": unavailable_days,
+              "calendarHorizonDays": DAYS_AHEAD + 1,
 
               "historyCount":
                   len(history),
@@ -3078,6 +2952,9 @@ jobs:
                   "drawAttentionAtOrBelow": 3.0,
                   "maxProbabilityPriceGap": 0.12,
                   "maxProbabilityPriceRatio": 1.40,
+                  "maximumRecommendedOdd": MAX_RECOMMENDED_ODD,
+                  "minimumRecommendedModelProbability": MIN_RECOMMENDED_PROBABILITY,
+                  "quoteSelection": "median_of_available_bookmakers",
                   "exactScoresRecommended": False,
                   "note": "Filtri sperimentali; non implicano redditivita' verificata"
               },
@@ -3286,7 +3163,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V9.2.1 OK")
+          print("BETLAB MULTI-MARKET ENGINE V10.1 OK")
           print("==============================================")
 
           PY
@@ -3303,7 +3180,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V9.2.1 - fix NameError storico"
+          git commit -m "Aggiorna BETLAB V10.1 - quote robuste e calendario"
 
           git pull --rebase origin main
 
