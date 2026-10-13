@@ -1217,6 +1217,30 @@
 @media (max-width:1350px){.monitor-grid{grid-template-columns:1fr;}}
 @media (max-width:700px){.analysis-match-head{flex-wrap:wrap}.analysis-probability-grid{grid-template-columns:1fr 1fr}.recommended-model-details .analysis-probability-grid{grid-template-columns:1fr}.analysis-match-card{padding:13px;}}
 
+/* BETLAB V10.3.1: letture statistiche visibili, separate dalle giocate */
+.model-insights-section{margin:20px 0 10px;padding:18px;border:1px solid #31536a;background:#0d2032;border-radius:14px}
+.model-insights-heading{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:15px}
+.model-insights-heading h2{font-size:21px;line-height:1.25;margin:0 0 7px;color:#f3fafb}
+.model-insights-heading p{font-size:12px;line-height:1.55;color:#adbfca;margin:0;max-width:850px}
+.model-insights-count{font-size:11px;font-weight:850;color:#9de1c1;white-space:nowrap;flex-shrink:0}
+.model-insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.model-insight-card{padding:15px;border:1px solid #36586a;background:#152c3e;color:#f0f9fc;border-radius:11px;min-width:0}
+.model-insight-title{display:flex;align-items:start;justify-content:space-between;gap:9px;margin-bottom:12px}
+.model-insight-title small{font-size:10px;color:#a8c4d0;display:block;margin-bottom:4px}
+.model-insight-title h3{font-size:17px;line-height:1.35;margin:0;overflow-wrap:anywhere}
+.model-insight-tag{font-size:9px;font-weight:900;color:#d1f5df;border:1px solid #42735e;border-radius:6px;padding:5px 7px;white-space:nowrap}
+.model-insight-tag.weak{color:#ffe0aa;border-color:#9b7546}
+.model-insight-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.model-insight-metrics>div{background:#0d2232;border:1px solid #2b4658;border-radius:8px;padding:10px 9px;min-width:0}
+.model-insight-metrics small{display:block;font-size:9px;font-weight:850;letter-spacing:.2px;color:#a9bfcb;line-height:1.3;margin-bottom:7px}
+.model-insight-metrics strong{font-size:15px;line-height:1.3;display:block;overflow-wrap:anywhere;color:#ecfafa}
+.model-insight-metrics span{display:block;font-size:11px;margin-top:5px;color:#a5cfbc}
+.model-insight-caution{font-size:11px;line-height:1.5;color:#b4c7d1;margin:11px 0 0}
+.model-insight-caution.alert{color:#f6ce96}
+.model-insight-empty{color:#b7c9d2;font-size:12px;line-height:1.6}
+@media(max-width:1100px){.model-insights-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.model-insights-heading{flex-direction:column}.model-insight-metrics{grid-template-columns:1fr}.model-insight-metrics>div{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}.model-insight-metrics small{margin:0}.model-insight-metrics span{margin:0}}
+
 </style>
 </head>
 
@@ -1239,7 +1263,7 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.3 · Sperimentale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.3.1 · Analisi visibile</button>
       <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
@@ -1254,8 +1278,8 @@
     </h1>
 
     <div class="subtitle">
-      BETLAB V10.3 separa l’analisi probabilistica dai consigli di giocata. Ogni stima indica i limiti dei dati; nessuna probabilità è stata validata.
-      Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
+      BETLAB mostra la lettura del modello anche quando nessun mercato supera i controlli per la giocata.
+      Le probabilità sono sperimentali e non validate: una tendenza statistica non è un consiglio di scommessa.
     </div>
 
 
@@ -1270,6 +1294,12 @@
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
     <div id="dailyMatches" class="daily-grid"></div>
+    <section id="modelInsightsSection" class="model-insights-section" aria-label="Letture probabilistiche del modello">
+      <div class="model-insights-heading"><div><h2>Letture del modello · anche senza giocate</h2>
+        <p>Per ogni partita con dati calcolabili: esito 1X2 più probabile, andamento dei gol e punteggio esatto più probabile. <strong>Non sono consigli di giocata e non hanno una quota implicita approvata.</strong></p></div>
+        <span id="modelInsightsCount" class="model-insights-count">Caricamento...</span></div>
+      <div id="modelInsightsCards" class="model-insights-grid"></div>
+    </section>
     <details id="monitoredMatches" class="monitor-panel" open>
       <summary><span>ANALISI DELLE PARTITE · NON CONSIGLIATE</span><span id="monitorCount" class="monitor-count">Caricamento...</span></summary>
       <p class="monitor-info">Per ogni incontro: stime 1X2, Under/Over, GOAL e PARI, tre risultati esatti più probabili e qualità dello storico. Le stime non quotate e non calibrate <strong>non sono consigli di giocata</strong>.</p>
@@ -1514,6 +1544,8 @@
   const dailyMatches = document.getElementById("dailyMatches");
   const monitorList = document.getElementById("monitorList");
   const monitorCount = document.getElementById("monitorCount");
+  const modelInsightsCards = document.getElementById("modelInsightsCards");
+  const modelInsightsCount = document.getElementById("modelInsightsCount");
   const v7Panel = document.getElementById("v7Panel");
   const v9Panel = document.getElementById("v9Panel");
   const tabV7 = document.getElementById("tabV7");
@@ -1883,6 +1915,7 @@
   dayFilter.addEventListener("change", () => {
     selectedDay = dayFilter.value;
     renderDailyRecommendations();
+    renderModelInsights();
     renderMonitoredMatches();
   });
 
@@ -1927,6 +1960,77 @@
     }));
     const today = new Date(betlabData?.generatedAt || Date.now());
     availability.textContent = `${rows.length} consigliati su ${availableFixtures.length} incontri disponibili · Quote consigliate massimo ${oddText(MAX_RECOMMENDED_ODD)} · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
+  }
+
+
+  // Sintesi del modello, indipendente dal selettore delle giocate.
+  // Non si attribuiscono quote, affidabilita' o probabilita' aggiuntive.
+  function modelReading(m) {
+    const model = m?.modelAnalysis || {};
+    const p = model.probabilities || {};
+    const prob = key => {
+      if (p[key] === null || p[key] === undefined || p[key] === "") return null;
+      const n = Number(p[key]);
+      return Number.isFinite(n) && n >= 0 && n <= 1 ? n : null;
+    };
+    if (model.status === "non_calcolabile") return null;
+    const triple = [["1",prob("1")],["X",prob("X")],["2",prob("2")]];
+    if (triple.some(([k,v])=>v === null)) return null;
+    triple.sort((a,b)=>b[1]-a[1]);
+    const goalUnder = prob("UNDER 2.5"), goalOver = prob("OVER 2.5");
+    const top = Array.isArray(model.topScores) ? model.topScores.find(x =>
+      /^\d+-\d+$/.test(String(x.score || "")) &&
+      x.probability != null && Number.isFinite(Number(x.probability)) &&
+      Number(x.probability) >= 0 && Number(x.probability) <= 1) : null;
+    const scoreLabel = top ? String(top.score) : "—";
+    const scoreProbability = top ? Number(top.probability) : null;
+    const goals = goalUnder !== null && goalOver !== null
+      ? (goalUnder >= goalOver ? {label:"UNDER 2.5", p:goalUnder} : {label:"OVER 2.5", p:goalOver})
+      : {label:"Non calcolabile",p:null};
+    const homeName = String(m.home?.name || "Casa");
+    const awayName = String(m.away?.name || "Trasferta");
+    const teamLabel = triple[0][0] === "1" ? "1 · "+homeName :
+      triple[0][0] === "2" ? "2 · "+awayName : "X · Pareggio";
+    // Il confronto fra mercato e modello e' un avviso, non un ricalcolo postumo.
+    const market = m.riskSignals?.market1X2 || {};
+    const marketVal = market?.probabilities?.[triple[0][0]];
+    const fair = marketVal === null || marketVal === undefined ? NaN : Number(marketVal);
+    const hasConsensus = market.available === true && Number(market.sourceCount) >= 3 && Number.isFinite(fair) && fair >= 0 && fair <= 1;
+    const gap = hasConsensus ? triple[0][1]-fair : null;
+    return {teamLabel,teamProbability:triple[0][1],goals,scoreLabel,scoreProbability,
+      quality:model.status,homeGames:Number(model.homeGames || 0),awayGames:Number(model.awayGames || 0),
+      gap,marketProbability:hasConsensus ? fair : null};
+  }
+
+  function renderModelInsights() {
+    const fixtures = getMatches().filter(m => validFixture(m) &&
+      (selectedDay === "all" || m.date === selectedDay));
+    const readings = fixtures.map(m => ({m,reading:modelReading(m)}))
+      .filter(x => x.reading !== null).sort((a,b) => {
+        const quality = r => r.quality === "campione_idoneo" ? 2 : 1;
+        return quality(b.reading)-quality(a.reading) || Number(a.m.timestamp)-Number(b.m.timestamp);
+      });
+    const approved = new Set(dailyRecommendations.map(x => String(x.match.fixtureId)));
+    modelInsightsCount.textContent = `${readings.length} con stime su ${fixtures.length} partite`;
+    modelInsightsCards.innerHTML = readings.length ? readings.map(({m,reading:r})=>{
+      const weak = r.quality !== "campione_idoneo";
+      const discordant = r.gap !== null && Math.abs(r.gap) > 0.075;
+      const approvedPick = approved.has(String(m.fixtureId));
+      const note = discordant
+        ? `Attenzione: esito 1X2 stimato ${readablePercent(r.teamProbability)}, consenso bookmaker ${readablePercent(r.marketProbability)}. Scarto rilevante: non usare questa stima come consiglio.`
+        : weak ? `Storico parziale (${r.homeGames} + ${r.awayGames} gare): stima esplorativa, non validata.`
+        : `Storico ${r.homeGames} + ${r.awayGames} gare. Le stime non sono calibrate; lo scenario non e' una selezione quotata.`;
+      return `<article class="model-insight-card">
+        <div class="model-insight-title"><div><small>${safeText(m.league)} · ${formatDate(m)}</small><h3>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</h3></div>
+          <span class="model-insight-tag ${weak ? "weak" : ""}">${weak ? "STIMA ESPLORATIVA" : approvedPick ? "GIOCATA APPROVATA A PARTE" : "SOLO ANALISI"}</span></div>
+        <div class="model-insight-metrics">
+          <div><small>ESITO 1X2 PIÙ PROBABILE</small><strong>${safeText(r.teamLabel)}</strong><span>${readablePercent(r.teamProbability)}</span></div>
+          <div><small>TENDENZA GOL (LINEA 2.5)</small><strong>${safeText(r.goals.label)}</strong><span>${r.goals.p === null ? "n.d." : readablePercent(r.goals.p)}</span></div>
+          <div><small>PUNTEGGIO ESATTO PIÙ PROBABILE</small><strong>${safeText(r.scoreLabel)}</strong><span>${r.scoreProbability === null ? "n.d." : readablePercent(r.scoreProbability)}</span></div>
+        </div>
+        <p class="model-insight-caution ${discordant || weak ? "alert" : ""}">${safeText(note)}</p>
+      </article>`;
+    }).join("") : `<p class="model-insight-empty">Nessuna lettura numerica disponibile nelle date selezionate: il feed non contiene dati storici sufficienti. Gli incontri restano elencati qui sotto senza percentuali inventate.</p>`;
   }
 
   // Analisi e consigli sono percorsi distinti. Le stime senza quote non
@@ -2455,6 +2559,7 @@
       prepareDailyRecommendations();
       refreshDayFilter();
       renderDailyRecommendations();
+      renderModelInsights();
       renderMonitoredMatches();
       await refreshBetStatuses();
       renderSavedBets();
@@ -2463,6 +2568,8 @@
       console.error(error);
       availability.textContent = "Dati BETLAB non disponibili.";
       dailyMatches.innerHTML = '<div class="daily-empty">Impossibile caricare le analisi. Riprova con AGGIORNA DATI.</div>';
+      modelInsightsCards.innerHTML = '<p class="model-insight-empty">Analisi non disponibili: impossibile leggere il feed.</p>';
+      modelInsightsCount.textContent = "0 stime";
       showError("Errore di caricamento: " + String(error.message || error));
     } finally {refreshButton.disabled = false;}
   }
