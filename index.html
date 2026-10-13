@@ -1146,6 +1146,13 @@
     @media(max-width:700px){.context-injuries{grid-template-columns:1fr}}
 
 
+    /* Calendario V10.1: tutte le fixture restano consultabili. */
+    .day-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 14px;margin:10px 0 14px;border:1px solid #2a4a5b;background:#0e2637;border-radius:11px;color:#e3efe8}
+    .day-controls label{font-size:11px;font-weight:900;letter-spacing:.8px}
+    .day-controls select{background:#fff;color:#162b23;border-radius:7px;border:1px solid #b1c8bc;padding:10px 12px;font-size:12px;font-weight:800;max-width:100%}
+    .calendar-coverage{font-size:11px;color:#acc8ba}
+    @media(max-width:700px){.day-controls select{width:100%}}
+
     /* BETLAB V9 + V7: due schermate realmente separate */
     [hidden] { display:none !important; }
     .engine-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 23px; padding:6px; border:1px solid #254056; border-radius:14px; background:#0c1c2d; width:max-content; max-width:100%; }
@@ -1196,7 +1203,7 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10 · Sperimentale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.1 · Sperimentale</button>
       <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
@@ -1207,11 +1214,11 @@
     </div>
 
     <h1>
-      Pronostici del giorno
+      Pronostici e calendario
     </h1>
 
     <div class="subtitle">
-      BETLAB V10 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
+      BETLAB V10.1 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
       Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
     </div>
 
@@ -1219,6 +1226,11 @@
     <div class="daily-head">
       <div><h2>Analisi delle partite</h2><p>Un solo pronostico principale per incontro. Le stime sono sperimentali; nei dettagli trovi anche casa/trasferta, riposo e indisponibili quando disponibili.</p></div>
       <button id="refreshButton" class="refresh-button" type="button">AGGIORNA DATI</button>
+    </div>
+    <div class="day-controls">
+      <label for="dayFilter">CALENDARIO PARTITE</label>
+      <select id="dayFilter" aria-label="Seleziona il giorno delle partite"><option value="all">Tutti i giorni disponibili</option></select>
+      <span id="calendarCoverage" class="calendar-coverage">Verifica disponibilità date...</span>
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
     <div id="dailyMatches" class="daily-grid"></div>
@@ -1449,6 +1461,12 @@
   let dailyRecommendations = [];
   const nowEpoch = () => Math.floor(Date.now() / 1000);
   const MIN_QUOTA = 1.10; // Soglia richiesta: 1,10 ammessa, valori inferiori esclusi.
+  const MAX_RECOMMENDED_ODD = 3.00;
+  const MIN_RECOMMENDED_PROBABILITY = 0.50;
+  const dayFilter = document.getElementById("dayFilter");
+  const calendarCoverage = document.getElementById("calendarCoverage");
+  let selectedDay = "all";
+
 
 
   const BETS_STORAGE_KEY = "betlab_saved_bets_v1";
@@ -1659,14 +1677,15 @@
   }
 
   function getCandidateAssessment(candidate, match) {
-    if (!String(betlabData?.engine || "").includes("V10.0")) return null;
+    if (!String(betlabData?.engine || "").includes("V10.1")) return null;
     if (candidate?.oddAvailable !== true) return null;
     const odd = Number(candidate.odd);
     const p = Number(candidate.modelProbability);
     const homeGames = Number(match?.home?.form?.played || 0);
     const awayGames = Number(match?.away?.form?.played || 0);
     const risk = match?.riskSignals || {};
-    if (!(Number.isFinite(odd) && odd >= MIN_QUOTA && p > 0 && p < 1)) return null;
+    if (!(Number.isFinite(odd) && odd >= MIN_QUOTA && odd <= MAX_RECOMMENDED_ODD &&
+          p >= MIN_RECOMMENDED_PROBABILITY && p < 1)) return null;
     if (homeGames < 6 || awayGames < 6 || match.historyEligible !== true) return null;
     // Risultati esatti esclusi dalle proposte finche' non esiste
     // una verifica storica della calibrazione del modello.
@@ -1770,11 +1789,48 @@
     </div>`;
   }
 
+  function romeTodayISO() {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("it-IT", {
+      timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit"
+    }).formatToParts(new Date()).map(p => [p.type, p.value]));
+    return `${parts.year}-${parts.month}-${parts.day}`;
+  }
+
+  function refreshDayFilter() {
+    const today = romeTodayISO();
+    const counts = {};
+    getMatches().filter(validFixture).forEach(m => { counts[m.date] = (counts[m.date] || 0) + 1; });
+    const options = ['<option value="all">Tutte le date disponibili</option>'];
+    for (let offset = 0; offset < 7; offset++) {
+      const date = new Date(today + "T12:00:00Z");
+      date.setUTCDate(date.getUTCDate() + offset);
+      const key = date.toISOString().slice(0, 10);
+      const label = offset === 0 ? "Oggi" : offset === 1 ? "Domani" :
+        new Intl.DateTimeFormat("it-IT", { weekday: "short", day: "2-digit", month: "short", timeZone: "UTC" }).format(date);
+      options.push(`<option value="${key}">${label} · ${counts[key] || 0} partite</option>`);
+    }
+    dayFilter.innerHTML = options.join("");
+    if (selectedDay !== "all" && ![...dayFilter.options].some(o => o.value === selectedDay)) selectedDay = "all";
+    dayFilter.value = selectedDay;
+    const unavailable = (betlabData?.calendarDaysUnavailable || []).filter(d => d >= today);
+    calendarCoverage.textContent = unavailable.length
+      ? `Date non coperte dal provider: ${unavailable.map(d => d.slice(8,10) + "/" + d.slice(5,7)).join(", ")}`
+      : `Calendario fino a 7 giorni, secondo disponibilità API`;
+  }
+  dayFilter.addEventListener("change", () => {
+    selectedDay = dayFilter.value;
+    renderDailyRecommendations();
+    renderMonitoredMatches();
+  });
+
   function renderDailyRecommendations() {
-    const rows = dailyRecommendations;
+    const rows = dailyRecommendations.filter(row => selectedDay === "all" || row.match.date === selectedDay);
+    const availableFixtures = getMatches().filter(m => validFixture(m) && (selectedDay === "all" || m.date === selectedDay));
     if (!rows.length) {
-      dailyMatches.innerHTML = `<div class="daily-empty">Nessun incontro supera oggi i controlli di dati e quota. BETLAB non forza un pronostico per riempire la schedina.</div>`;
-      availability.textContent = `Ultimo aggiornamento: ${safeText(betlabData?.generatedAt || "n.d.")} · 0 selezioni consigliate · filtri prudenti attivi`;
+      dailyMatches.innerHTML = `<div class="daily-empty">${availableFixtures.length
+        ? "Per questa data nessuna partita supera i filtri di probabilità e quota. Consulta ALTRE PARTITE MONITORATE per il calendario completo."
+        : "Nessuna partita disponibile nel feed per questa data. Il piano API potrebbe non fornire ancora il calendario; nessun evento viene inventato."}</div>`;
+      availability.textContent = `${availableFixtures.length} partite disponibili, 0 consigliate · ${safeText(betlabData?.generatedAt || "n.d.")}`;
       return;
     }
     dailyMatches.innerHTML = rows.map(row => {
@@ -1806,20 +1862,21 @@
       createBet(false);
     }));
     const today = new Date(betlabData?.generatedAt || Date.now());
-    availability.textContent = `${rows.length} consigliati su ${getMatches().filter(validFixture).length} incontri futuri analizzati · Quota minima 1,10 · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
+    availability.textContent = `${rows.length} consigliati su ${availableFixtures.length} incontri disponibili · Quote consigliate massimo ${oddText(MAX_RECOMMENDED_ODD)} · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
   }
 
   // Distinguiamo partite disponibili e pronostici che superano i controlli.
   // Non presentiamo come giocabili eventi senza quote e stime adeguate.
   function renderMonitoredMatches() {
     const recommended = new Set(dailyRecommendations.map(r => String(r.match.fixtureId)));
-    const remaining = getMatches().filter(m => validFixture(m) && !recommended.has(String(m.fixtureId)));
+    const remaining = getMatches().filter(m => validFixture(m) &&
+      (selectedDay === "all" || m.date === selectedDay) && !recommended.has(String(m.fixtureId)));
     remaining.sort((a,b) => {
       const amin = Math.min(Number(a.home?.form?.played || 0),Number(a.away?.form?.played || 0));
       const bmin = Math.min(Number(b.home?.form?.played || 0),Number(b.away?.form?.played || 0));
       return bmin-amin || Number(b.priority || 0)-Number(a.priority || 0) || Number(a.timestamp)-Number(b.timestamp);
     });
-    const visible = remaining.slice(0,16);
+    const visible = remaining.slice(0,100);
     monitorCount.textContent = remaining.length + " senza consiglio · " + visible.length + " visualizzate";
     monitorList.innerHTML = visible.length ? visible.map(m => {
       const h = Number(m.home?.form?.played || 0), a = Number(m.away?.form?.played || 0);
@@ -2291,6 +2348,7 @@
         }
       } catch(error) { console.warn("Storico risultati non disponibile",error); }
       prepareDailyRecommendations();
+      refreshDayFilter();
       renderDailyRecommendations();
       renderMonitoredMatches();
       await refreshBetStatuses();
