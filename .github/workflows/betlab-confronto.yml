@@ -1,356 +1,3384 @@
-name: BETLAB Confronto V7 e V10 (offline)
+name: Aggiorna feed BETLAB
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Aggiorna feed BETLAB"]
-    types: [completed]
+  schedule:
+    - cron: "15 5 * * *"
+    - cron: "15 11 * * *"
+    - cron: "15 16 * * *"
 
 permissions:
   contents: write
 
 jobs:
-  confronto:
+  update:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    timeout-minutes: 12
-    steps:
-      - name: Scarica repo e cronologia
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: main
 
-      - name: Confronta i due motori senza nuove richieste API
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: BETLAB Prediction Engine V10.3 - Analisi separate dai consigli
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           python3 <<'PY'
-          import ast
-          import csv
           import json
-          import math
           import os
-          from pathlib import Path
-          import shutil
-          import subprocess
-          import sys
-          import textwrap
-          from datetime import datetime, timezone, timedelta
+          import re
+          import math
+          from functools import lru_cache
+          import unicodedata
+          import urllib.request
+          import urllib.parse
+
+          from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
 
-          ROOT = Path(os.environ['GITHUB_WORKSPACE'])
-          TEMP = Path(os.environ['RUNNER_TEMP']) / 'betlab_parallel_offline'
-          OUT = ROOT / 'betlab_confronto_output'
-          ORIGINAL_SHA = '9aa2d8b61282dca91c82bed23d3c729ec72902e7'
-          START = datetime.now(timezone.utc)
-          RUN_EPOCH = int(START.timestamp())
-          TODAY = datetime.now(ZoneInfo('Europe/Rome')).date()
-          DAYS = [TODAY.isoformat(), (TODAY + timedelta(days=1)).isoformat()]
-          TEMP.mkdir(parents=True, exist_ok=True)
-          OUT.mkdir(parents=True, exist_ok=True)
+
+          API_KEY = os.environ["API_FOOTBALL_KEY"]
+
+          ROME = ZoneInfo("Europe/Rome")
+
+          TODAY = datetime.now(ROME).date()
+          YESTERDAY = TODAY - timedelta(days=1)
+          TOMORROW = TODAY + timedelta(days=1)
+          DAYS_AHEAD = 6
+
+          # Ieri per liquidare le schedine; oggi + sei giorni per il calendario.
+          # Le date non disponibili sul piano API vengono segnalate, non inventate.
+          DAYS = [YESTERDAY.isoformat()] + [
+              (TODAY + timedelta(days=offset)).isoformat()
+              for offset in range(DAYS_AHEAD + 1)
+          ]
+
+          MAX_HISTORY = 10
+          MAX_SCORE_GOALS = 5
+
+          # Qualita' della forma recente: le partite del 2025 non possono
+          # determinare da sole un pronostico dell'ottobre 2026.
+          RECENT_WINDOW_DAYS = 90
+          MIN_RECENT_GAMES = 5
+          MIN_TEAM_HISTORY = 6
+          MAX_LAST_GAME_AGE_DAYS = 30
+
+          MIN_MARKET_INDEX = 0.0  # Conserva tutti i mercati per il controllo quote finale
+          MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
+          MAX_RECOMMENDED_ODD = 3.00  # Protezione sperimentale dalle quote estreme.
+          MIN_RECOMMENDED_PROBABILITY = 0.50
+          MIN_EXACT_SCORE_PROBABILITY = 0.025
 
 
-          def extract_python(workflow):
-              lines = workflow.splitlines()
-              starts = [i for i, line in enumerate(lines) if "python3 <<'PY'" in line]
-              if len(starts) != 1:
-                  raise RuntimeError('Motore non riconosciuto: serve un solo blocco Python, rilevati: ' + str(len(starts)))
-              start = starts[0]
-              indent = len(lines[start]) - len(lines[start].lstrip())
-              for end in range(start+1, len(lines)):
-                  line = lines[end]
-                  if line.strip() == 'PY' and len(line)-len(line.lstrip()) <= indent:
-                      source = textwrap.dedent('\n'.join(lines[start+1:end]))+'\n'
-                      compile(source, '<engine>', 'exec')
-                      return source
-              raise RuntimeError('Terminatore del motore Python non trovato')
+          # ==========================================================
+          # UTILITA
+          # ==========================================================
+
+          def normalize(value):
+
+              value = str(value or "")
+
+              value = unicodedata.normalize(
+                  "NFKD",
+                  value
+              )
+
+              value = "".join(
+                  c for c in value
+                  if not unicodedata.combining(c)
+              )
+
+              value = value.lower()
+
+              value = re.sub(
+                  r"[^a-z0-9]+",
+                  " ",
+                  value
+              )
+
+              return " ".join(
+                  value.split()
+              )
 
 
-          def get_original():
-              return subprocess.check_output(['git','show',ORIGINAL_SHA+':.github/workflows/test-api-football.yml'], cwd=ROOT, text=True)
+          ALIASES = {
+
+              "atletico mg":
+                  "atletico mineiro",
+
+              "ca mineiro":
+                  "atletico mineiro",
+
+              "clube atletico mineiro":
+                  "atletico mineiro",
+
+              "atletico mineiro":
+                  "atletico mineiro",
+
+              "rb bragantino":
+                  "bragantino",
+
+              "red bull bragantino":
+                  "bragantino",
+
+              "bragantino":
+                  "bragantino",
+
+              "real sociedad ii":
+                  "real sociedad b",
+
+              "real sociedad b":
+                  "real sociedad b",
+
+              "ud las palmas":
+                  "las palmas",
+
+              "las palmas":
+                  "las palmas",
+
+              "valladolid":
+                  "real valladolid",
+
+              "real valladolid":
+                  "real valladolid",
+
+              "sporting gijon":
+                  "sporting gijon",
+
+              "real sporting de gijon":
+                  "sporting gijon",
+
+              "sporting de gijon":
+                  "sporting gijon",
+
+              "castellon":
+                  "castellon",
+
+              "cd castellon":
+                  "castellon",
+
+              "rcd mallorca":
+                  "mallorca",
+
+              "mallorca":
+                  "mallorca",
+
+              "internazionale":
+                  "inter",
+
+              "inter milan":
+                  "inter",
+
+              "ac milan":
+                  "milan",
+
+              "manchester united":
+                  "manchester united",
+
+              "man utd":
+                  "manchester united",
+
+              "manchester city":
+                  "manchester city",
+
+              "man city":
+                  "manchester city",
+
+              "wolverhampton wanderers":
+                  "wolves",
+
+              "paris saint germain":
+                  "psg",
+
+              "paris sg":
+                  "psg",
+
+              "bayern munich":
+                  "bayern munchen",
+
+              "bayern munchen":
+                  "bayern munchen",
+
+              "atletico madrid":
+                  "atletico madrid",
+
+              "atletico de madrid":
+                  "atletico madrid"
+
+          }
 
 
-          def head_sha():
-              return subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip()
+          def canonical(value):
+
+              key = normalize(value)
+
+              return ALIASES.get(
+                  key,
+                  key
+              )
 
 
-          def freeze_inputs():
-              # Recuperiamo file del repository: NESSUNA chiamata HTTP.
-              if not (ROOT/'data/betlab-history.json').exists():
-                  raise RuntimeError('Manca data/betlab-history.json')
-              future = {}
-              counts = {}
-              for day in DAYS:
-                  path = ROOT/'data/future'/f'{day}.json'
-                  if not path.exists():
-                      print('ATTENZIONE: snapshot calendario assente per',day)
-                      future[day] = []
-                      counts[day] = 0
-                      continue
-                  raw = json.loads(path.read_text(encoding='utf-8'))
-                  rows = raw.get('response', []) if isinstance(raw,dict) else []
-                  future[day] = rows if isinstance(rows,list) else []
-                  counts[day] = len(future[day])
-              if not any(counts.values()):
-                  raise RuntimeError('Nessuno snapshot calendario per oggi/domani: prima eseguire Aggiorna feed BETLAB, poi il confronto. Non usare l’API due volte.')
+          def safe_float(value):
 
-              path = ROOT/'data/betlab-analysis.json'
-              if not path.exists():
-                  raise RuntimeError('Manca data/betlab-analysis.json: occorrono le quote gia archiviate')
-              feed = json.loads(path.read_text(encoding='utf-8'))
-              odds = {}
-              count_quotes = 0
-              for match in (feed.get('analysis') or []):
-                  ident = match.get('fixtureId')
-                  if ident is None:
-                      continue
-                  bookmakers = {}
-                  candidates = list(match.get('candidates') or [])
-                  main = match.get('prediction') or {}
-                  if main.get('oddAvailable'):
-                      candidates.append(main)
-                  for row in candidates:
-                      if not row.get('oddAvailable'):
-                          continue
-                      try:
-                          odd = float(row.get('odd'))
-                      except (TypeError, ValueError):
-                          continue
-                      market = str(row.get('apiMarket') or '')
-                      selection = str(row.get('apiSelection') or '')
-                      if not market or not selection or odd <= 1 or not math.isfinite(odd):
-                          continue
-                      book = str(row.get('bookmaker') or 'BETLAB snapshot')
-                      bets = bookmakers.setdefault(book, {})
-                      markets = bets.setdefault(market, {})
-                      markets[selection] = max(odd, markets.get(selection,0))
-                  if not bookmakers:
-                      continue
-                  odds[str(ident)] = [{
-                      'fixture':{'id':ident},
-                      'bookmakers': [
-                          {'name':book,'bets':[
-                              {'name':market,'values':[{'value':sel,'odd':str(value)} for sel,value in selections.items()]}
-                              for market,selections in markets.items()]}
-                          for book,markets in bookmakers.items()]
-                  }]
-                  count_quotes += sum(len(x) for bet in bookmakers.values() for x in bet.values())
-              print('Calendari congelati:',counts, 'fixture con quote:',len(odds),'quote registrate:',count_quotes,flush=True)
-              if not odds:
-                  raise RuntimeError('Nessuna quota archiviata nel feed: non è possibile confrontare i due motori senza nuove richieste')
-              return {'fixtures':future,'odds':odds}, {'date':feed.get('generatedAt'), 'matchesWithQuotes':len(odds), 'quotations':count_quotes, 'dates':counts}
-
-
-          def patch_engine_to_offline(code):
-              tree = ast.parse(code)
-              funcs = [n for n in tree.body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and n.name=='api_get']
-              if len(funcs)!=1:
-                  raise RuntimeError('Impossibile localizzare api_get nel motore ('+str(len(funcs))+')')
-              fn = funcs[0]
-              lines=code.splitlines(keepends=True)
-              original_line=lines[fn.lineno-1]
-              indent=original_line[:len(original_line)-len(original_line.lstrip())]
-              replacement=indent+'def api_get(endpoint, params):\n'+indent+'    return offline_api_get(endpoint, params)\n'
-              lines[fn.lineno-1:fn.end_lineno]=[replacement]
-              new=''.join(lines)
-              compile(new,'<offline-engine>','exec')
-              return new
-
-
-          OFFLINE_HEADER = '''import json as _snapshot_json
-          from pathlib import Path as _SnapshotPath
-          _SNAPSHOT = _snapshot_json.loads(_SnapshotPath('offline-input.json').read_text(encoding='utf-8'))
-
-          def offline_api_get(endpoint, params):
-              if endpoint == 'fixtures' and 'date' in params:
-                  rows = _SNAPSHOT['fixtures'].get(str(params['date']), [])
-                  return {'response':rows, 'paging':{'current':1,'total':1}}
-              if endpoint == 'odds' and 'fixture' in params:
-                  rows = _SNAPSHOT['odds'].get(str(params['fixture']), [])
-                  return {'response':rows if int(params.get('page',1))==1 else [],'paging':{'current':1,'total':1}}
-              raise RuntimeError('Richiesta API non consentita nel confronto offline: '+str(endpoint)+' '+str(params))
-
-          '''
-
-
-          def run_engine(label, code, snapshot):
-              work = TEMP/label
-              work.mkdir(exist_ok=True)
-              shutil.copytree(ROOT/'data',work/'data',dirs_exist_ok=True)
-              (work/'offline-input.json').write_text(json.dumps(snapshot,ensure_ascii=False),encoding='utf-8')
-              engine = work/'engine.py'
-              engine.write_text(OFFLINE_HEADER+patch_engine_to_offline(code),encoding='utf-8')
-              env=os.environ.copy()
-              env['API_FOOTBALL_KEY']='OFFLINE_SENZA_CHIAMATE'
-              env['PYTHONUNBUFFERED']='1'
-              print('=== Eseguo',label,'solo da snapshot ===',flush=True)
-              subprocess.run([sys.executable,str(engine)],cwd=work,env=env,check=True)
-              output_file=work/'data/betlab-analysis.json'
-              if not output_file.exists():
-                  raise RuntimeError(label+' non ha creato analisi')
-              shutil.copy2(output_file,OUT/(label+'_analisi.json'))
-              return json.loads(output_file.read_text(encoding='utf-8'))
-
-
-          def safe_float(v):
               try:
-                  x=float(v)
-                  return x if math.isfinite(x) else None
-              except (ValueError,TypeError):
+                  return float(value)
+
+              except:
                   return None
 
 
-          def select_common(match):
-              # Criterio identico fra versioni: quote da 1,10; edge teorico prudenziale.
-              hg=int(((match.get('home') or {}).get('form') or {}).get('played') or 0)
-              ag=int(((match.get('away') or {}).get('form') or {}).get('played') or 0)
-              if min(hg,ag)<5:
-                  return None
-              scored=[]
-              for cand in (match.get('candidates') or []):
-                  odd,p=safe_float(cand.get('odd')),safe_float(cand.get('modelProbability'))
-                  if cand.get('oddAvailable') is not True or odd is None or p is None or odd<1.10 or not 0<p<1:
-                      continue
-                  exact=cand.get('market')=='Risultato Esatto'
-                  if exact and (min(hg,ag)<8 or cand.get('model')!='poisson'):
-                      continue
-                  implied=1/odd
-                  if p/implied>2.4:
-                      continue
-                  volume=min(hg,ag,10)/10
-                  conservative=implied+(0.45 if exact else 0.60)*volume*(p-implied)
-                  edge=conservative*odd-1
-                  if edge<0.06:
-                      continue
-                  score=edge*math.sqrt(conservative)/(1+0.35*math.log(odd))*(0.8 if exact else 1)
-                  scored.append((score,cand))
-              if not scored:
-                  return None
-              best=max(scored,key=lambda pair:pair[0])[1]
-              return {'selection':best.get('selection'),'market':best.get('market'),
-                      'odd':best.get('odd'),'probability':best.get('modelProbability')}
+          def clamp(value, low, high):
+
+              return max(
+                  low,
+                  min(
+                      high,
+                      value
+                  )
+              )
 
 
-          def unpack(feed):
-              matches={}
-              for m in feed.get('analysis') or []:
-                  try:
-                      fid=int(m['fixtureId']); start=int(m['timestamp'])
-                  except (KeyError,ValueError,TypeError):
-                      continue
-                  if start<=RUN_EPOCH+15*60:
-                      continue
-                  home=str((m.get('home') or {}).get('name') or '')
-                  away=str((m.get('away') or {}).get('name') or '')
-                  if not home or not away or home==away:
-                      continue
-                  main=m.get('prediction') or {}
-                  matches[fid]={'id':fid,'date':m.get('date'),'kickoff':start,
-                                'match':home+' – '+away,
-                                'pick':select_common(m),
-                                'originalPrediction': main.get('selection') if main.get('available') else None,
-                                'originalMarket':main.get('market') if main.get('available') else None,
-                                'originalOdd':main.get('odd') if main.get('available') else None}
-              return matches
+          # ==========================================================
+          # API
+          # ==========================================================
+
+          def api_get(endpoint, params):
+
+              query = urllib.parse.urlencode(
+                  params
+              )
+
+              url = (
+                  "https://v3.football.api-sports.io/"
+                  + endpoint
+                  + "?"
+                  + query
+              )
+
+              request = urllib.request.Request(
+                  url,
+                  headers={
+                      "x-apisports-key":
+                          API_KEY
+                  }
+              )
+
+              with urllib.request.urlopen(
+                  request,
+                  timeout=45
+              ) as response:
+
+                  payload = json.loads(
+                      response.read().decode(
+                          "utf-8"
+                      )
+                  )
+
+              errors = payload.get(
+                  "errors"
+              )
+
+              if errors:
+                  raise RuntimeError(
+                      f"API ERROR {endpoint}: {errors}"
+                  )
+
+              return payload
 
 
-          snapshot,coverage = freeze_inputs()
-          v7_code=extract_python(get_original())
-          v9_code=extract_python((ROOT/'.github/workflows/test-api-football.yml').read_text(encoding='utf-8'))
-          if 'LOOKUPS_PER_RUN = 4' not in v9_code:
-              raise RuntimeError('V10 attesa con LOOKUPS_PER_RUN = 4; controllare la revisione del motore')
-          v9_code=v9_code.replace('LOOKUPS_PER_RUN = 4','LOOKUPS_PER_RUN = 0',1)
-          # IDENTICO storico iniziale per entrambi. Zero chiamate HTTP.
-          r7=unpack(run_engine('V7_originale',v7_code,snapshot))
-          r9=unpack(run_engine('V10_corrente',v9_code,snapshot))
-          ids=sorted(set(r7)|set(r9),key=lambda fid:((r7.get(fid) or r9.get(fid))['kickoff'],fid))
-          rows=[]
-          for fid in ids:
-              a=r7.get(fid,{})
-              b=r9.get(fid,{})
-              z=b or a
-              p7=a.get('pick') or {};p9=b.get('pick') or {}
-              rows.append({'fixtureId':fid,'data':z.get('date'),'partita':z.get('match'),
-                 'V7_originale':a.get('originalPrediction') or '',
-                 'V7_mercato_originale':a.get('originalMarket') or '',
-                 'V7_selezione_comune':p7.get('selection') or '',
-                 'V7_mercato_comune':p7.get('market') or '',
-                 'V7_quota':p7.get('odd') or '', 'V7_probabilita':p7.get('probability') or '',
-                 'V10_originale':b.get('originalPrediction') or '',
-                 'V10_mercato_originale':b.get('originalMarket') or '',
-                 'V10_selezione_comune':p9.get('selection') or '',
-                 'V10_mercato_comune':p9.get('market') or '',
-                 'V10_quota':p9.get('odd') or '', 'V10_probabilita':p9.get('probability') or ''})
+          # ==========================================================
+          # FILE JSON
+          # ==========================================================
 
-          fields=['fixtureId','data','partita','V7_originale','V7_mercato_originale',
-                  'V7_selezione_comune','V7_mercato_comune','V7_quota','V7_probabilita',
-                  'V10_originale','V10_mercato_originale','V10_selezione_comune','V10_mercato_comune','V10_quota','V10_probabilita']
-          with (OUT/'confronto.csv').open('w',newline='',encoding='utf-8-sig') as f:
-              writer=csv.DictWriter(f,fieldnames=fields,delimiter=';');writer.writeheader();writer.writerows(rows)
-          meta={'esecuzioneUTC':START.isoformat(),'V7_commit':ORIGINAL_SHA,'V10_commit':head_sha(),
-                'quote_cache':coverage,'confrontate':len(rows),
-                'V7_con_pronostico':sum(bool(r['V7_selezione_comune']) for r in rows),
-                'V10_con_pronostico':sum(bool(r['V10_selezione_comune']) for r in rows),
-                'nota':'Solo snapshot locali: il confronto include solo quote archiviate dal motore corrente. Non riproduce l’intero mercato delle quote. Selettore comune applicato a entrambi; i pronostici originali sono esposti a parte. Nessuna chiamata API, nessun esito reale o giocata.'}
-          (OUT/'metadati.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
-          public_rows=[]
-          for r in rows:
-              if not (r['V7_selezione_comune'] or r['V10_selezione_comune']):
+          def load_json(path, default):
+
+              if not os.path.exists(path):
+                  return default
+
+              try:
+
+                  with open(
+                      path,
+                      "r",
+                      encoding="utf-8"
+                  ) as f:
+
+                      return json.load(f)
+
+              except:
+
+                  return default
+
+
+          def save_json(path, data):
+
+              os.makedirs(
+                  os.path.dirname(path),
+                  exist_ok=True
+              )
+
+              with open(
+                  path,
+                  "w",
+                  encoding="utf-8"
+              ) as f:
+
+                  json.dump(
+                      data,
+                      f,
+                      ensure_ascii=False,
+                      indent=2
+                  )
+
+
+          # ==========================================================
+          # SCARICA CALENDARIO OGGI + PROSSIMI 6 GIORNI
+          # ==========================================================
+
+          all_api_matches = []
+
+          print("")
+          print("==============================================")
+          print("BETLAB MULTI-MARKET ENGINE V10.2")
+          print("==============================================")
+          print("")
+
+
+          unavailable_days = []
+          fixture_requests = 0
+          for day in DAYS:
+              future_path = f"data/future/{day}.json"
+              payload = None
+              try:
+                  fixture_requests += 1
+                  payload = api_get("fixtures", {"date": day})
+                  if not isinstance(payload, dict):
+                      raise RuntimeError("Risposta API non valida")
+                  save_json(future_path, payload)
+                  source = "API"
+              except Exception as exc:
+                  # Il piano Free puo' negare date future. Recupera SOLO dati
+                  # gia' salvati per quel giorno, mai risultati inventati.
+                  cached = load_json(future_path, None)
+                  if isinstance(cached, dict) and isinstance(cached.get("response"), list):
+                      payload = cached
+                      source = "cache"
+                  elif day == TODAY.isoformat():
+                      raise
+                  else:
+                      unavailable_days.append(day)
+                      print(f"{day}: calendario non disponibile ({str(exc)[:150]})")
+                      continue
+
+              fixtures = payload.get("response") or []
+              all_api_matches.extend(fixtures)
+              print(f"{day}: {len(fixtures)} partite ({source})")
+
+          print("Giorni senza calendario verificabile:", unavailable_days)
+
+
+          # ==========================================================
+          # DEDUPE API
+          # ==========================================================
+
+          api_by_id = {}
+
+          for item in all_api_matches:
+
+              fixture_id = (
+                  item.get("fixture", {})
+                  .get("id")
+              )
+
+              if fixture_id is not None:
+
+                  api_by_id[
+                      fixture_id
+                  ] = item
+
+
+          all_api_matches = list(
+              api_by_id.values()
+          )
+
+
+          print(
+              "Partite API uniche:",
+              len(all_api_matches)
+          )
+
+
+          # ==========================================================
+          # STORICO
+          # ==========================================================
+
+          history_payload = load_json(
+              "data/betlab-history.json",
+              []
+          )
+
+
+          if isinstance(
+              history_payload,
+              dict
+          ):
+
+              history = (
+                  history_payload.get("matches")
+                  or
+                  history_payload.get("history")
+                  or
+                  []
+              )
+
+          else:
+
+              history = history_payload
+
+
+          print(
+              "Storico iniziale:",
+              len(history)
+          )
+
+
+          # ==========================================================
+          # FUNZIONI STORICO
+          # ==========================================================
+
+          def historical_team_name(
+              record,
+              side
+          ):
+
+              value = record.get(side)
+
+              if isinstance(value, dict):
+
+                  return value.get(
+                      "name"
+                  )
+
+              return value
+
+
+          def historical_goals(record):
+
+              home_goals = record.get(
+                  "homeGoals"
+              )
+
+              away_goals = record.get(
+                  "awayGoals"
+              )
+
+              if (
+                  home_goals is not None
+                  and
+                  away_goals is not None
+              ):
+
+                  return (
+                      home_goals,
+                      away_goals
+                  )
+
+
+              goal_data = (
+                  record.get("goals")
+                  or
+                  {}
+              )
+
+              return (
+                  goal_data.get("home"),
+                  goal_data.get("away")
+              )
+
+
+          def logical_history_key(record):
+
+              date = str(
+                  record.get("date")
+                  or
+                  ""
+              )[:10]
+
+              home = historical_team_name(
+                  record,
+                  "home"
+              )
+
+              away = historical_team_name(
+                  record,
+                  "away"
+              )
+
+              return (
+                  date,
+                  canonical(home),
+                  canonical(away)
+              )
+
+
+          # ==========================================================
+          # AGGIUNGI RISULTATI COMPLETATI API
+          # ==========================================================
+
+          existing_keys = set()
+
+          for record in history:
+
+              key = logical_history_key(
+                  record
+              )
+
+              if (
+                  key[0]
+                  and
+                  key[1]
+                  and
+                  key[2]
+              ):
+
+                  existing_keys.add(
+                      key
+                  )
+
+
+          new_results = 0
+
+
+          for item in all_api_matches:
+
+              fixture = (
+                  item.get("fixture")
+                  or
+                  {}
+              )
+
+              status = (
+                  fixture.get("status")
+                  or
+                  {}
+              ).get("short")
+
+
+              if status not in {
+                  "FT",
+                  "AET",
+                  "PEN"
+              }:
                   continue
-              public_rows.append({
-                  'fixtureId':r['fixtureId'],'date':r['data'],'match':r['partita'],
-                  'v7':{'selection':r['V7_selezione_comune'],'market':r['V7_mercato_comune'],
-                        'odd':r['V7_quota'] or None,'probability':r['V7_probabilita'] or None,
-                        'originalSelection':r['V7_originale'],'originalMarket':r['V7_mercato_originale']},
-                  'v9':{'selection':r['V10_selezione_comune'],'market':r['V10_mercato_comune'],
-                        'odd':r['V10_quota'] or None,'probability':r['V10_probabilita'] or None}
-              })
-          public={'schemaVersion':1,'generatedAt':START.isoformat(),
-                  'quoteSnapshotAt':coverage['date'],'source':'confronto offline V7/V10',
-                  'v7Commit':ORIGINAL_SHA,'v9Commit':meta['V10_commit'],
-                  'caveat':'Quote archiviate dal feed corrente, applicazione di un selettore comune; non coincide con il generatore originale delle multiple.',
-                  'matches':public_rows}
-          (ROOT/'data/betlab-confronto.json').write_text(json.dumps(public,ensure_ascii=False,indent=2),encoding='utf-8')
-          print('Schede V7 pubblicabili:',len(public_rows),flush=True)
 
-          summary=['# BETLAB: confronto V7 e V10 (solo dati archiviati)','',
-           '- V7: `'+ORIGINAL_SHA+'`','- V10: `'+meta['V10_commit']+'`',
-           '- Incontri futuri confrontati: '+str(len(rows)),
-           '- V7 con selezione comparabile: '+str(meta['V7_con_pronostico']),
-           '- V10 con selezione comparabile: '+str(meta['V10_con_pronostico']),
-           '- Fixture con quote in archivio: '+str(coverage['matchesWithQuotes']),
-           '- Generazione feed quote: '+str(coverage['date']), '',
-           '## Limiti essenziali','',
-           '- Test **offline**: non usa API-Football e non modifica lo storico del repository.',
-           '- Quote disponibili limitate a quelle pubblicate nel JSON delle analisi: non è il catalogo completo dei bookmaker.',
-           '- Il selettore comune serve a confrontare i modelli, non riproduce la vecchia generazione automatica delle multiple.',
-           '- Non prova quale modello sia migliore. Per valutarlo occorrono pronostici salvati prima dell’inizio e risultati finali.', '',
-           'Scarica `confronto.csv`, i due JSON e `metadati.json` dall’artifact dell’esecuzione.']
-          (OUT/'RIEPILOGO.md').write_text('\n'.join(summary)+'\n',encoding='utf-8')
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:
-                  f.write('\n'.join(summary)+'\n')
-          print('COMPLETATO',json.dumps(meta,ensure_ascii=False),flush=True)
+
+              teams = (
+                  item.get("teams")
+                  or
+                  {}
+              )
+
+              goals = (
+                  item.get("goals")
+                  or
+                  {}
+              )
+
+
+              home = (
+                  teams.get("home")
+                  or
+                  {}
+              ).get("name")
+
+              away = (
+                  teams.get("away")
+                  or
+                  {}
+              ).get("name")
+
+
+              hg = goals.get("home")
+              ag = goals.get("away")
+
+
+              if (
+                  not home
+                  or
+                  not away
+                  or
+                  hg is None
+                  or
+                  ag is None
+              ):
+                  continue
+
+
+              date = str(
+                  fixture.get("date")
+                  or
+                  ""
+              )[:10]
+
+
+              key = (
+                  date,
+                  canonical(home),
+                  canonical(away)
+              )
+
+
+              if key in existing_keys:
+                  continue
+
+
+              league = (
+                  item.get("league")
+                  or
+                  {}
+              )
+
+
+              history.append({
+
+                  "source":
+                      "api-football",
+
+                  "fixtureId":
+                      fixture.get("id"),
+
+                  "date":
+                      date,
+
+                  "timestamp":
+                      fixture.get(
+                          "timestamp",
+                          0
+                      ),
+
+                  "country":
+                      league.get(
+                          "country"
+                      ),
+
+                  "league":
+                      league.get(
+                          "name"
+                      ),
+
+                  "home":
+                      home,
+
+                  "away":
+                      away,
+
+                  "homeGoals":
+                      int(hg),
+
+                  "awayGoals":
+                      int(ag)
+
+              })
+
+
+              existing_keys.add(
+                  key
+              )
+
+              new_results += 1
+
+
+          # ==========================================================
+          # DEDUPE STORICO LOGICO
+          # ==========================================================
+
+          unique_history = {}
+
+          for record in history:
+
+              key = logical_history_key(
+                  record
+              )
+
+              if not all(key):
+                  continue
+
+
+              old = unique_history.get(
+                  key
+              )
+
+
+              if old is None:
+
+                  unique_history[
+                      key
+                  ] = record
+
+                  continue
+
+
+              old_source = str(
+                  old.get("source")
+                  or
+                  ""
+              )
+
+              new_source = str(
+                  record.get("source")
+                  or
+                  ""
+              )
+
+
+              if (
+                  new_source == "api-football"
+                  and
+                  old_source != "api-football"
+              ):
+
+                  unique_history[
+                      key
+                  ] = record
+
+
+          history = list(
+              unique_history.values()
+          )
+
+
+          history.sort(
+              key=lambda record:
+                  str(
+                      record.get("date")
+                      or
+                      ""
+                  )
+          )
+
+
+          save_json(
+              "data/betlab-history.json",
+              history
+          )
+
+
+          print(
+              "Nuovi risultati API:",
+              new_results
+          )
+
+          print(
+              "Storico totale:",
+              len(history)
+          )
+
+
+          # ==========================================================
+          # PRIORITA CAMPIONATI
+          # ==========================================================
+
+          def league_priority(
+              country,
+              league
+          ):
+
+              c = normalize(country)
+              l = normalize(league)
+
+
+              if (
+                  "champions league" in l
+                  or
+                  "europa league" in l
+                  or
+                  "conference league" in l
+              ):
+                  return 5
+
+
+              priority5 = [
+
+                  ("italy", "serie a"),
+                  ("england", "premier league"),
+                  ("spain", "la liga"),
+                  ("spain", "primera division"),
+                  ("germany", "bundesliga"),
+                  ("france", "ligue 1")
+
+              ]
+
+
+              for pc, pl in priority5:
+
+                  if (
+                      pc in c
+                      and
+                      pl in l
+                  ):
+                      return 5
+
+
+              priority4 = [
+
+                  ("italy", "serie b"),
+                  ("england", "championship"),
+                  ("spain", "segunda"),
+                  ("germany", "2 bundesliga"),
+                  ("france", "ligue 2"),
+                  ("portugal", "primeira"),
+                  ("netherlands", "eredivisie"),
+                  ("belgium", ""),
+                  ("turkey", "")
+
+              ]
+
+
+              for pc, pl in priority4:
+
+                  if (
+                      pc in c
+                      and
+                      (
+                          not pl
+                          or
+                          pl in l
+                      )
+                  ):
+                      return 4
+
+
+              priority3 = [
+
+                  ("brazil", "serie a"),
+                  ("argentina", ""),
+                  ("scotland", ""),
+                  ("usa", "major league soccer"),
+                  ("united states", "major league soccer"),
+                  ("mexico", "liga mx")
+
+              ]
+
+
+              for pc, pl in priority3:
+
+                  if (
+                      pc in c
+                      and
+                      (
+                          not pl
+                          or
+                          pl in l
+                      )
+                  ):
+                      return 3
+
+
+              priority2 = [
+
+                  "greece",
+                  "austria",
+                  "switzerland",
+                  "denmark",
+                  "norway",
+                  "sweden"
+
+              ]
+
+
+              for pc in priority2:
+
+                  if pc in c:
+                      return 2
+
+
+              return 0
+
+
+          # ==========================================================
+          # PARTITE STORICHE SQUADRA
+          # ==========================================================
+
+          @lru_cache(maxsize=4096)
+          def team_games(
+              team,
+              before_date,
+              limit=MAX_HISTORY
+          ):
+
+              key = canonical(team)
+
+              games = []
+
+
+              for record in history:
+
+                  date = str(
+                      record.get("date")
+                      or
+                      ""
+                  )[:10]
+
+
+                  if (
+                      not date
+                      or
+                      date >= before_date
+                  ):
+                      continue
+
+
+                  home = historical_team_name(
+                      record,
+                      "home"
+                  )
+
+                  away = historical_team_name(
+                      record,
+                      "away"
+                  )
+
+
+                  hg, ag = historical_goals(
+                      record
+                  )
+
+
+                  if (
+                      not home
+                      or
+                      not away
+                      or
+                      hg is None
+                      or
+                      ag is None
+                  ):
+                      continue
+
+
+                  if canonical(home) == key:
+
+                      games.append({
+
+                          "date":
+                              date,
+
+                          "gf":
+                              int(hg),
+
+                          "ga":
+                              int(ag),
+
+                          "home":
+                              True,
+                          "opponent": away
+
+                      })
+
+
+                  elif canonical(away) == key:
+
+                      games.append({
+
+                          "date":
+                              date,
+
+                          "gf":
+                              int(ag),
+
+                          "ga":
+                              int(hg),
+
+                          "home":
+                              False,
+                          "opponent": home
+
+                      })
+
+
+              games.sort(
+                  key=lambda x:
+                      x["date"]
+              )
+
+
+              return games[
+                  -limit:
+              ]
+
+
+          # ==========================================================
+          # FRESCHEZZA DELLO STORICO: BLOCCA PRONOSTICI CON DATI DATATI
+          # ==========================================================
+          # Non e' una calibrazione della probabilita': e' un controllo
+          # preliminare per evitare stime fondate soltanto su dati vecchi.
+          # Richiediamo almeno 3 incontri negli ultimi 90 giorni, con
+          # l'ultimo incontro registrato non piu' vecchio di 30 giorni.
+          # La mancata copertura comporta NESSUN PRONOSTICO, non una
+          # confidenza inventata. La partita resta visibile nell'analisi.
+          def history_freshness(games, match_date):
+              try:
+                  target = datetime.fromisoformat(str(match_date)[:10]).date()
+              except (TypeError, ValueError):
+                  return {"eligible": False, "reason": "data_non_valida",
+                          "recentGames": 0, "lastRecorded": None,
+                          "lastAgeDays": None}
+              valid = []
+              for game in games:
+                  try:
+                      played = datetime.fromisoformat(str(game.get("date") or "")[:10]).date()
+                  except (ValueError, TypeError, AttributeError):
+                      continue
+                  age = (target - played).days
+                  if age > 0:
+                      valid.append((played, age))
+              valid.sort(reverse=True)
+              recent = sum(1 for _day, age in valid if age <= RECENT_WINDOW_DAYS)
+              last_day = valid[0][0] if valid else None
+              last_age = valid[0][1] if valid else None
+              if len(valid) < MIN_TEAM_HISTORY:
+                  reason = "storico_insufficiente"
+              elif last_age is None or last_age > MAX_LAST_GAME_AGE_DAYS:
+                  reason = "storico_non_recente"
+              elif recent < MIN_RECENT_GAMES:
+                  reason = "poche_gare_recenti"
+              else:
+                  reason = "ok"
+              return {
+                  "eligible": reason == "ok",
+                  "reason": reason,
+                  "recentGames": recent,
+                  "lastRecorded": last_day.isoformat() if last_day else None,
+                  "lastAgeDays": last_age,
+                  "windowDays": RECENT_WINDOW_DAYS,
+                  "requiredRecentGames": MIN_RECENT_GAMES,
+                  "maxLastAgeDays": MAX_LAST_GAME_AGE_DAYS
+              }
+
+          # ==========================================================
+          # ARRICCHIMENTO PROGRESSIVO DELLO STORICO (BUDGET LIMITATO)
+          # ==========================================================
+          # Il feed iniziale puo' includere centinaia di fixture, ma solo
+          # poche con almeno 5 risultati recenti per ciascuna squadra.
+          # NON abbassiamo la soglia di affidabilita': recuperiamo pochi
+          # risultati reali alla volta, usando le ID squadra API-Football.
+          # Il piano Free puo' negare alcune richieste: nessun blocco del feed.
+
+          LOOKUPS_PER_RUN = 4
+          LOOKUP_COOLDOWN_SECONDS = 20 * 3600
+          BACKFILL_STATE_FILE = "data/betlab-history-enrichment-state.json"
+          enrichment_state = load_json(BACKFILL_STATE_FILE, {})
+          if not isinstance(enrichment_state, dict):
+              enrichment_state = {}
+          last_attempt = enrichment_state.get("attempted", {})
+          if not isinstance(last_attempt, dict):
+              last_attempt = {}
+
+          now_ts = int(datetime.now(ROME).timestamp())
+          future_fixtures = []
+          for item in all_api_matches:
+              f = item.get("fixture") or {}
+              lg = item.get("league") or {}
+              ts = int(f.get("timestamp") or 0)
+              if ((f.get("status") or {}).get("short") not in {"NS", "TBD"}
+                  or ts <= now_ts or league_priority(lg.get("country"), lg.get("name")) <= 0):
+                  continue
+              future_fixtures.append(item)
+
+          future_fixtures.sort(key=lambda item: (
+              -league_priority((item.get("league") or {}).get("country"),
+                               (item.get("league") or {}).get("name")),
+              int((item.get("fixture") or {}).get("timestamp") or 0)
+          ))
+          requested_teams = set()
+          attempted_requests = 0
+          enrichment_added = 0
+          historical_keys = {logical_history_key(record) for record in history}
+
+          for item in future_fixtures:
+              if attempted_requests >= LOOKUPS_PER_RUN:
+                  break
+              date_limit = str((item.get("fixture") or {}).get("date") or "")[:10]
+              teams = item.get("teams") or {}
+              for side in ("home", "away"):
+                  if attempted_requests >= LOOKUPS_PER_RUN:
+                      break
+                  obj = teams.get(side) or {}
+                  team_id, team_name = obj.get("id"), obj.get("name")
+                  if not isinstance(team_id, int) or team_id <= 0 or not team_name:
+                      continue
+                  key = str(team_id)
+                  # Anche uno storico con 10 gare puo' essere vecchio di mesi.
+                  # In quel caso tentiamo comunque il recupero delle ultime
+                  # partite, rispettando il budget di 4 chiamate per run.
+                  if key in requested_teams or history_freshness(
+                          team_games(team_name, date_limit), date_limit)["eligible"]:
+                      continue
+                  requested_teams.add(key)
+                  if now_ts - int(last_attempt.get(key) or 0) < LOOKUP_COOLDOWN_SECONDS:
+                      continue
+
+                  attempted_requests += 1
+                  last_attempt[key] = now_ts
+                  try:
+                      result = api_get("fixtures", {"team": team_id, "last": MAX_HISTORY})
+                      for record in result.get("response") or []:
+                          fixture = record.get("fixture") or {}
+                          status = (fixture.get("status") or {}).get("short")
+                          if status not in {"FT", "AET", "PEN"}:
+                              continue
+                          date = str(fixture.get("date") or "")[:10]
+                          if not date or date >= date_limit:
+                              continue
+                          clubs = record.get("teams") or {}
+                          home = (clubs.get("home") or {}).get("name")
+                          away = (clubs.get("away") or {}).get("name")
+                          goals = record.get("goals") or {}
+                          hg, ag = goals.get("home"), goals.get("away")
+                          if (not home or not away or canonical(home) == canonical(away)
+                              or hg is None or ag is None):
+                              continue
+                          record_key = (date, canonical(home), canonical(away))
+                          if record_key in historical_keys:
+                              continue
+                          league = record.get("league") or {}
+                          history.append({
+                              "source": "api-football",
+                              "fixtureId": fixture.get("id"),
+                              "date": date,
+                              "timestamp": fixture.get("timestamp", 0),
+                              "country": league.get("country"),
+                              "league": league.get("name"),
+                              "home": home,
+                              "away": away,
+                              "homeGoals": int(hg),
+                              "awayGoals": int(ag)
+                          })
+                          historical_keys.add(record_key)
+                          enrichment_added += 1
+                  except Exception as exc:
+                      print("Recupero storico non disponibile per", team_name, ":", exc)
+
+          enrichment_state["attempted"] = last_attempt
+          enrichment_state["updatedAt"] = datetime.now(ROME).isoformat()
+          save_json(BACKFILL_STATE_FILE, enrichment_state)
+          if enrichment_added:
+              history.sort(key=lambda r: str(r.get("date") or ""))
+              save_json("data/betlab-history.json", history)
+          print("Ricerche storico supplementari:", attempted_requests,
+                "| Risultati aggiunti:", enrichment_added)
+
+          # ==========================================================
+          # STATISTICHE
+          # ==========================================================
+
+          def team_stats(games):
+
+              played = len(games)
+
+              if played == 0:
+
+                  return {
+
+                      "played": 0,
+                      "wins": 0,
+                      "draws": 0,
+                      "losses": 0,
+                      "gf": 0,
+                      "ga": 0,
+                      "ppg": 0,
+                      "avgGF": 0,
+                      "avgGA": 0
+
+                  }
+
+
+              wins = 0
+              draws = 0
+              losses = 0
+              gf = 0
+              ga = 0
+
+
+              for game in games:
+
+                  gf += game["gf"]
+                  ga += game["ga"]
+
+
+                  if game["gf"] > game["ga"]:
+                      wins += 1
+
+                  elif game["gf"] == game["ga"]:
+                      draws += 1
+
+                  else:
+                      losses += 1
+
+
+              points = (
+                  wins * 3
+                  +
+                  draws
+              )
+
+
+              return {
+
+                  "played":
+                      played,
+
+                  "wins":
+                      wins,
+
+                  "draws":
+                      draws,
+
+                  "losses":
+                      losses,
+
+                  "gf":
+                      gf,
+
+                  "ga":
+                      ga,
+
+                  "ppg":
+                      round(
+                          points / played,
+                          3
+                      ),
+
+                  "avgGF":
+                      round(
+                          gf / played,
+                          3
+                      ),
+
+                  "avgGA":
+                      round(
+                          ga / played,
+                          3
+                      )
+
+              }
+
+
+          # ==========================================================
+          # FREQUENZE EVENTI
+          # ==========================================================
+
+          def event_frequency(
+              games,
+              predicate
+          ):
+
+              if not games:
+                  return 0.5
+
+
+              hits = sum(
+                  1
+                  for game in games
+                  if predicate(game)
+              )
+
+
+              return (
+                  hits /
+                  len(games)
+              )
+
+
+          # Smussamento bayesiano: ogni squadra contribuisce in base
+          # al proprio campione; il prior evita percentuali estreme.
+          PRIOR_STRENGTH = 8.0
+
+          def combined_probability(
+              home_games,
+              away_games,
+              home_predicate,
+              away_predicate,
+              prior=0.50
+          ):
+              nh = len(home_games)
+              na = len(away_games)
+              if nh == 0 or na == 0:
+                  return prior
+
+              home_hits = sum(1 for g in home_games if home_predicate(g))
+              away_hits = sum(1 for g in away_games if away_predicate(g))
+
+              # Non assegnare lo stesso peso a 1 e 10 partite.
+              # Le osservazioni vengono aggregate, con prior esplicito.
+              return (
+                  home_hits + away_hits + PRIOR_STRENGTH * prior
+              ) / (nh + na + PRIOR_STRENGTH)
+
+
+          # ==========================================================
+          # CASA/TRASFERTA: AGGIUSTAMENTO SPERIMENTALE E LIMITATO
+          # ==========================================================
+          # Non usiamo come prova 1-2 sole partite in casa/trasferta.
+          # Il risultato specifico per sede viene smussato verso la
+          # probabilita' generale (prior 8 incontri equivalenti) e
+          # la correzione non puo' superare 10 punti percentuali.
+          # L'euristica richiede backtesting: NON e' una calibrazione.
+          def contextual_probability(home_games, away_games,
+                                     home_predicate, away_predicate,
+                                     prior=0.50):
+              base = combined_probability(
+                  home_games, away_games, home_predicate,
+                  away_predicate, prior=prior
+              )
+              recent_home = [g for g in home_games if g.get("home") is True]
+              recent_away = [g for g in away_games if g.get("home") is False]
+              if len(recent_home) < 3 or len(recent_away) < 3:
+                  return base
+              hits = (sum(1 for g in recent_home if home_predicate(g))
+                      + sum(1 for g in recent_away if away_predicate(g)))
+              sample = len(recent_home) + len(recent_away)
+              conditional = (hits + 8.0 * base) / (sample + 8.0)
+              return clamp(base + clamp(conditional - base, -0.10, 0.10),
+                           0.01, 0.99)
+
+          # ==========================================================
+          # POISSON RISULTATO ESATTO
+          # ==========================================================
+
+          def weighted_average(
+              games,
+              field
+          ):
+
+              if not games:
+                  return None
+
+
+              total = 0.0
+              weights = 0.0
+
+
+              for index, game in enumerate(
+                  games,
+                  start=1
+              ):
+
+                  weight = index
+
+                  total += (
+                      game[field]
+                      *
+                      weight
+                  )
+
+                  weights += weight
+
+
+              return (
+                  total /
+                  weights
+              )
+
+
+          def expected_goals(
+              home_games,
+              away_games
+          ):
+
+              home_attack = weighted_average(
+                  home_games,
+                  "gf"
+              )
+
+              home_defence = weighted_average(
+                  home_games,
+                  "ga"
+              )
+
+              away_attack = weighted_average(
+                  away_games,
+                  "gf"
+              )
+
+              away_defence = weighted_average(
+                  away_games,
+                  "ga"
+              )
+
+
+              if None in {
+                  home_attack,
+                  home_defence,
+                  away_attack,
+                  away_defence
+              }:
+
+                  return None, None
+
+
+              home_xg = (
+                  home_attack
+                  +
+                  away_defence
+              ) / 2
+
+
+              away_xg = (
+                  away_attack
+                  +
+                  home_defence
+              ) / 2
+
+
+              home_xg *= 1.08
+              away_xg *= 0.92
+
+
+              # Dati brevi -> forte incertezza. Riduzione verso una
+              # media neutra di riferimento, non una probabilita' calibrata.
+              n = min(len(home_games), len(away_games))
+              sample_weight = min(0.70, n / (n + 7.0))
+              home_xg = 1.35 + sample_weight * (home_xg - 1.35)
+              away_xg = 1.15 + sample_weight * (away_xg - 1.15)
+              home_xg = clamp(home_xg, 0.45, 2.80)
+              away_xg = clamp(away_xg, 0.40, 2.70)
+
+
+              return (
+                  home_xg,
+                  away_xg
+              )
+
+
+          def poisson_probability(
+              goals,
+              expected
+          ):
+
+              return (
+                  math.exp(-expected)
+                  *
+                  expected ** goals
+                  /
+                  math.factorial(goals)
+              )
+
+
+          # ==========================================================
+          # CANDIDATI PARTITA
+          # ==========================================================
+
+          def create_candidate(
+              market,
+              selection,
+              probability,
+              source="frequency"
+          ):
+
+              probability = clamp(
+                  probability,
+                  0.01,
+                  0.99
+              )
+
+
+              return {
+
+                  "market":
+                      market,
+
+                  "selection":
+                      selection,
+
+                  "modelProbability":
+                      round(
+                          probability,
+                          5
+                      ),
+
+                  "index":
+                      round(
+                          probability * 100,
+                          1
+                      ),
+
+                  "model":
+                      source,
+
+                  "oddAvailable":
+                      False,
+
+                  "odd":
+                      None,
+
+                  "bookmaker":
+                      None,
+
+                  "apiMarket":
+                      None,
+
+                  "apiSelection":
+                      None,
+
+                  "value":
+                      None
+
+              }
+
+
+          def build_market_candidates(home_games, away_games):
+              """Tutti i mercati dalla STESSA distribuzione dei risultati.
+              Metodo sperimentale Poisson indipendente, non calibrato.
+              Evita che GOAL, PARI, Over e 1X2 si contraddicano.
+              """
+              # Analisi esplorativa anche con campioni incompleti.
+              # La selezione quotata continua a richiedere storia recente idonea.
+              if not home_games or not away_games:
+                  return []
+              home_xg, away_xg = expected_goals(home_games, away_games)
+              if home_xg is None or away_xg is None:
+                  return []
+
+              # Coda trascurabile oltre 12 gol per squadra con lambda <= 2.8.
+              # Normalizziamo comunque la matrice a probabilita' totale 1.
+              outcomes = []
+              for hg in range(13):
+                  for ag in range(13):
+                      p = poisson_probability(hg, home_xg) * poisson_probability(ag, away_xg)
+                      outcomes.append((hg, ag, p))
+              mass = sum(p for _, _, p in outcomes)
+              outcomes = [(hg, ag, p / mass) for hg, ag, p in outcomes]
+              def prob(fn):
+                  return sum(p for hg,ag,p in outcomes if fn(hg,ag))
+              def candidate(market, selection, value, source="poisson_v10"):
+                  c = create_candidate(market, selection, value, source)
+                  c["expectedHomeGoals"] = round(home_xg, 3)
+                  c["expectedAwayGoals"] = round(away_xg, 3)
+                  return c
+
+              home_win = prob(lambda h,a: h > a)
+              draw = prob(lambda h,a: h == a)
+              away_win = prob(lambda h,a: h < a)
+              candidates = [
+                  candidate("1X2", "1", home_win),
+                  candidate("1X2", "X", draw),
+                  candidate("1X2", "2", away_win),
+                  candidate("Doppia Chance", "1X", home_win + draw),
+                  candidate("Doppia Chance", "X2", draw + away_win),
+                  candidate("Doppia Chance", "12", home_win + away_win),
+              ]
+              goal = prob(lambda h,a: h > 0 and a > 0)
+              candidates.extend([
+                  candidate("Goal/No Goal", "GOAL", goal),
+                  candidate("Goal/No Goal", "NO GOAL", 1.0 - goal),
+              ])
+              for line in (1.5, 2.5, 3.5):
+                  over = prob(lambda h,a,line=line: h + a > line)
+                  candidates.extend([
+                      candidate("Totale Gol", f"OVER {line}", over),
+                      candidate("Totale Gol", f"UNDER {line}", 1 - over),
+                  ])
+              even = prob(lambda h,a: (h + a) % 2 == 0)
+              candidates.extend([
+                  candidate("Pari/Dispari", "PARI", even),
+                  candidate("Pari/Dispari", "DISPARI", 1.0 - even),
+              ])
+              for label, fn in [
+                  ("0-1", lambda h,a: h + a <= 1),
+                  ("2-3", lambda h,a: 2 <= h + a <= 3),
+                  ("4-5", lambda h,a: 4 <= h + a <= 5),
+                  ("6+", lambda h,a: h + a >= 6),
+              ]:
+                  candidates.append(candidate("Somma Gol", label, prob(fn)))
+              for hg in range(MAX_SCORE_GOALS + 1):
+                  for ag in range(MAX_SCORE_GOALS + 1):
+                      score_prob = next(p for h,a,p in outcomes if h == hg and a == ag)
+                      if score_prob >= MIN_EXACT_SCORE_PROBABILITY:
+                          candidates.append(candidate("Risultato Esatto", f"{hg}:{ag}", score_prob))
+              candidates.sort(key=lambda c: c["index"], reverse=True)
+              return candidates
+
+
+          # ==========================================================
+          # MATCHER QUOTE STRETTO
+          # ==========================================================
+
+          def market_normalized(
+              value
+          ):
+
+              return normalize(value)
+
+
+          def forbidden_market(
+              market_name
+          ):
+
+              name = market_normalized(
+                  market_name
+              )
+
+
+              forbidden = [
+
+                  "first half",
+                  "second half",
+                  "1st half",
+                  "2nd half",
+                  "half time",
+                  "halftime",
+                  "yellow",
+                  "card",
+                  "booking",
+                  "corner",
+                  "player",
+                  "team total",
+                  "home team",
+                  "away team",
+                  "minute"
+
+              ]
+
+
+              return any(
+                  text in name
+                  for text in forbidden
+              )
+
+
+          def score_tuple(value):
+
+              match = re.fullmatch(
+                  r"\s*(\d+)\s*[:\-]\s*(\d+)\s*",
+                  str(value or "")
+              )
+
+
+              if not match:
+                  return None
+
+
+              return (
+                  int(match.group(1)),
+                  int(match.group(2))
+              )
+
+
+          def selection_matches(
+              candidate,
+              api_market,
+              api_value
+          ):
+
+              if forbidden_market(
+                  api_market
+              ):
+                  return False
+
+
+              market = candidate[
+                  "market"
+              ]
+
+              selection = candidate[
+                  "selection"
+              ]
+
+              m = market_normalized(
+                  api_market
+              )
+
+              v = normalize(
+                  api_value
+              )
+
+
+              # ------------------------------------------------------
+              # 1X2
+              # ------------------------------------------------------
+
+              if market == "1X2":
+
+                  if m not in {
+                      "match winner",
+                      "1x2"
+                  }:
+                      return False
+
+
+                  if selection == "1":
+
+                      return v in {
+                          "home",
+                          "1"
+                      }
+
+
+                  if selection == "X":
+
+                      return v in {
+                          "draw",
+                          "x"
+                      }
+
+
+                  if selection == "2":
+
+                      return v in {
+                          "away",
+                          "2"
+                      }
+
+
+              # ------------------------------------------------------
+              # DOUBLE CHANCE - ESATTO
+              # ------------------------------------------------------
+
+              if market == "Doppia Chance":
+
+                  if m != "double chance":
+                      return False
+
+
+                  accepted = {
+
+                      "1X": {
+                          "home draw",
+                          "1x"
+                      },
+
+                      "X2": {
+                          "draw away",
+                          "x2"
+                      },
+
+                      "12": {
+                          "home away",
+                          "12"
+                      }
+
+                  }
+
+
+                  return (
+                      v
+                      in
+                      accepted.get(
+                          selection,
+                          set()
+                      )
+                  )
+
+
+              # ------------------------------------------------------
+              # BTTS
+              # ------------------------------------------------------
+
+              if market == "Goal/No Goal":
+
+                  if m not in {
+                      "both teams score",
+                      "both teams to score"
+                  }:
+                      return False
+
+
+                  if selection == "GOAL":
+
+                      return v in {
+                          "yes",
+                          "goal"
+                      }
+
+
+                  if selection == "NO GOAL":
+
+                      return v in {
+                          "no",
+                          "no goal"
+                      }
+
+
+              # ------------------------------------------------------
+              # OVER / UNDER FULL TIME
+              # ------------------------------------------------------
+
+              if market == "Totale Gol":
+
+                  if m not in {
+                      "goals over under",
+                      "over under",
+                      "total goals"
+                  }:
+                      return False
+
+
+                  expected = normalize(
+                      selection
+                  )
+
+
+                  return (
+                      v == expected
+                  )
+
+
+              # ------------------------------------------------------
+              # PARI / DISPARI
+              # ------------------------------------------------------
+
+              if market == "Pari/Dispari":
+
+                  if m not in {
+                      "odd even",
+                      "goals odd even"
+                  }:
+                      return False
+
+
+                  if selection == "PARI":
+
+                      return v in {
+                          "even",
+                          "pari"
+                      }
+
+
+                  if selection == "DISPARI":
+
+                      return v in {
+                          "odd",
+                          "dispari"
+                      }
+
+
+              # ------------------------------------------------------
+              # SOMMA GOL
+              # ------------------------------------------------------
+
+              if market == "Somma Gol":
+
+                  allowed_markets = {
+                      "total goals",
+                      "goal bands",
+                      "goals range",
+                      "total goal range"
+                  }
+
+
+                  if m not in allowed_markets:
+                      return False
+
+
+                  expected = normalize(
+                      selection
+                  )
+
+
+                  return (
+                      v == expected
+                  )
+
+
+              # ------------------------------------------------------
+              # RISULTATO ESATTO FULL TIME
+              # ------------------------------------------------------
+
+              if market == "Risultato Esatto":
+
+                  if m not in {
+                      "exact score",
+                      "correct score",
+                      "full time correct score",
+                      "fulltime correct score"
+                  }:
+                      return False
+
+
+                  api_score = score_tuple(
+                      api_value
+                  )
+
+                  betlab_score = score_tuple(
+                      selection
+                  )
+
+
+                  return (
+                      api_score is not None
+                      and
+                      api_score == betlab_score
+                  )
+
+
+              return False
+
+
+          # ==========================================================
+          # RECUPERA QUOTE FIXTURE
+          # ==========================================================
+
+          odds_cache = {}
+
+
+          def get_fixture_odds(
+              fixture_id
+          ):
+
+              if fixture_id in odds_cache:
+
+                  return odds_cache[
+                      fixture_id
+                  ]
+
+
+              page = 1
+              blocks = []
+
+
+              while True:
+
+                  payload = api_get(
+                      "odds",
+                      {
+                          "fixture":
+                              fixture_id,
+
+                          "page":
+                              page
+                      }
+                  )
+
+
+                  blocks.extend(
+                      payload.get(
+                          "response"
+                      )
+                      or
+                      []
+                  )
+
+
+                  paging = (
+                      payload.get(
+                          "paging"
+                      )
+                      or
+                      {}
+                  )
+
+
+                  current = int(
+                      paging.get(
+                          "current"
+                      )
+                      or
+                      page
+                  )
+
+                  total = int(
+                      paging.get(
+                          "total"
+                      )
+                      or
+                      1
+                  )
+
+
+                  if current >= total:
+                      break
+
+
+                  page += 1
+
+
+              odds_cache[
+                  fixture_id
+              ] = blocks
+
+
+              return blocks
+
+
+          # ==========================================================
+          # ASSOCIA MIGLIORE QUOTA
+          # ==========================================================
+
+          def attach_best_odds(fixture_id, candidates):
+              """Una quota rappresentativa, non il massimo isolato.
+              Mediana delle quote di bookmaker distinti sullo stesso mercato
+              e sulla stessa selezione. La quota pubblicata viene davvero
+              offerta da un bookmaker, non e' un prezzo costruito.
+              """
+              blocks = get_fixture_odds(fixture_id)
+              for candidate in candidates:
+                  offered = {}
+                  for block in blocks:
+                      for bookmaker in block.get("bookmakers") or []:
+                          bookmaker_name = str(bookmaker.get("name") or "Bookmaker")
+                          for bet in bookmaker.get("bets") or []:
+                              market_name = bet.get("name") or ""
+                              for value in bet.get("values") or []:
+                                  api_value = value.get("value")
+                                  if not selection_matches(candidate, market_name, api_value):
+                                      continue
+                                  odd = safe_float(value.get("odd"))
+                                  if odd is None or not math.isfinite(odd) or odd <= 1.00 or odd > 1000:
+                                      continue
+                                  # Una sola offerta per bookmaker e mercato.
+                                  # Non trasformare differenze di bookmaker in
+                                  # una ricerca sistematica del massimo prezzo.
+                                  key = (bookmaker_name.lower(), normalize(market_name))
+                                  datum = {
+                                      "odd": odd,
+                                      "bookmaker": bookmaker_name,
+                                      "apiMarket": market_name,
+                                      "apiSelection": str(api_value)
+                                  }
+                                  if key not in offered or odd < offered[key]["odd"]:
+                                      offered[key] = datum
+                  prices = sorted(offered.values(), key=lambda row: row["odd"])
+                  if not prices:
+                      continue
+                  # Scarta offerte fortemente divergenti se esiste un consenso.
+                  middle = prices[len(prices)//2]["odd"] if len(prices) % 2 else (
+                      prices[len(prices)//2-1]["odd"] + prices[len(prices)//2]["odd"]
+                  ) / 2
+                  inliers = [row for row in prices if 0.80 * middle <= row["odd"] <= 1.20 * middle]
+                  if not inliers:
+                      continue
+                  # Per un numero pari di fonti preferisci l'osservazione
+                  # inferiore: scegli una quota davvero quotata, conservativa.
+                  chosen = inliers[(len(inliers)-1)//2]
+                  candidate["oddAvailable"] = True
+                  candidate["odd"] = round(chosen["odd"], 3)
+                  candidate["bookmaker"] = chosen["bookmaker"]
+                  candidate["apiMarket"] = chosen["apiMarket"]
+                  candidate["apiSelection"] = chosen["apiSelection"]
+                  candidate["oddsSources"] = len(inliers)
+                  candidate["oddsObserved"] = len(prices)
+                  candidate["oddsQuality"] = "multi_source" if len(inliers) >= 2 else "single_source"
+                  candidate["value"] = round(candidate["modelProbability"] * chosen["odd"], 3)
+              return candidates
+
+
+          # ==========================================================
+          # CONSENSO 1X2: quote di almeno tre bookmaker indipendenti.
+          # Rimuoviamo l'overround per una distribuzione 1/X/2 coerente.
+          # Non equivale alla probabilita' vera; e' un confronto di mercato.
+          # Se la copertura e' bassa o i book non concordano, non autorizza
+          # pronostici sui segni 1X2/doppia chance.
+          # ==========================================================
+          def market_1x2_consensus(fixture_id):
+              by_bookmaker = {}
+              for block in odds_cache.get(fixture_id, []):
+                  for book in block.get("bookmakers") or []:
+                      name = str(book.get("name") or "").strip().lower()
+                      if not name:
+                          continue
+                      for bet in book.get("bets") or []:
+                          if normalize(bet.get("name")) not in {"match winner", "1x2"}:
+                              continue
+                          trio = {}
+                          for entry in bet.get("values") or []:
+                              item = normalize(entry.get("value"))
+                              side = {"home":"1", "1":"1", "draw":"X", "x":"X", "away":"2", "2":"2"}.get(item)
+                              odd = safe_float(entry.get("odd"))
+                              if side and odd is not None and math.isfinite(odd) and 1.02 <= odd <= 100:
+                                  trio[side] = odd
+                          if len(trio) != 3:
+                              continue
+                          implied = {k: 1.0 / v for k,v in trio.items()}
+                          margin_total = sum(implied.values())
+                          # Ignora triple chiaramente incoerenti o troppo vecchie.
+                          if not 1.005 <= margin_total <= 1.25:
+                              continue
+                          fair = {k: implied[k] / margin_total for k in ("1","X","2")}
+                          by_bookmaker[name] = fair
+              points = list(by_bookmaker.values())
+              n = len(points)
+              if n < 3:
+                  return {"available": False, "sourceCount": n,
+                          "status": "meno_di_tre_bookmaker"}
+              def median(nums):
+                  nums = sorted(nums)
+                  k = len(nums) // 2
+                  return nums[k] if len(nums) % 2 else (nums[k-1] + nums[k]) / 2
+              raw = {k: median([row[k] for row in points]) for k in ("1","X","2")}
+              dispersion = max(max(row[k] for row in points) - min(row[k] for row in points)
+                               for k in ("1","X","2"))
+              if dispersion > 0.14:
+                  return {"available": False, "sourceCount": n,
+                          "status": "quote_discordanti",
+                          "dispersion": round(dispersion, 4)}
+              total = sum(raw.values())
+              fair = {k: round(v / total, 5) for k,v in raw.items()}
+              return {"available": True, "sourceCount": n, "status": "verificato",
+                      "probabilities": fair, "dispersion": round(dispersion, 4),
+                      "method": "mediana_probabilita_quote_1x2_senza_margine"}
+
+          # La forza degli avversari e' una PROXY: punti medi recenti,
+          # NON una classifica ufficiale. Non sono disponibili dati societari.
+          def opponent_strength(games, before_date):
+              values = []
+              for game in games:
+                  opponent = str(game.get("opponent") or "").strip()
+                  if not opponent:
+                      continue
+                  past = team_games(opponent, before_date)
+                  relevant = [g for g in past if 0 < (datetime.fromisoformat(before_date).date()
+                      - datetime.fromisoformat(g["date"]).date()).days <= 120]
+                  if len(relevant) < 5:
+                      continue
+                  sample = team_stats(relevant)
+                  values.append(sample["ppg"])
+              return {
+                  "coverage": len(values),
+                  "gamesExamined": len(games),
+                  "opponentsAvgPPG": round(sum(values) / len(values), 3) if len(values) >= 3 else None,
+                  "status": "stimabile" if len(values) >= 3 else "non_verificabile"
+              }
+
+          def consensus_for_market(consensus, market, selection):
+              if not consensus.get("available"):
+                  return None
+              p = consensus["probabilities"]
+              if market == "1X2":
+                  return p.get(selection)
+              if market == "Doppia Chance":
+                  return {"1X":p["1"]+p["X"], "X2":p["X"]+p["2"],
+                          "12":p["1"]+p["2"]}.get(selection)
+              return None
+
+          def consecutive_wins(games):
+              streak = 0
+              for game in reversed(games):
+                  if game["gf"] > game["ga"]:
+                      streak += 1
+                  else:
+                      break
+              return streak
+
+
+          def draw_market_odd(fixture_id):
+              values = []
+              for block in odds_cache.get(fixture_id, []):
+                  for bookmaker in block.get("bookmakers") or []:
+                      for bet in bookmaker.get("bets") or []:
+                          m = normalize(bet.get("name"))
+                          if m not in {"match winner", "1x2", "full time result",
+                                       "fulltime result", "match result"}:
+                              continue
+                          for item in bet.get("values") or []:
+                              if normalize(item.get("value")) not in {"draw", "x"}:
+                                  continue
+                              odd = safe_float(item.get("odd"))
+                              if odd is not None and 1.01 < odd < 15:
+                                  values.append(odd)
+              if not values:
+                  return None
+              values.sort()
+              return round(values[len(values)//2], 3)
+
+
+          # ==========================================================
+          # COSTRUISCI CANDIDATE PARTITE
+          # ==========================================================
+
+          candidate_matches = []
+
+
+          for item in all_api_matches:
+
+              fixture = (
+                  item.get("fixture")
+                  or
+                  {}
+              )
+
+              status = (
+                  fixture.get("status")
+                  or
+                  {}
+              ).get("short")
+
+
+              if status not in {
+                  "NS",
+                  "TBD"
+              }:
+                  continue
+
+              kickoff_ts = int(fixture.get("timestamp") or 0)
+              if kickoff_ts <= int(datetime.now(ROME).timestamp()):
+                  continue
+
+
+              league = (
+                  item.get("league")
+                  or
+                  {}
+              )
+
+              priority = league_priority(
+                  league.get("country"),
+                  league.get("name")
+              )
+
+
+              if priority <= 0:
+                  continue
+
+
+              teams = (
+                  item.get("teams")
+                  or
+                  {}
+              )
+
+
+              home = (
+                  teams.get("home")
+                  or
+                  {}
+              ).get("name")
+
+              away = (
+                  teams.get("away")
+                  or
+                  {}
+              ).get("name")
+
+
+              # Un incontro valido deve avere due squadre DISTINTE e ID API.
+              # Le quote sono poi cercate esclusivamente per fixtureId.
+              fixture_id = fixture.get("id")
+              h_id = (teams.get("home") or {}).get("id")
+              a_id = (teams.get("away") or {}).get("id")
+              if (not home or not away or canonical(home) == canonical(away)
+                  or not isinstance(fixture_id, int) or fixture_id <= 0
+                  or (h_id is not None and a_id is not None and h_id == a_id)):
+                  print("ESCLUSA FIXTURE CON DATI NON COERENTI:", fixture_id, home, away)
+                  continue
+
+
+              date = str(
+                  fixture.get("date")
+                  or
+                  ""
+              )[:10]
+
+
+              home_games = team_games(
+                  home,
+                  date
+              )
+
+              away_games = team_games(
+                  away,
+                  date
+              )
+
+
+              history_score = (
+                  len(home_games)
+                  +
+                  len(away_games)
+              )
+
+              # Una forma storica quantitativamente ampia puo' comunque
+              # essere inadatta per un pronostico se manca l'ultimo mese.
+              home_freshness = history_freshness(home_games, date)
+              away_freshness = history_freshness(away_games, date)
+              history_eligible = (home_freshness["eligible"]
+                                  and away_freshness["eligible"])
+
+
+              candidate_matches.append({
+
+                  "raw":
+                      item,
+
+                  "fixtureId":
+                      fixture.get("id"),
+
+                  "date":
+                      date,
+
+                  "timestamp":
+                      fixture.get(
+                          "timestamp",
+                          0
+                      ),
+
+                  "country":
+                      league.get(
+                          "country"
+                      ),
+
+                  "league":
+                      league.get(
+                          "name"
+                      ),
+
+                  "priority":
+                      priority,
+
+                  "home":
+                      home,
+
+                  "away":
+                      away,
+
+                  "homeGames":
+                      home_games,
+
+                  "awayGames":
+                      away_games,
+
+                  "historyScore":
+                      history_score,
+
+                  "historyEligible":
+                      history_eligible,
+
+                  "historyQuality": {
+                      "home": home_freshness,
+                      "away": away_freshness
+                  }
+
+              })
+
+
+          candidate_matches.sort(
+              key=lambda m: (
+
+                  -int(
+                      len(
+                          m["homeGames"]
+                      ) >= 5
+                      and
+                      len(
+                          m["awayGames"]
+                      ) >= 5
+                  ),
+
+                  -int(
+                      len(
+                          m["homeGames"]
+                      ) > 0
+                      and
+                      len(
+                          m["awayGames"]
+                      ) > 0
+                  ),
+
+                  -m[
+                      "historyScore"
+                  ],
+
+                  -m[
+                      "priority"
+                  ],
+
+                  m[
+                      "timestamp"
+                  ]
+
+              )
+          )
+
+
+          print(
+              "Candidate calendario:",
+              len(candidate_matches)
+          )
+
+
+          # ==========================================================
+          # ANALISI + QUOTE
+          # ==========================================================
+
+          analysis = []
+
+          matches_with_candidates = 0
+          total_market_candidates = 0
+          total_candidates_with_odds = 0
+          exact_scores_with_odds = 0
+          stale_or_insufficient_matches = 0
+          recent_eligible_matches = 0
+
+
+          # ==========================================================
+          # DATI CONTESTUALI PRE-PARTITA - SOLO FONTI VERIFICABILI
+          # ==========================================================
+          # Il piano API-Football Free non consente /injuries?ids=.
+          # Non inviamo richieste vietate e non deduciamo la rosa completa.
+          # Le assenze non cambiano probabilita' senza dati sull'impatto.
+
+          # Piano API-Football Free: il parametro "ids" di /injuries e'
+          # stato rifiutato dal provider. Evitiamo chiamate note come vietate
+          # e non trasformiamo mai la mancanza di dati in "rosa completa".
+          injuries_by_fixture = {}
+          requested_injury_ids = set()
+          injuries_api_status = "non_disponibile_piano"
+          injury_fetch_note = (
+              "Indisponibilita' non verificabili con il piano API attuale: "
+              "endpoint /injuries con parametro ids non autorizzato. "
+              "Controllare fonti ufficiali prima della partita."
+          )
+          injury_records = 0
+
+          def venue_summary(games, is_home):
+              subset = [g for g in games if g.get("home") is is_home]
+              n = len(subset)
+              if not n:
+                  return {"played": 0, "wins": 0, "draws": 0, "losses": 0,
+                          "avgGF": None, "avgGA": None}
+              return {
+                  "played": n,
+                  "wins": sum(g["gf"] > g["ga"] for g in subset),
+                  "draws": sum(g["gf"] == g["ga"] for g in subset),
+                  "losses": sum(g["gf"] < g["ga"] for g in subset),
+                  "avgGF": round(sum(g["gf"] for g in subset) / n, 2),
+                  "avgGA": round(sum(g["ga"] for g in subset) / n, 2)
+              }
+
+          # Un intervallo e' interpretabile soltanto se il calendario storico
+          # e' abbastanza recente. Non equivale comunque a riposo verificato.
+          MAX_REST_LOOKBACK_DAYS = 21
+
+          def rest_before(games, match_date):
+              if not games:
+                  return {"days": None, "status": "storico_insufficiente",
+                          "lastRecorded": None, "ageDays": None}
+              try:
+                  target_date = datetime.fromisoformat(match_date).date()
+                  dates = [datetime.fromisoformat(str(g["date"])[:10]).date()
+                           for g in games if g.get("date")]
+                  prior_dates = [date for date in dates if date < target_date]
+                  if not prior_dates:
+                      return {"days": None, "status": "storico_insufficiente",
+                              "lastRecorded": None, "ageDays": None}
+                  last_date = max(prior_dates)
+                  gap = (target_date - last_date).days
+                  if gap > MAX_REST_LOOKBACK_DAYS:
+                      return {"days": None, "status": "storico_non_recente",
+                              "lastRecorded": last_date.isoformat(), "ageDays": gap}
+                  return {"days": max(0, gap - 1), "status": "indicativo",
+                          "lastRecorded": last_date.isoformat(), "ageDays": gap}
+              except (ValueError, TypeError, KeyError):
+                  return {"days": None, "status": "storico_insufficiente",
+                          "lastRecorded": None, "ageDays": None}
+
+          def fixture_context(match):
+              raw = match.get("raw") or {}
+              team_raw = raw.get("teams") or {}
+              h_id = (team_raw.get("home") or {}).get("id")
+              a_id = (team_raw.get("away") or {}).get("id")
+              fid = int(match["fixtureId"])
+              fixture = raw.get("fixture") or {}
+              venue = fixture.get("venue") or {}
+              valid_ids = (isinstance(h_id, int) and isinstance(a_id, int)
+                           and h_id != a_id)
+              fetched = fid in requested_injury_ids and injuries_api_status == "consultata"
+              # Almeno una segnalazione verificabile per la fixture e le squadre corrette.
+              injuries = ([row for row in injuries_by_fixture.get(fid, [])
+                           if row["teamId"] in {h_id, a_id}] if valid_ids and fetched else [])
+              has_reports = bool(injuries)
+              def by_side(team_id):
+                  unique = {}
+                  for item in injuries:
+                      if item["teamId"] != team_id:
+                          continue
+                      key = str(item.get("playerId") or item["name"])
+                      unique[key] = item
+                  return list(unique.values())[:15]
+
+              if not valid_ids:
+                  injury_note = "Identificativi delle squadre incoerenti: assenze non verificabili"
+              elif not fetched:
+                  injury_note = injury_fetch_note
+              elif not has_reports:
+                  injury_note = "Endpoint consultato, ma nessuna segnalazione ricevuta per questa partita: non equivale a rosa completa"
+              else:
+                  injury_note = "Segnalazioni presenti in API-Football; elenco potenzialmente incompleto e aggiornabile"
+
+              home_gap = rest_before(match["homeGames"], match["date"])
+              away_gap = rest_before(match["awayGames"], match["date"])
+              return {
+                  "source": "API-Football + storico BETLAB",
+                  "generatedAt": datetime.now(ROME).isoformat(),
+                  "injuriesStatus": "disponibile" if has_reports else "non_verificato",
+                  "injuriesRequestStatus": injuries_api_status,
+                  "injuriesNote": injury_note,
+                  "homeInjuries": by_side(h_id) if has_reports else [],
+                  "awayInjuries": by_side(a_id) if has_reports else [],
+                  "homeVenueForm": venue_summary(match["homeGames"], True),
+                  "awayVenueForm": venue_summary(match["awayGames"], False),
+                  "homeRestDays": home_gap["days"],
+                  "awayRestDays": away_gap["days"],
+                  "homeRestStatus": home_gap["status"],
+                  "awayRestStatus": away_gap["status"],
+                  "homeLastRecorded": home_gap["lastRecorded"],
+                  "awayLastRecorded": away_gap["lastRecorded"],
+                  "homeHistoryAgeDays": home_gap["ageDays"],
+                  "awayHistoryAgeDays": away_gap["ageDays"],
+                  "historyEligible": match["historyEligible"],
+                  "historyQuality": match["historyQuality"],
+                  "venue": {"name": str(venue.get("name") or "")[:120],
+                            "city": str(venue.get("city") or "")[:100]},
+                  "homeTeamId": h_id,
+                  "awayTeamId": a_id,
+                  "lineupsStatus": "non_verificato",
+                  "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
+              }
+
+          # analizza tutte le partite candidate disponibili
+          for match in candidate_matches:
+
+              home_games = match[
+                  "homeGames"
+              ]
+
+              away_games = match[
+                  "awayGames"
+              ]
+
+
+              home_stats = team_stats(
+                  home_games
+              )
+
+              away_stats = team_stats(
+                  away_games
+              )
+
+
+              # Due percorsi INDIPENDENTI:
+              # 1) distribuzione probabilistica mostrata anche se fragile;
+              # 2) selezione quotata solo con storia verificata.
+              raw_model_candidates = build_market_candidates(home_games, away_games)
+              if match["historyEligible"]:
+                  recent_eligible_matches += 1
+                  candidates = [dict(c) for c in raw_model_candidates]
+              else:
+                  stale_or_insufficient_matches += 1
+                  candidates = []
+
+              # Una stima con pochi incontri non e' un consiglio di giocata.
+              # Il riepilogo e' derivato dalla medesima Poisson coerente per
+              # tutti i mercati; le quote non sono necessarie per descriverlo.
+              def model_probability(market, selection):
+                  return next((c["modelProbability"] for c in raw_model_candidates
+                               if c["market"] == market and c["selection"] == selection), None)
+
+              raw_scores = [c for c in raw_model_candidates
+                            if c["market"] == "Risultato Esatto"]
+              raw_scores.sort(key=lambda c: -c["modelProbability"])
+              sample_min = min(len(home_games), len(away_games))
+              if not raw_model_candidates:
+                  model_state = "non_calcolabile"
+                  model_note = "Una o entrambe le squadre non hanno partite valide nello storico prima del calcio d'inizio. Nessuna previsione numerica."
+              elif not match["historyEligible"]:
+                  model_state = "esplorativa"
+                  model_note = "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata."
+              else:
+                  model_state = "campione_idoneo"
+                  model_note = "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata."
+              xh, xa = expected_goals(home_games, away_games)
+              model_analysis = {
+                  "status": model_state,
+                  "note": model_note,
+                  "homeGames": len(home_games),
+                  "awayGames": len(away_games),
+                  "expectedGoals": {"home": round(xh, 3) if xh is not None else None,
+                                    "away": round(xa, 3) if xa is not None else None},
+                  "probabilities": {
+                      "1": model_probability("1X2", "1"),
+                      "X": model_probability("1X2", "X"),
+                      "2": model_probability("1X2", "2"),
+                      "1X": model_probability("Doppia Chance", "1X"),
+                      "X2": model_probability("Doppia Chance", "X2"),
+                      "12": model_probability("Doppia Chance", "12"),
+                      "GOAL": model_probability("Goal/No Goal", "GOAL"),
+                      "NO GOAL": model_probability("Goal/No Goal", "NO GOAL"),
+                      "OVER 1.5": model_probability("Totale Gol", "OVER 1.5"),
+                      "UNDER 1.5": model_probability("Totale Gol", "UNDER 1.5"),
+                      "OVER 2.5": model_probability("Totale Gol", "OVER 2.5"),
+                      "UNDER 2.5": model_probability("Totale Gol", "UNDER 2.5"),
+                      "OVER 3.5": model_probability("Totale Gol", "OVER 3.5"),
+                      "UNDER 3.5": model_probability("Totale Gol", "UNDER 3.5"),
+                      "PARI": model_probability("Pari/Dispari", "PARI"),
+                      "DISPARI": model_probability("Pari/Dispari", "DISPARI")
+                  },
+                  "topScores": [
+                      {"score": c["selection"].replace(":", "-"),
+                       "probability": c["modelProbability"]}
+                      for c in raw_scores[:3]
+                  ]
+              }
+
+
+              # scarta mercati ordinari sotto indice minimo
+              filtered = []
+
+
+              for candidate in candidates:
+
+                  if (
+                      candidate[
+                          "market"
+                      ]
+                      ==
+                      "Risultato Esatto"
+                  ):
+
+                      filtered.append(
+                          candidate
+                      )
+
+                  elif (
+                      candidate[
+                          "index"
+                      ]
+                      >=
+                      MIN_MARKET_INDEX
+                  ):
+
+                      filtered.append(
+                          candidate
+                      )
+
+
+              candidates = filtered
+
+
+              if candidates:
+
+                  try:
+
+                      candidates = attach_best_odds(
+                          match[
+                              "fixtureId"
+                          ],
+                          candidates
+                      )
+
+                  except Exception as exc:
+
+                      print(
+                          "ERRORE QUOTE",
+                          match["home"],
+                          "-",
+                          match["away"],
+                          ":",
+                          exc
+                      )
+
+
+              # solo candidati con quota
+              market_consensus = market_1x2_consensus(match["fixtureId"])
+              home_opp_strength = opponent_strength(home_games, match["date"])
+              away_opp_strength = opponent_strength(away_games, match["date"])
+              risk_signals = {
+                  "market1X2": market_consensus,
+                  "opponentStrength": {
+                      "home": home_opp_strength,
+                      "away": away_opp_strength
+                  },
+                  "relativeFormPPG": round(home_stats["ppg"] - away_stats["ppg"], 3),
+                  "blockedSelections": [],
+                  "newsStatus": "non_verificato_nessun_feed_notizie",
+                  "officialStandingStatus": "non_verificata_nessun_feed_classifica",
+                  "homeWinStreak": consecutive_wins(home_games),
+                  "awayWinStreak": consecutive_wins(away_games),
+                  "drawOdd": draw_market_odd(match["fixtureId"]),
+                  "drawAttention": False,
+                  "engineModel": "poisson_v10_uncalibrated"
+              }
+              risk_signals["drawAttention"] = (
+                  risk_signals["drawOdd"] is not None
+                  and risk_signals["drawOdd"] <= 3.00
+              )
+
+              quoted_candidates = [
+                  c for c in candidates
+                  if c.get("oddAvailable")
+                  and safe_float(c.get("odd")) is not None
+                  and MIN_ODD <= safe_float(c.get("odd")) <= MAX_RECOMMENDED_ODD
+                  and safe_float(c.get("modelProbability")) is not None
+                  and safe_float(c.get("modelProbability")) >= MIN_RECOMMENDED_PROBABILITY
+              ]
+
+
+              # Controlli sul feed, indipendenti dalla pagina web.
+              # Non pubblicare consigli su un vantaggio apparente enorme:
+              # spesso e' un errore di stima o un prezzo non comparabile.
+              def passes_risk_controls(c):
+                  if c["market"] == "Risultato Esatto":
+                      return False
+                  selection = str(c.get("selection") or "").upper()
+                  if c["market"] in {"1X2", "Doppia Chance"}:
+                      # Se mancano almeno 3 triplette 1X2 affidabili,
+                      # non consigliamo questo mercato (resta nell'analisi).
+                      consensus_p = consensus_for_market(
+                          market_consensus, c["market"], selection)
+                      if consensus_p is None:
+                          risk_signals["blockedSelections"].append(
+                              f"{c['market']} {selection}: confronto 1X2 non verificabile")
+                          return False
+                      c["marketFairProbability"] = round(consensus_p, 5)
+                      c["marketConsensusGap"] = round(
+                          c["modelProbability"] - consensus_p, 5)
+                      # Il valore apparente non puo' basarsi su un errore
+                      # di probabilita' superiore a 7,5 punti sul mercato.
+                      if c["modelProbability"] - consensus_p > 0.075:
+                          risk_signals["blockedSelections"].append(
+                              f"{c['market']} {selection}: modello "
+                              f"{c['modelProbability']*100:.1f}% vs mercato "
+                              f"{consensus_p*100:.1f}%")
+                          return False
+                      # Forma direzionale controindicata: altra difesa
+                      # se un X2 copre squadra nettamente peggiore.
+                      diff = risk_signals["relativeFormPPG"]
+                      market_home = market_consensus["probabilities"]["1"]
+                      market_away = market_consensus["probabilities"]["2"]
+                      if (c["market"] == "Doppia Chance"
+                          and selection == "X2" and diff >= 0.70
+                          and market_home >= 0.51 and market_home-market_away >= 0.22):
+                          return False
+                      if (c["market"] == "Doppia Chance"
+                          and selection == "1X" and diff <= -0.70
+                          and market_away >= 0.51 and market_away-market_home >= 0.22):
+                          return False
+                  if c["market"] == "1X2":
+                      if selection == "1" and risk_signals["homeWinStreak"] >= 6:
+                          return False
+                      if selection == "2" and risk_signals["awayWinStreak"] >= 6:
+                          return False
+                      if (selection in {"1", "2"} and risk_signals["drawAttention"]
+                          and c["modelProbability"] < 0.63):
+                          return False
+                  p_model = c["modelProbability"]
+                  p_odd = 1.0 / float(c["odd"])
+                  if p_model - p_odd > 0.12 or p_model / p_odd > 1.40:
+                      return False
+                  return True
+
+              quoted_candidates = [c for c in quoted_candidates
+                                   if passes_risk_controls(c)]
+
+              quoted_candidates.sort(
+                  key=lambda c: (
+
+                      -c[
+                          "index"
+                      ],
+
+                      -(
+                          c[
+                              "value"
+                          ]
+                          or
+                          0
+                      )
+
+                  )
+              )
+
+
+              if quoted_candidates:
+
+                  matches_with_candidates += 1
+
+
+              total_market_candidates += len(
+                  candidates
+              )
+
+              total_candidates_with_odds += len(
+                  quoted_candidates
+              )
+
+
+              exact_scores_with_odds += sum(
+
+                  1
+                  for c in quoted_candidates
+                  if c[
+                      "market"
+                  ]
+                  ==
+                  "Risultato Esatto"
+
+              )
+
+
+              # compatibilità temporanea con vecchia homepage:
+              # primo candidato diventa prediction
+              if quoted_candidates:
+
+                  best = quoted_candidates[0]
+
+
+                  prediction = {
+
+                      "available":
+                          True,
+
+                      "selection":
+                          best[
+                              "selection"
+                          ],
+
+                      "market":
+                          best[
+                              "market"
+                          ],
+
+                      "confidence":
+                          best[
+                              "index"
+                          ],
+
+                      "oddAvailable":
+                          True,
+
+                      "odd":
+                          best[
+                              "odd"
+                          ],
+
+                      "bookmaker":
+                          best[
+                              "bookmaker"
+                          ],
+
+                      "apiMarket":
+                          best[
+                              "apiMarket"
+                          ],
+
+                      "apiSelection":
+                          best[
+                              "apiSelection"
+                          ]
+
+                  }
+
+              else:
+
+                  prediction = {
+
+                      "available":
+                          False,
+
+                      "selection":
+                          None,
+
+                      "market":
+                          None,
+
+                      "confidence":
+                          None,
+
+                      "oddAvailable":
+                          False,
+
+                      "odd":
+                          None,
+
+                      "bookmaker":
+                          None
+
+                  }
+
+
+              analysis.append({
+
+                  "fixtureId":
+                      match[
+                          "fixtureId"
+                      ],
+
+                  "date":
+                      match[
+                          "date"
+                      ],
+
+                  "timestamp":
+                      match[
+                          "timestamp"
+                      ],
+
+                  "country":
+                      match[
+                          "country"
+                      ],
+
+                  "league":
+                      match[
+                          "league"
+                      ],
+
+                  "priority":
+                      match[
+                          "priority"
+                      ],
+
+                  "home": {
+
+                      "name":
+                          match[
+                              "home"
+                          ],
+
+                      "form":
+                          home_stats
+
+                  },
+
+                  "away": {
+
+                      "name":
+                          match[
+                              "away"
+                          ],
+
+                      "form":
+                          away_stats
+
+                  },
+
+                  "historyScore":
+                      match[
+                          "historyScore"
+                      ],
+
+                  "historyEligible": match["historyEligible"],
+                  "historyQuality": match["historyQuality"],
+
+                  "context": fixture_context(match),
+                  "riskSignals": risk_signals,
+                  "modelAnalysis": model_analysis,
+
+                  "prediction":
+                      prediction,
+
+                  "candidates":
+                      quoted_candidates
+
+              })
+
+
+          print("Contesto indisponibili:", len(requested_injury_ids),
+                "fixture richieste |", injury_fetch_note,
+                "| stato:", injuries_api_status)
+          print("Storico recente idoneo:", recent_eligible_matches,
+                "| esclusi per date/campione:", stale_or_insufficient_matches)
+
+          # ==========================================================
+          # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
+          # Una selezione per fixture, alla prima analisi disponibile.
+          # ==========================================================
+
+          prediction_log_path = "data/betlab-predictions-log.json"
+          prediction_log = load_json(prediction_log_path, [])
+          if not isinstance(prediction_log, list):
+              prediction_log = []
+
+          logged_ids = {
+              str(row.get("fixtureId"))
+              for row in prediction_log
+              if isinstance(row, dict) and row.get("fixtureId") is not None
+          }
+          recorded_at = datetime.now(ROME).isoformat()
+          recorded_ts = int(datetime.now(ROME).timestamp())
+          added_predictions = 0
+
+          for match in analysis:
+              fixture_id = match.get("fixtureId")
+              kickoff_ts = int(match.get("timestamp") or 0)
+              quoted = match.get("candidates") or []
+              if (fixture_id is None or str(fixture_id) in logged_ids
+                  or kickoff_ts <= recorded_ts or not quoted):
+                  continue
+              pick = quoted[0]
+              prediction_log.append({
+                  "fixtureId": fixture_id,
+                  "date": match.get("date"),
+                  "timestamp": kickoff_ts,
+                  "country": match.get("country"),
+                  "league": match.get("league"),
+                  "home": match["home"]["name"],
+                  "away": match["away"]["name"],
+                  "market": pick["market"],
+                  "selection": pick["selection"],
+                  "odd": pick["odd"],
+                  "bookmaker": pick.get("bookmaker"),
+                  "index": pick["index"],
+                  "recordedAt": recorded_at,
+                  "status": "IN_ATTESA",
+                  "homeGoals": None,
+                  "awayGoals": None
+              })
+              logged_ids.add(str(fixture_id))
+              added_predictions += 1
+
+          def grade_pick(market, selection, hg, ag):
+              market = str(market or "").lower()
+              selection = str(selection or "").strip().upper()
+              total = hg + ag
+              outcome = "1" if hg > ag else ("2" if ag > hg else "X")
+              if market == "1x2":
+                  return outcome == selection
+              if market == "doppia chance":
+                  return outcome in selection
+              if market == "goal/no goal":
+                  return (hg > 0 and ag > 0) if selection == "GOAL" else (hg == 0 or ag == 0)
+              if market == "totale gol":
+                  parts = selection.split()
+                  if len(parts) != 2:
+                      return None
+                  try:
+                      threshold = float(parts[1])
+                  except ValueError:
+                      return None
+                  return total > threshold if parts[0] == "OVER" else total < threshold if parts[0] == "UNDER" else None
+              if market == "pari/dispari":
+                  return (total % 2 == 0) if selection == "PARI" else (total % 2 != 0)
+              if market == "somma gol":
+                  if selection.endswith("+"):
+                      return total >= int(selection[:-1])
+                  if "-" in selection:
+                      a, b = selection.split("-", 1)
+                      return int(a) <= total <= int(b)
+              if market == "risultato esatto":
+                  return selection.replace("-", ":") == f"{hg}:{ag}"
+              return None
+
+          results_by_id = {}
+          results_by_key = {}
+          for item in all_api_matches:
+              fixture = item.get("fixture") or {}
+              if (fixture.get("status") or {}).get("short") not in {"FT", "AET", "PEN"}:
+                  continue
+              goals = item.get("goals") or {}
+              if goals.get("home") is None or goals.get("away") is None:
+                  continue
+              teams = item.get("teams") or {}
+              home = (teams.get("home") or {}).get("name")
+              away = (teams.get("away") or {}).get("name")
+              result = (int(goals["home"]), int(goals["away"]))
+              results_by_id[str(fixture.get("id"))] = result
+              results_by_key[(str(fixture.get("date") or "")[:10], canonical(home), canonical(away))] = result
+
+          # Lo storico persistente consente anche la liquidazione nei run successivi.
+          for record in history:
+              hg, ag = historical_goals(record)
+              if hg is None or ag is None:
+                  continue
+              result = (int(hg), int(ag))
+              if record.get("fixtureId") is not None:
+                  results_by_id[str(record["fixtureId"])] = result
+              results_by_key[logical_history_key(record)] = result
+
+          settled_predictions = 0
+          for row in prediction_log:
+              if not isinstance(row, dict) or row.get("status") != "IN_ATTESA":
+                  continue
+              result = results_by_id.get(str(row.get("fixtureId")))
+              if result is None:
+                  result = results_by_key.get((str(row.get("date") or "")[:10], canonical(row.get("home")), canonical(row.get("away"))))
+              if result is None:
+                  continue
+              hg, ag = result
+              verdict = grade_pick(row.get("market"), row.get("selection"), hg, ag)
+              if verdict is None:
+                  continue
+              row["homeGoals"] = hg
+              row["awayGoals"] = ag
+              row["status"] = "VINTA" if verdict else "PERSA"
+              row["settledAt"] = recorded_at
+              settled_predictions += 1
+
+          save_json(prediction_log_path, prediction_log)
+          print("Pronostici pre-partita registrati:", added_predictions)
+          print("Pronostici liquidati:", settled_predictions)
+          print("Totale registro:", len(prediction_log))
+
+          # ==========================================================
+          # SALVA ANALISI
+          # ==========================================================
+
+          output = {
+
+              "engine":
+                  "BETLAB V10.3 ANALYSIS + MARKET CONSENSUS EXPERIMENTAL",
+
+              "generatedAt":
+                  datetime.now(
+                      ROME
+                  ).isoformat(),
+
+              "days":
+                  DAYS,
+              "calendarDaysUnavailable": unavailable_days,
+              "calendarHorizonDays": DAYS_AHEAD + 1,
+
+              "historyCount":
+                  len(history),
+
+              "matchesAnalyzed":
+                  len(analysis),
+
+              "matchesWithCandidates":
+                  matches_with_candidates,
+
+              "matchesHistoryRecent": recent_eligible_matches,
+              "matchesHistoryUnreliable": stale_or_insufficient_matches,
+              "selectionPolicy": {
+                  "model": "poisson_coherent_uncalibrated_with_market_veto",
+                  "winStreakExcludeAt": 6,
+                  "drawAttentionAtOrBelow": 3.0,
+                  "maxProbabilityPriceGap": 0.12,
+                  "maxProbabilityPriceRatio": 1.40,
+                  "maximumRecommendedOdd": MAX_RECOMMENDED_ODD,
+                  "minimumRecommendedModelProbability": MIN_RECOMMENDED_PROBABILITY,
+                  "quoteSelection": "median_of_available_bookmakers",
+                  "oneXTwoMarketMinimumBookmakers": 3,
+                  "oneXTwoMaximumOvervaluationVsMarket": 0.075,
+                  "oneXTwoMarketReference": "consensus_fair_probabilities_overround_removed",
+                  "opponentQuality": "recent_opponents_points_proxy_not_official_rank",
+                  "corporateAndTeamNews": "not_verified_no_news_provider",
+                  "exactScoresRecommended": False,
+                  "note": "Filtri sperimentali; non implicano redditivita' verificata"
+              },
+              "historyPolicy": {
+                  "recentWindowDays": RECENT_WINDOW_DAYS,
+                  "minRecentGamesPerTeam": MIN_RECENT_GAMES,
+                  "maxDaysFromLastMatch": MAX_LAST_GAME_AGE_DAYS
+              },
+
+              "marketCandidates":
+                  total_market_candidates,
+
+              "candidatesWithOdds":
+                  total_candidates_with_odds,
+
+              "exactScoresWithOdds":
+                  exact_scores_with_odds,
+
+              "injuriesApiStatus": injuries_api_status,
+              "injuriesApiNote": injury_fetch_note,
+              "injuriesFixturesQueried": len(requested_injury_ids),
+              "injuriesFixturesWithReports": len(injuries_by_fixture),
+
+              "analysis":
+                  analysis
+
+          }
+
+
+          save_json(
+              "data/betlab-analysis.json",
+              output
+          )
+
+
+          # shortlist semplice
+          shortlist = [
+
+              {
+                  "fixtureId":
+                      m[
+                          "fixtureId"
+                      ],
+
+                  "date":
+                      m[
+                          "date"
+                      ],
+
+                  "country":
+                      m[
+                          "country"
+                      ],
+
+                  "league":
+                      m[
+                          "league"
+                      ],
+
+                  "home":
+                      m[
+                          "home"
+                      ],
+
+                  "away":
+                      m[
+                          "away"
+                      ],
+
+                  "priority":
+                      m[
+                          "priority"
+                      ],
+
+                  "historyScore":
+                      m[
+                          "historyScore"
+                      ]
+              }
+
+              for m in candidate_matches[:50]
+
+          ]
+
+
+          save_json(
+              "data/betlab-shortlist.json",
+              shortlist
+          )
+
+
+          # ==========================================================
+          # LOG
+          # ==========================================================
+
+          print("")
+          print("==============================================")
+          print("RISULTATO BETLAB V9")
+          print("==============================================")
+
+          print(
+              "Storico totale:",
+              len(history)
+          )
+
+          print(
+              "Partite analizzate:",
+              len(analysis)
+          )
+
+          print(
+              "Partite con candidati:",
+              matches_with_candidates
+          )
+
+          print(
+              "Candidati mercato generati:",
+              total_market_candidates
+          )
+
+          print(
+              "Candidati con quota:",
+              total_candidates_with_odds
+          )
+
+          print(
+              "Risultati esatti con quota:",
+              exact_scores_with_odds
+          )
+
+
+          print("")
+          print("TOP CANDIDATI PER PARTITA")
+          print("")
+
+
+          for index, match in enumerate(
+              analysis,
+              start=1
+          ):
+
+              candidates = match.get(
+                  "candidates"
+              ) or []
+
+
+              print(
+                  f'{index}. '
+                  f'{match["home"]["name"]}'
+                  f' - '
+                  f'{match["away"]["name"]}'
+              )
+
+
+              if not candidates:
+
+                  print(
+                      "   NESSUN CANDIDATO CON QUOTA"
+                  )
+
+                  continue
+
+
+              for candidate in candidates[:8]:
+
+                  print(
+                      "   "
+                      +
+                      candidate[
+                          "market"
+                      ]
+                      +
+                      " | "
+                      +
+                      candidate[
+                          "selection"
+                      ]
+                      +
+                      " | INDICE "
+                      +
+                      str(
+                          candidate[
+                              "index"
+                          ]
+                      )
+                      +
+                      "%"
+                      +
+                      " | @ "
+                      +
+                      str(
+                          candidate[
+                              "odd"
+                          ]
+                      )
+                      +
+                      " | "
+                      +
+                      str(
+                          candidate[
+                              "bookmaker"
+                          ]
+                      )
+                  )
+
+
+          print("")
+          print("==============================================")
+          print("BETLAB MULTI-MARKET ENGINE V10.2 OK")
+          print("==============================================")
+
           PY
 
-      - name: Scarica report e analisi
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: BETLAB-confronto-V7-V10-offline
-          path: betlab_confronto_output/
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Pubblica il confronto nel sito senza toccare gli altri dati
-        if: success()
+      - name: Commit aggiornamenti BETLAB
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/betlab-confronto.json
+
+          git add data/
+
           if git diff --cached --quiet; then
-            echo "Confronto invariato"
+            echo "Nessuna modifica da salvare"
             exit 0
           fi
-          git commit -m "Aggiorna confronto V7 V10 per sito"
+
+          git commit -m "Aggiorna BETLAB V10.3 - analisi separate dai consigli"
+
           git pull --rebase origin main
-          git push origin HEAD:main
+
+          git push origin main
