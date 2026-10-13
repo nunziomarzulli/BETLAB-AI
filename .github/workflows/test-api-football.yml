@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V10.1 - Quote robuste e calendario 7 giorni
+      - name: BETLAB Prediction Engine V10.2 - Controllo consenso bookmaker e forma
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -27,6 +27,7 @@ jobs:
           import os
           import re
           import math
+          from functools import lru_cache
           import unicodedata
           import urllib.request
           import urllib.parse
@@ -337,7 +338,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.1")
+          print("BETLAB MULTI-MARKET ENGINE V10.2")
           print("==============================================")
           print("")
 
@@ -897,6 +898,7 @@ jobs:
           # PARTITE STORICHE SQUADRA
           # ==========================================================
 
+          @lru_cache(maxsize=4096)
           def team_games(
               team,
               before_date,
@@ -967,7 +969,8 @@ jobs:
                               int(ag),
 
                           "home":
-                              True
+                              True,
+                          "opponent": away
 
                       })
 
@@ -986,7 +989,8 @@ jobs:
                               int(hg),
 
                           "home":
-                              False
+                              False,
+                          "opponent": home
 
                       })
 
@@ -2057,6 +2061,94 @@ jobs:
               return candidates
 
 
+          # ==========================================================
+          # CONSENSO 1X2: quote di almeno tre bookmaker indipendenti.
+          # Rimuoviamo l'overround per una distribuzione 1/X/2 coerente.
+          # Non equivale alla probabilita' vera; e' un confronto di mercato.
+          # Se la copertura e' bassa o i book non concordano, non autorizza
+          # pronostici sui segni 1X2/doppia chance.
+          # ==========================================================
+          def market_1x2_consensus(fixture_id):
+              by_bookmaker = {}
+              for block in odds_cache.get(fixture_id, []):
+                  for book in block.get("bookmakers") or []:
+                      name = str(book.get("name") or "").strip().lower()
+                      if not name:
+                          continue
+                      for bet in book.get("bets") or []:
+                          if normalize(bet.get("name")) not in {"match winner", "1x2"}:
+                              continue
+                          trio = {}
+                          for entry in bet.get("values") or []:
+                              item = normalize(entry.get("value"))
+                              side = {"home":"1", "1":"1", "draw":"X", "x":"X", "away":"2", "2":"2"}.get(item)
+                              odd = safe_float(entry.get("odd"))
+                              if side and odd is not None and math.isfinite(odd) and 1.02 <= odd <= 100:
+                                  trio[side] = odd
+                          if len(trio) != 3:
+                              continue
+                          implied = {k: 1.0 / v for k,v in trio.items()}
+                          margin_total = sum(implied.values())
+                          # Ignora triple chiaramente incoerenti o troppo vecchie.
+                          if not 1.005 <= margin_total <= 1.25:
+                              continue
+                          fair = {k: implied[k] / margin_total for k in ("1","X","2")}
+                          by_bookmaker[name] = fair
+              points = list(by_bookmaker.values())
+              n = len(points)
+              if n < 3:
+                  return {"available": False, "sourceCount": n,
+                          "status": "meno_di_tre_bookmaker"}
+              def median(nums):
+                  nums = sorted(nums)
+                  k = len(nums) // 2
+                  return nums[k] if len(nums) % 2 else (nums[k-1] + nums[k]) / 2
+              raw = {k: median([row[k] for row in points]) for k in ("1","X","2")}
+              dispersion = max(max(row[k] for row in points) - min(row[k] for row in points)
+                               for k in ("1","X","2"))
+              if dispersion > 0.14:
+                  return {"available": False, "sourceCount": n,
+                          "status": "quote_discordanti",
+                          "dispersion": round(dispersion, 4)}
+              total = sum(raw.values())
+              fair = {k: round(v / total, 5) for k,v in raw.items()}
+              return {"available": True, "sourceCount": n, "status": "verificato",
+                      "probabilities": fair, "dispersion": round(dispersion, 4),
+                      "method": "mediana_probabilita_quote_1x2_senza_margine"}
+
+          # La forza degli avversari e' una PROXY: punti medi recenti,
+          # NON una classifica ufficiale. Non sono disponibili dati societari.
+          def opponent_strength(games, before_date):
+              values = []
+              for game in games:
+                  opponent = str(game.get("opponent") or "").strip()
+                  if not opponent:
+                      continue
+                  past = team_games(opponent, before_date)
+                  relevant = [g for g in past if 0 < (datetime.fromisoformat(before_date).date()
+                      - datetime.fromisoformat(g["date"]).date()).days <= 120]
+                  if len(relevant) < 5:
+                      continue
+                  sample = team_stats(relevant)
+                  values.append(sample["ppg"])
+              return {
+                  "coverage": len(values),
+                  "gamesExamined": len(games),
+                  "opponentsAvgPPG": round(sum(values) / len(values), 3) if len(values) >= 3 else None,
+                  "status": "stimabile" if len(values) >= 3 else "non_verificabile"
+              }
+
+          def consensus_for_market(consensus, market, selection):
+              if not consensus.get("available"):
+                  return None
+              p = consensus["probabilities"]
+              if market == "1X2":
+                  return p.get(selection)
+              if market == "Doppia Chance":
+                  return {"1X":p["1"]+p["X"], "X2":p["X"]+p["2"],
+                          "12":p["1"]+p["2"]}.get(selection)
+              return None
+
           def consecutive_wins(games):
               streak = 0
               for game in reversed(games):
@@ -2532,7 +2624,19 @@ jobs:
 
 
               # solo candidati con quota
+              market_consensus = market_1x2_consensus(match["fixtureId"])
+              home_opp_strength = opponent_strength(home_games, match["date"])
+              away_opp_strength = opponent_strength(away_games, match["date"])
               risk_signals = {
+                  "market1X2": market_consensus,
+                  "opponentStrength": {
+                      "home": home_opp_strength,
+                      "away": away_opp_strength
+                  },
+                  "relativeFormPPG": round(home_stats["ppg"] - away_stats["ppg"], 3),
+                  "blockedSelections": [],
+                  "newsStatus": "non_verificato_nessun_feed_notizie",
+                  "officialStandingStatus": "non_verificata_nessun_feed_classifica",
                   "homeWinStreak": consecutive_wins(home_games),
                   "awayWinStreak": consecutive_wins(away_games),
                   "drawOdd": draw_market_odd(match["fixtureId"]),
@@ -2561,6 +2665,39 @@ jobs:
                   if c["market"] == "Risultato Esatto":
                       return False
                   selection = str(c.get("selection") or "").upper()
+                  if c["market"] in {"1X2", "Doppia Chance"}:
+                      # Se mancano almeno 3 triplette 1X2 affidabili,
+                      # non consigliamo questo mercato (resta nell'analisi).
+                      consensus_p = consensus_for_market(
+                          market_consensus, c["market"], selection)
+                      if consensus_p is None:
+                          risk_signals["blockedSelections"].append(
+                              f"{c['market']} {selection}: confronto 1X2 non verificabile")
+                          return False
+                      c["marketFairProbability"] = round(consensus_p, 5)
+                      c["marketConsensusGap"] = round(
+                          c["modelProbability"] - consensus_p, 5)
+                      # Il valore apparente non puo' basarsi su un errore
+                      # di probabilita' superiore a 7,5 punti sul mercato.
+                      if c["modelProbability"] - consensus_p > 0.075:
+                          risk_signals["blockedSelections"].append(
+                              f"{c['market']} {selection}: modello "
+                              f"{c['modelProbability']*100:.1f}% vs mercato "
+                              f"{consensus_p*100:.1f}%")
+                          return False
+                      # Forma direzionale controindicata: altra difesa
+                      # se un X2 copre squadra nettamente peggiore.
+                      diff = risk_signals["relativeFormPPG"]
+                      market_home = market_consensus["probabilities"]["1"]
+                      market_away = market_consensus["probabilities"]["2"]
+                      if (c["market"] == "Doppia Chance"
+                          and selection == "X2" and diff >= 0.70
+                          and market_home >= 0.51 and market_home-market_away >= 0.22):
+                          return False
+                      if (c["market"] == "Doppia Chance"
+                          and selection == "1X" and diff <= -0.70
+                          and market_away >= 0.51 and market_away-market_home >= 0.22):
+                          return False
                   if c["market"] == "1X2":
                       if selection == "1" and risk_signals["homeWinStreak"] >= 6:
                           return False
@@ -2923,7 +3060,7 @@ jobs:
           output = {
 
               "engine":
-                  "BETLAB V10.1 COHERENT POISSON EXPERIMENTAL",
+                  "BETLAB V10.2 POISSON MARKET CONSENSUS EXPERIMENTAL",
 
               "generatedAt":
                   datetime.now(
@@ -2947,7 +3084,7 @@ jobs:
               "matchesHistoryRecent": recent_eligible_matches,
               "matchesHistoryUnreliable": stale_or_insufficient_matches,
               "selectionPolicy": {
-                  "model": "poisson_coherent_uncalibrated",
+                  "model": "poisson_coherent_uncalibrated_with_market_veto",
                   "winStreakExcludeAt": 6,
                   "drawAttentionAtOrBelow": 3.0,
                   "maxProbabilityPriceGap": 0.12,
@@ -2955,6 +3092,11 @@ jobs:
                   "maximumRecommendedOdd": MAX_RECOMMENDED_ODD,
                   "minimumRecommendedModelProbability": MIN_RECOMMENDED_PROBABILITY,
                   "quoteSelection": "median_of_available_bookmakers",
+                  "oneXTwoMarketMinimumBookmakers": 3,
+                  "oneXTwoMaximumOvervaluationVsMarket": 0.075,
+                  "oneXTwoMarketReference": "consensus_fair_probabilities_overround_removed",
+                  "opponentQuality": "recent_opponents_points_proxy_not_official_rank",
+                  "corporateAndTeamNews": "not_verified_no_news_provider",
                   "exactScoresRecommended": False,
                   "note": "Filtri sperimentali; non implicano redditivita' verificata"
               },
@@ -3163,7 +3305,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.1 OK")
+          print("BETLAB MULTI-MARKET ENGINE V10.2 OK")
           print("==============================================")
 
           PY
@@ -3180,7 +3322,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V10.1 - quote robuste e calendario"
+          git commit -m "Aggiorna BETLAB V10.2 - verifica quote 1X2 e contesto"
 
           git pull --rebase origin main
 
