@@ -1181,6 +1181,42 @@
     .v7-unavailable { padding:25px; border:1px solid #2d4b60; border-radius:12px; background:#10283a; color:#d1e2ec; line-height:1.65; font-size:13px; }
     @media(max-width:700px) { .engine-tabs { width:100%; } .engine-tab { flex:1; padding:12px 8px; font-size:12px; } .v7-head h2 { font-size:18px; } .v7-card-teams { min-height:auto; } }
 
+
+/* BETLAB V10.3: distinzione esplicita fra analisi e giocata */
+.monitor-panel {margin-top:22px; padding:17px 17px 20px; border-color:#2c5463;}
+.monitor-panel>summary {font-size:14px;}
+.monitor-info {font-size:12px; margin:12px 0 14px;}
+.monitor-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.analysis-match-card {min-width:0; padding:17px; border:1px solid #35576b; border-radius:12px;background:#12293b; color:#e8f3f7;}
+.analysis-match-head {display:flex; align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.analysis-match-head h3 {font-size:16px;line-height:1.3;margin:5px 0 0;overflow-wrap:anywhere;}
+.analysis-match-head small {font-size:10px;color:#adc3d0;}
+.analysis-quality {border:1px solid #507c86;border-radius:6px;padding:5px 7px;font-size:9px;font-weight:900;white-space:nowrap;color:#c9e7e2;}
+.analysis-quality.esplorativa {border-color:#c7974e;color:#ffe1a8;}
+.analysis-quality.non_calcolabile {border-color:#788592;color:#d1dce1;}
+.analysis-mini {display:flex;gap:14px;flex-wrap:wrap;margin:0 0 12px;color:#a8c5d2;font-size:11px;}
+.analysis-mini b {color:#fff;}
+.analysis-probability-grid {display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr));}
+.analysis-prob-group {min-width:0;}
+.analysis-prob-group>strong {display:block;color:#7ae3ad;font-size:11px;margin-bottom:6px;}
+.analysis-prob-group>div {display:flex;flex-direction:column;gap:5px;}
+.analysis-prob-group span {display:flex;justify-content:space-between;gap:7px;font-size:11px;color:#c5d9e1;}
+.analysis-prob-group b {color:#f7ffff;white-space:nowrap;}
+.analysis-scores {margin:14px 0 8px;border-top:1px solid #34556a;padding-top:11px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:11px;}
+.analysis-scores strong {margin-right:4px;}
+.analysis-scores span {border-radius:5px;padding:5px 7px;background:#203d51;color:#f5fcff;}
+.analysis-scores b {color:#8ce6bc;}
+.analysis-caution,.analysis-unavailable {font-size:11px;color:#adc4d2;line-height:1.5;margin:9px 0;}
+.analysis-additional {border-top:1px solid #34556a;margin-top:12px;padding-top:10px;}
+.analysis-additional summary {font-size:11px;cursor:pointer;color:#82ddb3;font-weight:800;}
+.analysis-additional p {color:#abc4d0;font-size:11px;line-height:1.5;}
+.analysis-additional .context-section {background:#eaf4ee;color:#294337;}
+.recommended-model-details {background:#1b3545;border:1px solid #3b5966;border-radius:8px;padding:13px;margin-top:10px;}
+.recommended-model-details .analysis-probability-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+.recommended-model-details .analysis-caution,.recommended-model-details .analysis-mini {color:#d7e5e8;}
+@media (max-width:1350px){.monitor-grid{grid-template-columns:1fr;}}
+@media (max-width:700px){.analysis-match-head{flex-wrap:wrap}.analysis-probability-grid{grid-template-columns:1fr 1fr}.recommended-model-details .analysis-probability-grid{grid-template-columns:1fr}.analysis-match-card{padding:13px;}}
+
 </style>
 </head>
 
@@ -1203,7 +1239,7 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.2 · Sperimentale</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.3 · Sperimentale</button>
       <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
@@ -1218,13 +1254,13 @@
     </h1>
 
     <div class="subtitle">
-      BETLAB V10.2 sperimentale controlla lo storico, il rischio di serie positive e le quote anomale. Le stime non sono validate.
+      BETLAB V10.3 separa l’analisi probabilistica dai consigli di giocata. Ogni stima indica i limiti dei dati; nessuna probabilità è stata validata.
       Scegli liberamente quali pronostici inserire: nessun obiettivo di vincita guida l'analisi.
     </div>
 
 
     <div class="daily-head">
-      <div><h2>Analisi delle partite</h2><p>Un solo pronostico principale per incontro. Le stime sono sperimentali; nei dettagli trovi anche casa/trasferta, riposo e indisponibili quando disponibili.</p></div>
+      <div><h2>Selezioni che superano i controlli</h2><p>Solo mercati quotati che superano i filtri sperimentali. Le analisi delle altre partite sono consultabili sotto, senza che diventino consigli di giocata.</p></div>
       <button id="refreshButton" class="refresh-button" type="button">AGGIORNA DATI</button>
     </div>
     <div class="day-controls">
@@ -1234,9 +1270,9 @@
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
     <div id="dailyMatches" class="daily-grid"></div>
-    <details id="monitoredMatches" class="monitor-panel">
-      <summary><span>ALTRE PARTITE MONITORATE</span><span id="monitorCount" class="monitor-count">Caricamento...</span></summary>
-      <p class="monitor-info">Incontri ufficiali rilevati da API-Football per i quali BETLAB non ha ancora un pronostico quotato con dati sufficienti. Non sono consigli di giocata.</p>
+    <details id="monitoredMatches" class="monitor-panel" open>
+      <summary><span>ANALISI DELLE PARTITE · NON CONSIGLIATE</span><span id="monitorCount" class="monitor-count">Caricamento...</span></summary>
+      <p class="monitor-info">Per ogni incontro: stime 1X2, Under/Over, GOAL e PARI, tre risultati esatti più probabili e qualità dello storico. Le stime non quotate e non calibrate <strong>non sono consigli di giocata</strong>.</p>
       <div id="monitorList" class="monitor-grid"></div>
     </details>
     <section class="control-panel">
@@ -1677,7 +1713,7 @@
   }
 
   function getCandidateAssessment(candidate, match) {
-    if (!String(betlabData?.engine || "").includes("V10.2")) return null;
+    if (!/V10\.[23]/.test(String(betlabData?.engine || ""))) return null;
     if (candidate?.oddAvailable !== true) return null;
     const odd = Number(candidate.odd);
     const p = Number(candidate.modelProbability);
@@ -1855,7 +1891,7 @@
     const availableFixtures = getMatches().filter(m => validFixture(m) && (selectedDay === "all" || m.date === selectedDay));
     if (!rows.length) {
       dailyMatches.innerHTML = `<div class="daily-empty">${availableFixtures.length
-        ? "Per questa data nessuna partita supera i filtri di probabilità e quota. Consulta ALTRE PARTITE MONITORATE per il calendario completo."
+        ? "Nessun mercato supera i filtri di giocata per questa data. Le analisi delle partite sono disponibili nella sezione qui sotto, anche senza un consiglio."
         : "Nessuna partita disponibile nel feed per questa data. Il piano API potrebbe non fornire ancora il calendario; nessun evento viene inventato."}</div>`;
       availability.textContent = `${availableFixtures.length} partite disponibili, 0 consigliate · ${safeText(betlabData?.generatedAt || "n.d.")}`;
       return;
@@ -1876,6 +1912,7 @@
         <div class="daily-stats"><span>Stima non calibrata <b>${readablePercent(a.rawP)}</b></span><span>Margine teorico <b>+${(a.conservativeEdge*100).toFixed(1)}%</b></span></div>
         <details class="daily-details"><summary>Mostra analisi <span>${a.homeGames}+${a.awayGames} partite</span></summary>
           <div class="daily-reason">${safeText(recommendationReason(row))}<br>Fonte quota: ${safeText(c.bookmaker || "n.d.")}<br>Serie vittorie: casa ${Number(m.riskSignals?.homeWinStreak || 0)} · trasferta ${Number(m.riskSignals?.awayWinStreak || 0)}. Quota X: ${m.riskSignals?.drawOdd != null ? oddText(m.riskSignals.drawOdd) : "non disponibile"}.${m.riskSignals?.drawAttention ? " Analisi PARI e doppie chance approfondita." : ""}</div>
+          <div class="recommended-model-details">${scenarioHtml(m)}</div>
           ${renderContext(m)}
         </details>
         <div class="daily-actions"><input type="checkbox" id="pick-${safeText(id)}" data-fixture-id="${safeText(id)}" ${checked ? "checked" : ""}>
@@ -1892,33 +1929,66 @@
     availability.textContent = `${rows.length} consigliati su ${availableFixtures.length} incontri disponibili · Quote consigliate massimo ${oddText(MAX_RECOMMENDED_ODD)} · Generato: ${Number.isNaN(today.getTime()) ? "n.d." : today.toLocaleString("it-IT")}`;
   }
 
-  // Distinguiamo partite disponibili e pronostici che superano i controlli.
-  // Non presentiamo come giocabili eventi senza quote e stime adeguate.
+  // Analisi e consigli sono percorsi distinti. Le stime senza quote non
+  // diventano automaticamente selezioni della schedina.
+  function modelPct(value) {
+    return (value == null || !Number.isFinite(Number(value))) ? "—" : readablePercent(value);
+  }
+
+  function riskExplanation(m) {
+    const risk = m.riskSignals || {};
+    const rejected = Array.isArray(risk.blockedSelections) ? risk.blockedSelections : [];
+    const mh = Number(m.home?.form?.played || 0);
+    const ma = Number(m.away?.form?.played || 0);
+    if (!m.modelAnalysis || m.modelAnalysis.status === "non_calcolabile") {
+      return "Storico non disponibile per una o entrambe le squadre";
+    }
+    if (!m.historyEligible) return `Storico non idoneo alla selezione quotata (${mh}+${ma} incontri, freschezza/campione da verificare)`;
+    if (rejected.length) return rejected.slice(0,2).join(" · ");
+    return "I mercati non superano i controlli congiunti su probabilità, quote e coerenza";
+  }
+
+  function scenarioHtml(m) {
+    const model = m.modelAnalysis || {};
+    const probs = model.probabilities || {};
+    const scores = Array.isArray(model.topScores) ? model.topScores.slice(0,3) : [];
+    const hasAnalysis = [probs["1"],probs["X"],probs["2"]].every(x => x != null && Number.isFinite(Number(x)));
+    if (!hasAnalysis) return `<p class="analysis-unavailable">Nessuna probabilità calcolabile: ${safeText(model.note || 'Storico incompleto')}. Non vengono inventati valori.</p>`;
+    const h = model.expectedGoals?.home, a = model.expectedGoals?.away;
+    const xg = (h != null && a != null) ? `${Number(h).toLocaleString("it-IT",{maximumFractionDigits:2})} – ${Number(a).toLocaleString("it-IT",{maximumFractionDigits:2})}` : "—";
+    const groups = [
+      ["1X2", [["1",probs["1"]],["X",probs["X"]],["2",probs["2"]]]],
+      ["Totale gol", [["Under 2.5",probs["UNDER 2.5"]],["Over 2.5",probs["OVER 2.5"]],["Under 3.5",probs["UNDER 3.5"]]]],
+      ["Altri mercati", [["GOAL",probs["GOAL"]],["NO GOAL",probs["NO GOAL"]],["PARI",probs["PARI"]],["1X",probs["1X"]],["X2",probs["X2"]]]]
+    ];
+    return `<div class="analysis-mini"><span>Gol medi del modello <b>${safeText(xg)}</b></span><span>Campione <b>${Number(model.homeGames || 0)} + ${Number(model.awayGames || 0)}</b></span></div>
+      <div class="analysis-probability-grid">${groups.map(([label,items])=>`<div class="analysis-prob-group"><strong>${safeText(label)}</strong><div>${items.map(([name,p])=>`<span>${safeText(name)} <b>${modelPct(p)}</b></span>`).join("")}</div></div>`).join("")}</div>
+      <div class="analysis-scores"><strong>Tre risultati esatti più probabili:</strong> ${scores.length ? scores.map(s=>`<span>${safeText(s.score)} <b>${modelPct(s.probability)}</b></span>`).join("") : "non disponibili"}</div>
+      <div class="analysis-caution">${safeText(model.note || 'Stime non calibrate.')}</div>`;
+  }
+
   function renderMonitoredMatches() {
     const recommended = new Set(dailyRecommendations.map(r => String(r.match.fixtureId)));
     const remaining = getMatches().filter(m => validFixture(m) &&
       (selectedDay === "all" || m.date === selectedDay) && !recommended.has(String(m.fixtureId)));
     remaining.sort((a,b) => {
-      const amin = Math.min(Number(a.home?.form?.played || 0),Number(a.away?.form?.played || 0));
-      const bmin = Math.min(Number(b.home?.form?.played || 0),Number(b.away?.form?.played || 0));
-      return bmin-amin || Number(b.priority || 0)-Number(a.priority || 0) || Number(a.timestamp)-Number(b.timestamp);
+      const ar = a.modelAnalysis?.status === "campione_idoneo" ? 2 : a.modelAnalysis?.status === "esplorativa" ? 1 : 0;
+      const br = b.modelAnalysis?.status === "campione_idoneo" ? 2 : b.modelAnalysis?.status === "esplorativa" ? 1 : 0;
+      return br-ar || Number(b.priority || 0)-Number(a.priority || 0) || Number(a.timestamp)-Number(b.timestamp);
     });
-    const visible = remaining.slice(0,100);
-    monitorCount.textContent = remaining.length + " senza consiglio · " + visible.length + " visualizzate";
-    monitorList.innerHTML = visible.length ? visible.map(m => {
-      const h = Number(m.home?.form?.played || 0), a = Number(m.away?.form?.played || 0);
+    // Tutte le fixture ricevute sono consultabili, anche senza quote.
+    monitorCount.textContent = remaining.length + " analisi · " + remaining.filter(m=>m.modelAnalysis?.status!=="non_calcolabile").length + " con stime";
+    monitorList.innerHTML = remaining.length ? remaining.map(m => {
+      const state = m.modelAnalysis?.status || "non_calcolabile";
+      const label = state === "campione_idoneo" ? "STORICO IDONEO" : state === "esplorativa" ? "STIMA ESPLORATIVA" : "DATI INSUFFICIENTI";
       const risk = m.riskSignals || {};
-      const rejected = Array.isArray(risk.blockedSelections) ? risk.blockedSelections : [];
-      const reason = Math.min(h,a) < 3 ? "Storico insufficiente" :
-        (rejected.length ? "Quote 1X2 non coerenti con modello" :
-        (Array.isArray(m.candidates) && m.candidates.length ? "Nessun mercato supera i controlli" : "Quote o dati insufficienti"));
       const market = risk.market1X2?.available ? risk.market1X2.probabilities : null;
-      const explanation = rejected.length ? rejected.slice(0,2).join("; ") : "";
-      const summary = market ? `Mercato senza margine: 1 ${readablePercent(market["1"])}, X ${readablePercent(market["X"])}, 2 ${readablePercent(market["2"])}.` : "";
-      return `<div class="monitor-row"><div><b>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</b>
-        <small>${safeText(m.league)} · ${formatDate(m)} · ${h}+${a} partite nello storico</small>
-        ${explanation ? `<small>${safeText(explanation)}</small>` : ""}
-        ${summary ? `<small>${safeText(summary)}</small>` : ""}</div><span>${safeText(reason)}</span></div>`;
+      const benchmark = market ? `Consenso 1X2 bookmaker, senza margine: 1 ${modelPct(market["1"])}, X ${modelPct(market["X"])}, 2 ${modelPct(market["2"])}.` : "Consenso bookmaker 1X2 non disponibile o insufficiente.";
+      return `<article class="analysis-match-card">
+        <div class="analysis-match-head"><div><small>${safeText(m.league)} · ${formatDate(m)}</small><h3>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</h3></div><span class="analysis-quality ${safeText(state)}">${label}</span></div>
+        ${scenarioHtml(m)}
+        <details class="analysis-additional"><summary>Perché non è una giocata consigliata? · contesto</summary><p>${safeText(riskExplanation(m))}</p><p>${safeText(benchmark)}</p>${renderContext(m)}</details>
+      </article>`;
     }).join("") : '<p class="monitor-info">Nessun altro incontro futuro presente nel feed.</p>';
   }
 
