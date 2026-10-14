@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V10.4 - Recupero storico e identita squadre
+      - name: BETLAB AI - Motore stabile e verifica pre-partita
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -31,176 +31,178 @@ jobs:
           import unicodedata
           import urllib.request
           import urllib.parse
-
+          
           from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
-
-
+          
+          
           API_KEY = os.environ["API_FOOTBALL_KEY"]
-
+          
           ROME = ZoneInfo("Europe/Rome")
-
+          
           TODAY = datetime.now(ROME).date()
           YESTERDAY = TODAY - timedelta(days=1)
           TOMORROW = TODAY + timedelta(days=1)
           DAYS_AHEAD = 6
-
+          
           # Ieri per liquidare le schedine; oggi + sei giorni per il calendario.
           # Le date non disponibili sul piano API vengono segnalate, non inventate.
           DAYS = [YESTERDAY.isoformat()] + [
               (TODAY + timedelta(days=offset)).isoformat()
               for offset in range(DAYS_AHEAD + 1)
           ]
-
-          MAX_HISTORY = 10
+          
+          MAX_HISTORY = 12
+          MIN_EXPLORATORY_GAMES = 4
+          MIN_EXACT_SCORE_GAMES = 6
           MAX_SCORE_GOALS = 5
-
+          
           # Qualita' della forma recente: le partite del 2025 non possono
           # determinare da sole un pronostico dell'ottobre 2026.
           RECENT_WINDOW_DAYS = 90
           MIN_RECENT_GAMES = 5
           MIN_TEAM_HISTORY = 6
           MAX_LAST_GAME_AGE_DAYS = 30
-
+          
           MIN_MARKET_INDEX = 0.0  # Conserva tutti i mercati per il controllo quote finale
           MIN_ODD = 1.10  # Quote da 1,10 in su; niente selezione in base alla sola quota.
           MAX_RECOMMENDED_ODD = 3.00  # Protezione sperimentale dalle quote estreme.
           MIN_RECOMMENDED_PROBABILITY = 0.50
           MIN_EXACT_SCORE_PROBABILITY = 0.025
-
-
+          
+          
           # ==========================================================
           # UTILITA
           # ==========================================================
-
+          
           def normalize(value):
-
+          
               value = str(value or "")
-
+          
               value = unicodedata.normalize(
                   "NFKD",
                   value
               )
-
+          
               value = "".join(
                   c for c in value
                   if not unicodedata.combining(c)
               )
-
+          
               value = value.lower()
-
+          
               value = re.sub(
                   r"[^a-z0-9]+",
                   " ",
                   value
               )
-
+          
               return " ".join(
                   value.split()
               )
-
-
+          
+          
           ALIASES = {
-
+          
               "atletico mg":
                   "atletico mineiro",
-
+          
               "ca mineiro":
                   "atletico mineiro",
-
+          
               "clube atletico mineiro":
                   "atletico mineiro",
-
+          
               "atletico mineiro":
                   "atletico mineiro",
-
+          
               "rb bragantino":
                   "bragantino",
-
+          
               "red bull bragantino":
                   "bragantino",
-
+          
               "bragantino":
                   "bragantino",
-
+          
               "real sociedad ii":
                   "real sociedad b",
-
+          
               "real sociedad b":
                   "real sociedad b",
-
+          
               "ud las palmas":
                   "las palmas",
-
+          
               "las palmas":
                   "las palmas",
-
+          
               "valladolid":
                   "real valladolid",
-
+          
               "real valladolid":
                   "real valladolid",
-
+          
               "sporting gijon":
                   "sporting gijon",
-
+          
               "real sporting de gijon":
                   "sporting gijon",
-
+          
               "sporting de gijon":
                   "sporting gijon",
-
+          
               "castellon":
                   "castellon",
-
+          
               "cd castellon":
                   "castellon",
-
+          
               "rcd mallorca":
                   "mallorca",
-
+          
               "mallorca":
                   "mallorca",
-
+          
               "internazionale":
                   "inter",
-
+          
               "inter milan":
                   "inter",
-
+          
               "ac milan":
                   "milan",
-
+          
               "manchester united":
                   "manchester united",
-
+          
               "man utd":
                   "manchester united",
-
+          
               "manchester city":
                   "manchester city",
-
+          
               "man city":
                   "manchester city",
-
+          
               "wolverhampton wanderers":
                   "wolves",
-
+          
               "paris saint germain":
                   "psg",
-
+          
               "paris sg":
                   "psg",
-
+          
               "bayern munich":
                   "bayern munchen",
-
+          
               "bayern munchen":
                   "bayern munchen",
-
+          
               "atletico madrid":
                   "atletico madrid",
-
+          
               "atletico de madrid":
                   "atletico madrid",
               # Alias espliciti tra API-Football, Football-Data e OpenFootball.
@@ -352,31 +354,31 @@ jobs:
               "galatasaray sk": "galatasaray",
               "besiktas jk": "besiktas",
               "besiktas istanbul": "besiktas"
-
+          
           }
-
-
+          
+          
           def canonical(value):
-
+          
               key = normalize(value)
-
+          
               return ALIASES.get(
                   key,
                   key
               )
-
-
+          
+          
           def safe_float(value):
-
+          
               try:
                   return float(value)
-
+          
               except:
                   return None
-
-
+          
+          
           def clamp(value, low, high):
-
+          
               return max(
                   low,
                   min(
@@ -384,25 +386,25 @@ jobs:
                       value
                   )
               )
-
-
+          
+          
           # ==========================================================
           # API
           # ==========================================================
-
+          
           def api_get(endpoint, params):
-
+          
               query = urllib.parse.urlencode(
                   params
               )
-
+          
               url = (
                   "https://v3.football.api-sports.io/"
                   + endpoint
                   + "?"
                   + query
               )
-
+          
               request = urllib.request.Request(
                   url,
                   headers={
@@ -410,88 +412,88 @@ jobs:
                           API_KEY
                   }
               )
-
+          
               with urllib.request.urlopen(
                   request,
                   timeout=45
               ) as response:
-
+          
                   payload = json.loads(
                       response.read().decode(
                           "utf-8"
                       )
                   )
-
+          
               errors = payload.get(
                   "errors"
               )
-
+          
               if errors:
                   raise RuntimeError(
                       f"API ERROR {endpoint}: {errors}"
                   )
-
+          
               return payload
-
-
+          
+          
           # ==========================================================
           # FILE JSON
           # ==========================================================
-
+          
           def load_json(path, default):
-
+          
               if not os.path.exists(path):
                   return default
-
+          
               try:
-
+          
                   with open(
                       path,
                       "r",
                       encoding="utf-8"
                   ) as f:
-
+          
                       return json.load(f)
-
+          
               except:
-
+          
                   return default
-
-
+          
+          
           def save_json(path, data):
-
+          
               os.makedirs(
                   os.path.dirname(path),
                   exist_ok=True
               )
-
+          
               with open(
                   path,
                   "w",
                   encoding="utf-8"
               ) as f:
-
+          
                   json.dump(
                       data,
                       f,
                       ensure_ascii=False,
                       indent=2
                   )
-
-
+          
+          
           # ==========================================================
           # SCARICA CALENDARIO OGGI + PROSSIMI 6 GIORNI
           # ==========================================================
-
+          
           all_api_matches = []
-
+          
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.4")
+          print("BETLAB AI ENGINE STABILE")
           print("==============================================")
           print("")
-
-
+          
+          
           unavailable_days = []
           fixture_requests = 0
           for day in DAYS:
@@ -517,62 +519,62 @@ jobs:
                       unavailable_days.append(day)
                       print(f"{day}: calendario non disponibile ({str(exc)[:150]})")
                       continue
-
+          
               fixtures = payload.get("response") or []
               all_api_matches.extend(fixtures)
               print(f"{day}: {len(fixtures)} partite ({source})")
-
+          
           print("Giorni senza calendario verificabile:", unavailable_days)
-
-
+          
+          
           # ==========================================================
           # DEDUPE API
           # ==========================================================
-
+          
           api_by_id = {}
-
+          
           for item in all_api_matches:
-
+          
               fixture_id = (
                   item.get("fixture", {})
                   .get("id")
               )
-
+          
               if fixture_id is not None:
-
+          
                   api_by_id[
                       fixture_id
                   ] = item
-
-
+          
+          
           all_api_matches = list(
               api_by_id.values()
           )
-
-
+          
+          
           print(
               "Partite API uniche:",
               len(all_api_matches)
           )
-
-
+          
+          
           # ==========================================================
           # STORICO
           # ==========================================================
-
+          
           # Non sostituire MAI uno storico corrotto/assente con [] e salvarlo.
           HISTORY_PATH = "data/betlab-history.json"
           if not os.path.isfile(HISTORY_PATH):
               raise RuntimeError("Storico BETLAB assente: operazione fermata senza cancellare dati")
           with open(HISTORY_PATH, encoding="utf-8") as _history_file:
               history_payload = json.load(_history_file)
-
-
+          
+          
           if isinstance(
               history_payload,
               dict
           ):
-
+          
               history = (
                   history_payload.get("matches")
                   or
@@ -580,96 +582,96 @@ jobs:
                   or
                   []
               )
-
+          
           else:
-
+          
               history = history_payload
-
-
+          
+          
           if not isinstance(history, list) or not history:
               raise RuntimeError("Storico BETLAB vuoto o formato non valido: nessuna modifica")
           print("Storico iniziale:", len(history))
-
-
+          
+          
           # ==========================================================
           # FUNZIONI STORICO
           # ==========================================================
-
+          
           def historical_team_name(
               record,
               side
           ):
-
+          
               value = record.get(side)
-
+          
               if isinstance(value, dict):
-
+          
                   return value.get(
                       "name"
                   )
-
+          
               return value
-
-
+          
+          
           def historical_goals(record):
-
+          
               home_goals = record.get(
                   "homeGoals"
               )
-
+          
               away_goals = record.get(
                   "awayGoals"
               )
-
+          
               if (
                   home_goals is not None
                   and
                   away_goals is not None
               ):
-
+          
                   return (
                       home_goals,
                       away_goals
                   )
-
-
+          
+          
               goal_data = (
                   record.get("goals")
                   or
                   {}
               )
-
+          
               return (
                   goal_data.get("home"),
                   goal_data.get("away")
               )
-
-
+          
+          
           def logical_history_key(record):
-
+          
               date = str(
                   record.get("date")
                   or
                   ""
               )[:10]
-
+          
               home = historical_team_name(
                   record,
                   "home"
               )
-
+          
               away = historical_team_name(
                   record,
                   "away"
               )
-
+          
               return (
                   date,
                   canonical(home),
                   canonical(away)
               )
-
-
+          
+          
           # ==========================================================
           # INTEGRAZIONE RISULTATI 2026-27 - FONTI CSV PUBBLICHE
           # ==========================================================
@@ -678,7 +680,7 @@ jobs:
           # Le fonti che non rispondono sono semplicemente saltate.
           import csv
           import io
-
+          
           CSV_SEASON = "2627"
           CSV_SOURCES = [
               ("E0", "England", "Premier League"),
@@ -701,7 +703,7 @@ jobs:
               ("T1", "Turkey", "Super Lig"),
               ("G1", "Greece", "Super League 1"),
           ]
-
+          
           def parse_csv_result_date(text):
               for fmt in ("%d/%m/%Y", "%d/%m/%y", "%Y-%m-%d"):
                   try:
@@ -709,13 +711,13 @@ jobs:
                   except ValueError:
                       continue
               return None
-
+          
           def parse_csv_goals(value):
               value = str(value or "").strip()
               if not re.fullmatch(r"\d+", value):
                   return None
               return int(value)
-
+          
           initial_keys = {
               logical_history_key(record)
               for record in history if isinstance(record, dict)
@@ -781,19 +783,19 @@ jobs:
                 "| non disponibili:", csv_sources_unavailable,
                 "| risultati validi:", csv_results_examined,
                 "| nuovi:", csv_import_added)
-
+          
           # ==========================================================
           # AGGIUNGI RISULTATI COMPLETATI API
           # ==========================================================
-
+          
           existing_keys = set()
-
+          
           for record in history:
-
+          
               key = logical_history_key(
                   record
               )
-
+          
               if (
                   key[0]
                   and
@@ -801,68 +803,68 @@ jobs:
                   and
                   key[2]
               ):
-
+          
                   existing_keys.add(
                       key
                   )
-
-
+          
+          
           new_results = 0
-
-
+          
+          
           for item in all_api_matches:
-
+          
               fixture = (
                   item.get("fixture")
                   or
                   {}
               )
-
+          
               status = (
                   fixture.get("status")
                   or
                   {}
               ).get("short")
-
-
+          
+          
               if status not in {
                   "FT",
                   "AET",
                   "PEN"
               }:
                   continue
-
-
+          
+          
               teams = (
                   item.get("teams")
                   or
                   {}
               )
-
+          
               goals = (
                   item.get("goals")
                   or
                   {}
               )
-
-
+          
+          
               home = (
                   teams.get("home")
                   or
                   {}
               ).get("name")
-
+          
               away = (
                   teams.get("away")
                   or
                   {}
               ).get("name")
-
-
+          
+          
               hg = goals.get("home")
               ag = goals.get("away")
-
-
+          
+          
               if (
                   not home
                   or
@@ -873,141 +875,141 @@ jobs:
                   ag is None
               ):
                   continue
-
-
+          
+          
               date = str(
                   fixture.get("date")
                   or
                   ""
               )[:10]
-
-
+          
+          
               key = (
                   date,
                   canonical(home),
                   canonical(away)
               )
-
-
+          
+          
               if key in existing_keys:
                   continue
-
-
+          
+          
               league = (
                   item.get("league")
                   or
                   {}
               )
-
-
+          
+          
               history.append({
-
+          
                   "source":
                       "api-football",
-
+          
                   "fixtureId":
                       fixture.get("id"),
-
+          
                   "date":
                       date,
-
+          
                   "timestamp":
                       fixture.get(
                           "timestamp",
                           0
                       ),
-
+          
                   "country":
                       league.get(
                           "country"
                       ),
-
+          
                   "league":
                       league.get(
                           "name"
                       ),
-
+          
                   "home":
                       home,
-
+          
                   "away":
                       away,
-
+          
                   "homeGoals":
                       int(hg),
-
+          
                   "awayGoals":
                       int(ag)
-
+          
               })
-
-
+          
+          
               existing_keys.add(
                   key
               )
-
+          
               new_results += 1
-
-
+          
+          
           # ==========================================================
           # DEDUPE STORICO LOGICO
           # ==========================================================
-
+          
           unique_history = {}
-
+          
           for record in history:
-
+          
               key = logical_history_key(
                   record
               )
-
+          
               if not all(key):
                   continue
-
-
+          
+          
               old = unique_history.get(
                   key
               )
-
-
+          
+          
               if old is None:
-
+          
                   unique_history[
                       key
                   ] = record
-
+          
                   continue
-
-
+          
+          
               old_source = str(
                   old.get("source")
                   or
                   ""
               )
-
+          
               new_source = str(
                   record.get("source")
                   or
                   ""
               )
-
-
+          
+          
               if (
                   new_source == "api-football"
                   and
                   old_source != "api-football"
               ):
-
+          
                   unique_history[
                       key
                   ] = record
-
-
+          
+          
           history = list(
               unique_history.values()
           )
-
-
+          
+          
           history.sort(
               key=lambda record:
                   str(
@@ -1016,38 +1018,38 @@ jobs:
                       ""
                   )
           )
-
-
+          
+          
           save_json(
               "data/betlab-history.json",
               history
           )
-
-
+          
+          
           print(
               "Nuovi risultati API:",
               new_results
           )
-
+          
           print(
               "Storico totale:",
               len(history)
           )
-
-
+          
+          
           # ==========================================================
           # PRIORITA CAMPIONATI
           # ==========================================================
-
+          
           def league_priority(
               country,
               league
           ):
-
+          
               c = normalize(country)
               l = normalize(league)
-
-
+          
+          
               if (
                   "champions league" in l
                   or
@@ -1056,32 +1058,32 @@ jobs:
                   "conference league" in l
               ):
                   return 5
-
-
+          
+          
               priority5 = [
-
+          
                   ("italy", "serie a"),
                   ("england", "premier league"),
                   ("spain", "la liga"),
                   ("spain", "primera division"),
                   ("germany", "bundesliga"),
                   ("france", "ligue 1")
-
+          
               ]
-
-
+          
+          
               for pc, pl in priority5:
-
+          
                   if (
                       pc in c
                       and
                       pl in l
                   ):
                       return 5
-
-
+          
+          
               priority4 = [
-
+          
                   ("italy", "serie b"),
                   ("england", "championship"),
                   ("spain", "segunda"),
@@ -1091,12 +1093,12 @@ jobs:
                   ("netherlands", "eredivisie"),
                   ("belgium", ""),
                   ("turkey", "")
-
+          
               ]
-
-
+          
+          
               for pc, pl in priority4:
-
+          
                   if (
                       pc in c
                       and
@@ -1107,22 +1109,22 @@ jobs:
                       )
                   ):
                       return 4
-
-
+          
+          
               priority3 = [
-
+          
                   ("brazil", "serie a"),
                   ("argentina", ""),
                   ("scotland", ""),
                   ("usa", "major league soccer"),
                   ("united states", "major league soccer"),
                   ("mexico", "liga mx")
-
+          
               ]
-
-
+          
+          
               for pc, pl in priority3:
-
+          
                   if (
                       pc in c
                       and
@@ -1133,78 +1135,78 @@ jobs:
                       )
                   ):
                       return 3
-
-
+          
+          
               priority2 = [
-
+          
                   "greece",
                   "austria",
                   "switzerland",
                   "denmark",
                   "norway",
                   "sweden"
-
+          
               ]
-
-
+          
+          
               for pc in priority2:
-
+          
                   if pc in c:
                       return 2
-
-
+          
+          
               return 0
-
-
+          
+          
           # ==========================================================
           # PARTITE STORICHE SQUADRA
           # ==========================================================
-
+          
           @lru_cache(maxsize=4096)
           def team_games(
               team,
               before_date,
               limit=MAX_HISTORY
           ):
-
+          
               key = canonical(team)
-
+          
               games = []
-
-
+          
+          
               for record in history:
-
+          
                   date = str(
                       record.get("date")
                       or
                       ""
                   )[:10]
-
-
+          
+          
                   if (
                       not date
                       or
                       date >= before_date
                   ):
                       continue
-
-
+          
+          
                   home = historical_team_name(
                       record,
                       "home"
                   )
-
+          
                   away = historical_team_name(
                       record,
                       "away"
                   )
-
-
+          
+          
                   hg, ag = historical_goals(
                       record
                   )
-
-
+          
+          
                   if (
                       not home
                       or
@@ -1215,59 +1217,59 @@ jobs:
                       ag is None
                   ):
                       continue
-
-
+          
+          
                   if canonical(home) == key:
-
+          
                       games.append({
-
+          
                           "date":
                               date,
-
+          
                           "gf":
                               int(hg),
-
+          
                           "ga":
                               int(ag),
-
+          
                           "home":
                               True,
                           "opponent": away
-
+          
                       })
-
-
+          
+          
                   elif canonical(away) == key:
-
+          
                       games.append({
-
+          
                           "date":
                               date,
-
+          
                           "gf":
                               int(ag),
-
+          
                           "ga":
                               int(hg),
-
+          
                           "home":
                               False,
                           "opponent": home
-
+          
                       })
-
-
+          
+          
               games.sort(
                   key=lambda x:
                       x["date"]
               )
-
-
+          
+          
               return games[
                   -limit:
               ]
-
-
+          
+          
           # ==========================================================
           # FRESCHEZZA DELLO STORICO: BLOCCA PRONOSTICI CON DATI DATATI
           # ==========================================================
@@ -1315,7 +1317,7 @@ jobs:
                   "requiredRecentGames": MIN_RECENT_GAMES,
                   "maxLastAgeDays": MAX_LAST_GAME_AGE_DAYS
               }
-
+          
           # ==========================================================
           # ARRICCHIMENTO PROGRESSIVO DELLO STORICO (BUDGET LIMITATO)
           # ==========================================================
@@ -1324,7 +1326,7 @@ jobs:
           # NON abbassiamo la soglia di affidabilita': recuperiamo pochi
           # risultati reali alla volta, usando le ID squadra API-Football.
           # Il piano Free puo' negare alcune richieste: nessun blocco del feed.
-
+          
           LOOKUPS_PER_RUN = 4
           LOOKUP_COOLDOWN_SECONDS = 20 * 3600
           BACKFILL_STATE_FILE = "data/betlab-history-enrichment-state.json"
@@ -1334,7 +1336,7 @@ jobs:
           last_attempt = enrichment_state.get("attempted", {})
           if not isinstance(last_attempt, dict):
               last_attempt = {}
-
+          
           now_ts = int(datetime.now(ROME).timestamp())
           future_fixtures = []
           for item in all_api_matches:
@@ -1345,7 +1347,7 @@ jobs:
                   or ts <= now_ts or league_priority(lg.get("country"), lg.get("name")) <= 0):
                   continue
               future_fixtures.append(item)
-
+          
           future_fixtures.sort(key=lambda item: (
               -league_priority((item.get("league") or {}).get("country"),
                                (item.get("league") or {}).get("name")),
@@ -1355,7 +1357,7 @@ jobs:
           attempted_requests = 0
           enrichment_added = 0
           historical_keys = {logical_history_key(record) for record in history}
-
+          
           for item in future_fixtures:
               if attempted_requests >= LOOKUPS_PER_RUN:
                   break
@@ -1378,7 +1380,7 @@ jobs:
                   requested_teams.add(key)
                   if now_ts - int(last_attempt.get(key) or 0) < LOOKUP_COOLDOWN_SECONDS:
                       continue
-
+          
                   attempted_requests += 1
                   last_attempt[key] = now_ts
                   try:
@@ -1419,7 +1421,7 @@ jobs:
                           enrichment_added += 1
                   except Exception as exc:
                       print("Recupero storico non disponibile per", team_name, ":", exc)
-
+          
           enrichment_state["attempted"] = last_attempt
           enrichment_state["updatedAt"] = datetime.now(ROME).isoformat()
           save_json(BACKFILL_STATE_FILE, enrichment_state)
@@ -1432,19 +1434,19 @@ jobs:
           print("Cache statistiche squadre invalidata dopo aggiornamento storico")
           print("Ricerche storico supplementari:", attempted_requests,
                 "| Risultati aggiunti:", enrichment_added)
-
+          
           # ==========================================================
           # STATISTICHE
           # ==========================================================
-
+          
           def team_stats(games):
-
+          
               played = len(games)
-
+          
               if played == 0:
-
+          
                   return {
-
+          
                       "played": 0,
                       "wins": 0,
                       "draws": 0,
@@ -1454,111 +1456,111 @@ jobs:
                       "ppg": 0,
                       "avgGF": 0,
                       "avgGA": 0
-
+          
                   }
-
-
+          
+          
               wins = 0
               draws = 0
               losses = 0
               gf = 0
               ga = 0
-
-
+          
+          
               for game in games:
-
+          
                   gf += game["gf"]
                   ga += game["ga"]
-
-
+          
+          
                   if game["gf"] > game["ga"]:
                       wins += 1
-
+          
                   elif game["gf"] == game["ga"]:
                       draws += 1
-
+          
                   else:
                       losses += 1
-
-
+          
+          
               points = (
                   wins * 3
                   +
                   draws
               )
-
-
+          
+          
               return {
-
+          
                   "played":
                       played,
-
+          
                   "wins":
                       wins,
-
+          
                   "draws":
                       draws,
-
+          
                   "losses":
                       losses,
-
+          
                   "gf":
                       gf,
-
+          
                   "ga":
                       ga,
-
+          
                   "ppg":
                       round(
                           points / played,
                           3
                       ),
-
+          
                   "avgGF":
                       round(
                           gf / played,
                           3
                       ),
-
+          
                   "avgGA":
                       round(
                           ga / played,
                           3
                       )
-
+          
               }
-
-
+          
+          
           # ==========================================================
           # FREQUENZE EVENTI
           # ==========================================================
-
+          
           def event_frequency(
               games,
               predicate
           ):
-
+          
               if not games:
                   return 0.5
-
-
+          
+          
               hits = sum(
                   1
                   for game in games
                   if predicate(game)
               )
-
-
+          
+          
               return (
                   hits /
                   len(games)
               )
-
-
+          
+          
           # Smussamento bayesiano: ogni squadra contribuisce in base
           # al proprio campione; il prior evita percentuali estreme.
           PRIOR_STRENGTH = 8.0
-
+          
           def combined_probability(
               home_games,
               away_games,
@@ -1570,17 +1572,17 @@ jobs:
               na = len(away_games)
               if nh == 0 or na == 0:
                   return prior
-
+          
               home_hits = sum(1 for g in home_games if home_predicate(g))
               away_hits = sum(1 for g in away_games if away_predicate(g))
-
+          
               # Non assegnare lo stesso peso a 1 e 10 partite.
               # Le osservazioni vengono aggregate, con prior esplicito.
               return (
                   home_hits + away_hits + PRIOR_STRENGTH * prior
               ) / (nh + na + PRIOR_STRENGTH)
-
-
+          
+          
           # ==========================================================
           # CASA/TRASFERTA: AGGIUSTAMENTO SPERIMENTALE E LIMITATO
           # ==========================================================
@@ -1606,121 +1608,130 @@ jobs:
               conditional = (hits + 8.0 * base) / (sample + 8.0)
               return clamp(base + clamp(conditional - base, -0.10, 0.10),
                            0.01, 0.99)
-
+          
           # ==========================================================
           # POISSON RISULTATO ESATTO
           # ==========================================================
-
+          
           def weighted_average(
               games,
               field
           ):
-
+          
               if not games:
                   return None
-
-
+          
+          
               total = 0.0
               weights = 0.0
-
-
+          
+          
               for index, game in enumerate(
                   games,
                   start=1
               ):
-
+          
                   weight = index
-
+          
                   total += (
                       game[field]
                       *
                       weight
                   )
-
+          
                   weights += weight
-
-
+          
+          
               return (
                   total /
                   weights
               )
-
-
+          
+          
           def expected_goals(
               home_games,
               away_games
           ):
-
+          
               home_attack = weighted_average(
                   home_games,
                   "gf"
               )
-
+          
               home_defence = weighted_average(
                   home_games,
                   "ga"
               )
-
+          
               away_attack = weighted_average(
                   away_games,
                   "gf"
               )
-
+          
               away_defence = weighted_average(
                   away_games,
                   "ga"
               )
-
-
-              if None in {
-                  home_attack,
-                  home_defence,
-                  away_attack,
-                  away_defence
-              }:
-
+          
+          
+              if (min(len(home_games), len(away_games)) < MIN_EXPLORATORY_GAMES
+                  or None in {home_attack, home_defence, away_attack, away_defence}):
+                  # Con 1-3 partite, il risultato sarebbe quasi solo il prior:
+                  # non presentare 1-1 o percentuali come analisi di queste squadre.
                   return None, None
-
-
+          
+          
               home_xg = (
                   home_attack
                   +
                   away_defence
               ) / 2
-
-
+          
+          
               away_xg = (
                   away_attack
                   +
                   home_defence
               ) / 2
-
-
+          
+          
+              # Usa davvero casa/trasferta quando c'e' un minimo di evidenza.
+              home_venue = [g for g in home_games if g.get("home") is True]
+              away_venue = [g for g in away_games if g.get("home") is False]
+              if len(home_venue) >= 3 and len(away_venue) >= 3:
+                  xh_venue = (weighted_average(home_venue, "gf") +
+                              weighted_average(away_venue, "ga")) / 2
+                  xa_venue = (weighted_average(away_venue, "gf") +
+                              weighted_average(home_venue, "ga")) / 2
+                  home_xg = 0.68 * home_xg + 0.32 * xh_venue
+                  away_xg = 0.68 * away_xg + 0.32 * xa_venue
               home_xg *= 1.08
               away_xg *= 0.92
-
-
+          
+          
               # Dati brevi -> forte incertezza. Riduzione verso una
               # media neutra di riferimento, non una probabilita' calibrata.
               n = min(len(home_games), len(away_games))
-              sample_weight = min(0.70, n / (n + 7.0))
+              # 4 partite: peso parziale; 10-12: i dati della squadra dominano il prior.
+              # Il modello resta non calibrato, non una probabilita' di guadagno.
+              sample_weight = min(0.82, n / (n + 3.5))
               home_xg = 1.35 + sample_weight * (home_xg - 1.35)
               away_xg = 1.15 + sample_weight * (away_xg - 1.15)
               home_xg = clamp(home_xg, 0.45, 2.80)
               away_xg = clamp(away_xg, 0.40, 2.70)
-
-
+          
+          
               return (
                   home_xg,
                   away_xg
               )
-
-
+          
+          
           def poisson_probability(
               goals,
               expected
           ):
-
+          
               return (
                   math.exp(-expected)
                   *
@@ -1728,83 +1739,83 @@ jobs:
                   /
                   math.factorial(goals)
               )
-
-
+          
+          
           # ==========================================================
           # CANDIDATI PARTITA
           # ==========================================================
-
+          
           def create_candidate(
               market,
               selection,
               probability,
               source="frequency"
           ):
-
+          
               probability = clamp(
                   probability,
                   0.01,
                   0.99
               )
-
-
+          
+          
               return {
-
+          
                   "market":
                       market,
-
+          
                   "selection":
                       selection,
-
+          
                   "modelProbability":
                       round(
                           probability,
                           5
                       ),
-
+          
                   "index":
                       round(
                           probability * 100,
                           1
                       ),
-
+          
                   "model":
                       source,
-
+          
                   "oddAvailable":
                       False,
-
+          
                   "odd":
                       None,
-
+          
                   "bookmaker":
                       None,
-
+          
                   "apiMarket":
                       None,
-
+          
                   "apiSelection":
                       None,
-
+          
                   "value":
                       None
-
+          
               }
-
-
+          
+          
           def build_market_candidates(home_games, away_games):
               """Tutti i mercati dalla STESSA distribuzione dei risultati.
               Metodo sperimentale Poisson indipendente, non calibrato.
               Evita che GOAL, PARI, Over e 1X2 si contraddicano.
               """
-              # Analisi esplorativa anche con campioni incompleti.
-              # La selezione quotata continua a richiedere storia recente idonea.
-              if not home_games or not away_games:
+              # Analisi da storico soltanto quando esistono almeno 4 partite
+              # documentate per squadra. Con campione inferiore niente percentuali.
+              if min(len(home_games), len(away_games)) < MIN_EXPLORATORY_GAMES:
                   return []
               home_xg, away_xg = expected_goals(home_games, away_games)
               if home_xg is None or away_xg is None:
                   return []
-
+          
               # Coda trascurabile oltre 12 gol per squadra con lambda <= 2.8.
               # Normalizziamo comunque la matrice a probabilita' totale 1.
               outcomes = []
@@ -1821,7 +1832,7 @@ jobs:
                   c["expectedHomeGoals"] = round(home_xg, 3)
                   c["expectedAwayGoals"] = round(away_xg, 3)
                   return c
-
+          
               home_win = prob(lambda h,a: h > a)
               draw = prob(lambda h,a: h == a)
               away_win = prob(lambda h,a: h < a)
@@ -1863,30 +1874,30 @@ jobs:
                           candidates.append(candidate("Risultato Esatto", f"{hg}:{ag}", score_prob))
               candidates.sort(key=lambda c: c["index"], reverse=True)
               return candidates
-
-
+          
+          
           # ==========================================================
           # MATCHER QUOTE STRETTO
           # ==========================================================
-
+          
           def market_normalized(
               value
           ):
-
+          
               return normalize(value)
-
-
+          
+          
           def forbidden_market(
               market_name
           ):
-
+          
               name = market_normalized(
                   market_name
               )
-
-
+          
+          
               forbidden = [
-
+          
                   "first half",
                   "second half",
                   "1st half",
@@ -1902,130 +1913,130 @@ jobs:
                   "home team",
                   "away team",
                   "minute"
-
+          
               ]
-
-
+          
+          
               return any(
                   text in name
                   for text in forbidden
               )
-
-
+          
+          
           def score_tuple(value):
-
+          
               match = re.fullmatch(
                   r"\s*(\d+)\s*[:\-]\s*(\d+)\s*",
                   str(value or "")
               )
-
-
+          
+          
               if not match:
                   return None
-
-
+          
+          
               return (
                   int(match.group(1)),
                   int(match.group(2))
               )
-
-
+          
+          
           def selection_matches(
               candidate,
               api_market,
               api_value
           ):
-
+          
               if forbidden_market(
                   api_market
               ):
                   return False
-
-
+          
+          
               market = candidate[
                   "market"
               ]
-
+          
               selection = candidate[
                   "selection"
               ]
-
+          
               m = market_normalized(
                   api_market
               )
-
+          
               v = normalize(
                   api_value
               )
-
-
+          
+          
               # ------------------------------------------------------
               # 1X2
               # ------------------------------------------------------
-
+          
               if market == "1X2":
-
+          
                   if m not in {
                       "match winner",
                       "1x2"
                   }:
                       return False
-
-
+          
+          
                   if selection == "1":
-
+          
                       return v in {
                           "home",
                           "1"
                       }
-
-
+          
+          
                   if selection == "X":
-
+          
                       return v in {
                           "draw",
                           "x"
                       }
-
-
+          
+          
                   if selection == "2":
-
+          
                       return v in {
                           "away",
                           "2"
                       }
-
-
+          
+          
               # ------------------------------------------------------
               # DOUBLE CHANCE - ESATTO
               # ------------------------------------------------------
-
+          
               if market == "Doppia Chance":
-
+          
                   if m != "double chance":
                       return False
-
-
+          
+          
                   accepted = {
-
+          
                       "1X": {
                           "home draw",
                           "1x"
                       },
-
+          
                       "X2": {
                           "draw away",
                           "x2"
                       },
-
+          
                       "12": {
                           "home away",
                           "12"
                       }
-
+          
                   }
-
-
+          
+          
                   return (
                       v
                       in
@@ -2034,124 +2045,124 @@ jobs:
                           set()
                       )
                   )
-
-
+          
+          
               # ------------------------------------------------------
               # BTTS
               # ------------------------------------------------------
-
+          
               if market == "Goal/No Goal":
-
+          
                   if m not in {
                       "both teams score",
                       "both teams to score"
                   }:
                       return False
-
-
+          
+          
                   if selection == "GOAL":
-
+          
                       return v in {
                           "yes",
                           "goal"
                       }
-
-
+          
+          
                   if selection == "NO GOAL":
-
+          
                       return v in {
                           "no",
                           "no goal"
                       }
-
-
+          
+          
               # ------------------------------------------------------
               # OVER / UNDER FULL TIME
               # ------------------------------------------------------
-
+          
               if market == "Totale Gol":
-
+          
                   if m not in {
                       "goals over under",
                       "over under",
                       "total goals"
                   }:
                       return False
-
-
+          
+          
                   expected = normalize(
                       selection
                   )
-
-
+          
+          
                   return (
                       v == expected
                   )
-
-
+          
+          
               # ------------------------------------------------------
               # PARI / DISPARI
               # ------------------------------------------------------
-
+          
               if market == "Pari/Dispari":
-
+          
                   if m not in {
                       "odd even",
                       "goals odd even"
                   }:
                       return False
-
-
+          
+          
                   if selection == "PARI":
-
+          
                       return v in {
                           "even",
                           "pari"
                       }
-
-
+          
+          
                   if selection == "DISPARI":
-
+          
                       return v in {
                           "odd",
                           "dispari"
                       }
-
-
+          
+          
               # ------------------------------------------------------
               # SOMMA GOL
               # ------------------------------------------------------
-
+          
               if market == "Somma Gol":
-
+          
                   allowed_markets = {
                       "total goals",
                       "goal bands",
                       "goals range",
                       "total goal range"
                   }
-
-
+          
+          
                   if m not in allowed_markets:
                       return False
-
-
+          
+          
                   expected = normalize(
                       selection
                   )
-
-
+          
+          
                   return (
                       v == expected
                   )
-
-
+          
+          
               # ------------------------------------------------------
               # RISULTATO ESATTO FULL TIME
               # ------------------------------------------------------
-
+          
               if market == "Risultato Esatto":
-
+          
                   if m not in {
                       "exact score",
                       "correct score",
@@ -2159,63 +2170,63 @@ jobs:
                       "fulltime correct score"
                   }:
                       return False
-
-
+          
+          
                   api_score = score_tuple(
                       api_value
                   )
-
+          
                   betlab_score = score_tuple(
                       selection
                   )
-
-
+          
+          
                   return (
                       api_score is not None
                       and
                       api_score == betlab_score
                   )
-
-
+          
+          
               return False
-
-
+          
+          
           # ==========================================================
           # RECUPERA QUOTE FIXTURE
           # ==========================================================
-
+          
           odds_cache = {}
-
-
+          
+          
           def get_fixture_odds(
               fixture_id
           ):
-
+          
               if fixture_id in odds_cache:
-
+          
                   return odds_cache[
                       fixture_id
                   ]
-
-
+          
+          
               page = 1
               blocks = []
-
-
+          
+          
               while True:
-
+          
                   payload = api_get(
                       "odds",
                       {
                           "fixture":
                               fixture_id,
-
+          
                           "page":
                               page
                       }
                   )
-
-
+          
+          
                   blocks.extend(
                       payload.get(
                           "response"
@@ -2223,8 +2234,8 @@ jobs:
                       or
                       []
                   )
-
-
+          
+          
                   paging = (
                       payload.get(
                           "paging"
@@ -2232,8 +2243,8 @@ jobs:
                       or
                       {}
                   )
-
-
+          
+          
                   current = int(
                       paging.get(
                           "current"
@@ -2241,7 +2252,7 @@ jobs:
                       or
                       page
                   )
-
+          
                   total = int(
                       paging.get(
                           "total"
@@ -2249,27 +2260,27 @@ jobs:
                       or
                       1
                   )
-
-
+          
+          
                   if current >= total:
                       break
-
-
+          
+          
                   page += 1
-
-
+          
+          
               odds_cache[
                   fixture_id
               ] = blocks
-
-
+          
+          
               return blocks
-
-
+          
+          
           # ==========================================================
           # ASSOCIA MIGLIORE QUOTA
           # ==========================================================
-
+          
           def attach_best_odds(fixture_id, candidates):
               """Una quota rappresentativa, non il massimo isolato.
               Mediana delle quote di bookmaker distinti sullo stesso mercato
@@ -2326,8 +2337,8 @@ jobs:
                   candidate["oddsQuality"] = "multi_source" if len(inliers) >= 2 else "single_source"
                   candidate["value"] = round(candidate["modelProbability"] * chosen["odd"], 3)
               return candidates
-
-
+          
+          
           # ==========================================================
           # CONSENSO 1X2: quote di almeno tre bookmaker indipendenti.
           # Rimuoviamo l'overround per una distribuzione 1/X/2 coerente.
@@ -2382,7 +2393,7 @@ jobs:
               return {"available": True, "sourceCount": n, "status": "verificato",
                       "probabilities": fair, "dispersion": round(dispersion, 4),
                       "method": "mediana_probabilita_quote_1x2_senza_margine"}
-
+          
           # La forza degli avversari e' una PROXY: punti medi recenti,
           # NON una classifica ufficiale. Non sono disponibili dati societari.
           def opponent_strength(games, before_date):
@@ -2404,7 +2415,7 @@ jobs:
                   "opponentsAvgPPG": round(sum(values) / len(values), 3) if len(values) >= 3 else None,
                   "status": "stimabile" if len(values) >= 3 else "non_verificabile"
               }
-
+          
           def consensus_for_market(consensus, market, selection):
               if not consensus.get("available"):
                   return None
@@ -2415,7 +2426,7 @@ jobs:
                   return {"1X":p["1"]+p["X"], "X2":p["X"]+p["2"],
                           "12":p["1"]+p["2"]}.get(selection)
               return None
-
+          
           def consecutive_wins(games):
               streak = 0
               for game in reversed(games):
@@ -2424,8 +2435,8 @@ jobs:
                   else:
                       break
               return streak
-
-
+          
+          
           def draw_market_odd(fixture_id):
               values = []
               for block in odds_cache.get(fixture_id, []):
@@ -2445,77 +2456,77 @@ jobs:
                   return None
               values.sort()
               return round(values[len(values)//2], 3)
-
-
+          
+          
           # ==========================================================
           # COSTRUISCI CANDIDATE PARTITE
           # ==========================================================
-
+          
           candidate_matches = []
-
-
+          
+          
           for item in all_api_matches:
-
+          
               fixture = (
                   item.get("fixture")
                   or
                   {}
               )
-
+          
               status = (
                   fixture.get("status")
                   or
                   {}
               ).get("short")
-
-
+          
+          
               if status not in {
                   "NS",
                   "TBD"
               }:
                   continue
-
+          
               kickoff_ts = int(fixture.get("timestamp") or 0)
               if kickoff_ts <= int(datetime.now(ROME).timestamp()):
                   continue
-
-
+          
+          
               league = (
                   item.get("league")
                   or
                   {}
               )
-
+          
               priority = league_priority(
                   league.get("country"),
                   league.get("name")
               )
-
-
+          
+          
               if priority <= 0:
                   continue
-
-
+          
+          
               teams = (
                   item.get("teams")
                   or
                   {}
               )
-
-
+          
+          
               home = (
                   teams.get("home")
                   or
                   {}
               ).get("name")
-
+          
               away = (
                   teams.get("away")
                   or
                   {}
               ).get("name")
-
-
+          
+          
               # Un incontro valido deve avere due squadre DISTINTE e ID API.
               # Le quote sono poi cercate esclusivamente per fixtureId.
               fixture_id = fixture.get("id")
@@ -2526,99 +2537,99 @@ jobs:
                   or (h_id is not None and a_id is not None and h_id == a_id)):
                   print("ESCLUSA FIXTURE CON DATI NON COERENTI:", fixture_id, home, away)
                   continue
-
-
+          
+          
               date = str(
                   fixture.get("date")
                   or
                   ""
               )[:10]
-
-
+          
+          
               home_games = team_games(
                   home,
                   date
               )
-
+          
               away_games = team_games(
                   away,
                   date
               )
-
-
+          
+          
               history_score = (
                   len(home_games)
                   +
                   len(away_games)
               )
-
+          
               # Una forma storica quantitativamente ampia puo' comunque
               # essere inadatta per un pronostico se manca l'ultimo mese.
               home_freshness = history_freshness(home_games, date)
               away_freshness = history_freshness(away_games, date)
               history_eligible = (home_freshness["eligible"]
                                   and away_freshness["eligible"])
-
-
+          
+          
               candidate_matches.append({
-
+          
                   "raw":
                       item,
-
+          
                   "fixtureId":
                       fixture.get("id"),
-
+          
                   "date":
                       date,
-
+          
                   "timestamp":
                       fixture.get(
                           "timestamp",
                           0
                       ),
-
+          
                   "country":
                       league.get(
                           "country"
                       ),
-
+          
                   "league":
                       league.get(
                           "name"
                       ),
-
+          
                   "priority":
                       priority,
-
+          
                   "home":
                       home,
-
+          
                   "away":
                       away,
-
+          
                   "homeGames":
                       home_games,
-
+          
                   "awayGames":
                       away_games,
-
+          
                   "historyScore":
                       history_score,
-
+          
                   "historyEligible":
                       history_eligible,
-
+          
                   "historyQuality": {
                       "home": home_freshness,
                       "away": away_freshness
                   }
-
+          
               })
-
-
+          
+          
           candidate_matches.sort(
               key=lambda m: (
-
+          
                   -int(
                       len(
                           m["homeGames"]
@@ -2628,7 +2639,7 @@ jobs:
                           m["awayGames"]
                       ) >= 5
                   ),
-
+          
                   -int(
                       len(
                           m["homeGames"]
@@ -2638,50 +2649,52 @@ jobs:
                           m["awayGames"]
                       ) > 0
                   ),
-
+          
                   -m[
                       "historyScore"
                   ],
-
+          
                   -m[
                       "priority"
                   ],
-
+          
                   m[
                       "timestamp"
                   ]
-
+          
               )
           )
-
-
+          
+          
           print(
               "Candidate calendario:",
               len(candidate_matches)
           )
-
-
+          
+          
           # ==========================================================
           # ANALISI + QUOTE
           # ==========================================================
-
+          
           analysis = []
-
+          MARKET_REFERENCE_LIMIT = 8
+          reference_lookups = 0
+          
           matches_with_candidates = 0
           total_market_candidates = 0
           total_candidates_with_odds = 0
           exact_scores_with_odds = 0
           stale_or_insufficient_matches = 0
           recent_eligible_matches = 0
-
-
+          
+          
           # ==========================================================
           # DATI CONTESTUALI PRE-PARTITA - SOLO FONTI VERIFICABILI
           # ==========================================================
           # Il piano API-Football Free non consente /injuries?ids=.
           # Non inviamo richieste vietate e non deduciamo la rosa completa.
           # Le assenze non cambiano probabilita' senza dati sull'impatto.
-
+          
           # Piano API-Football Free: il parametro "ids" di /injuries e'
           # stato rifiutato dal provider. Evitiamo chiamate note come vietate
           # e non trasformiamo mai la mancanza di dati in "rosa completa".
@@ -2694,7 +2707,7 @@ jobs:
               "Controllare fonti ufficiali prima della partita."
           )
           injury_records = 0
-
+          
           def venue_summary(games, is_home):
               subset = [g for g in games if g.get("home") is is_home]
               n = len(subset)
@@ -2709,11 +2722,11 @@ jobs:
                   "avgGF": round(sum(g["gf"] for g in subset) / n, 2),
                   "avgGA": round(sum(g["ga"] for g in subset) / n, 2)
               }
-
+          
           # Un intervallo e' interpretabile soltanto se il calendario storico
           # e' abbastanza recente. Non equivale comunque a riposo verificato.
           MAX_REST_LOOKBACK_DAYS = 21
-
+          
           def rest_before(games, match_date):
               if not games:
                   return {"days": None, "status": "storico_insufficiente",
@@ -2736,7 +2749,7 @@ jobs:
               except (ValueError, TypeError, KeyError):
                   return {"days": None, "status": "storico_insufficiente",
                           "lastRecorded": None, "ageDays": None}
-
+          
           def fixture_context(match):
               raw = match.get("raw") or {}
               team_raw = raw.get("teams") or {}
@@ -2760,7 +2773,7 @@ jobs:
                       key = str(item.get("playerId") or item["name"])
                       unique[key] = item
                   return list(unique.values())[:15]
-
+          
               if not valid_ids:
                   injury_note = "Identificativi delle squadre incoerenti: assenze non verificabili"
               elif not fetched:
@@ -2769,7 +2782,7 @@ jobs:
                   injury_note = "Endpoint consultato, ma nessuna segnalazione ricevuta per questa partita: non equivale a rosa completa"
               else:
                   injury_note = "Segnalazioni presenti in API-Football; elenco potenzialmente incompleto e aggiornabile"
-
+          
               home_gap = rest_before(match["homeGames"], match["date"])
               away_gap = rest_before(match["awayGames"], match["date"])
               return {
@@ -2799,28 +2812,28 @@ jobs:
                   "lineupsStatus": "non_verificato",
                   "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
               }
-
+          
           # analizza tutte le partite candidate disponibili
           for match in candidate_matches:
-
+          
               home_games = match[
                   "homeGames"
               ]
-
+          
               away_games = match[
                   "awayGames"
               ]
-
-
+          
+          
               home_stats = team_stats(
                   home_games
               )
-
+          
               away_stats = team_stats(
                   away_games
               )
-
-
+          
+          
               # Due percorsi INDIPENDENTI:
               # 1) distribuzione probabilistica mostrata anche se fragile;
               # 2) selezione quotata solo con storia verificata.
@@ -2831,21 +2844,24 @@ jobs:
               else:
                   stale_or_insufficient_matches += 1
                   candidates = []
-
+          
               # Una stima con pochi incontri non e' un consiglio di giocata.
               # Il riepilogo e' derivato dalla medesima Poisson coerente per
               # tutti i mercati; le quote non sono necessarie per descriverlo.
               def model_probability(market, selection):
                   return next((c["modelProbability"] for c in raw_model_candidates
                                if c["market"] == market and c["selection"] == selection), None)
-
+          
               raw_scores = [c for c in raw_model_candidates
                             if c["market"] == "Risultato Esatto"]
               raw_scores.sort(key=lambda c: -c["modelProbability"])
               sample_min = min(len(home_games), len(away_games))
+              can_display_score = (sample_min >= MIN_EXACT_SCORE_GAMES
+                                   and match["historyEligible"])
               if not raw_model_candidates:
                   model_state = "non_calcolabile"
-                  model_note = "Una o entrambe le squadre non hanno partite valide nello storico prima del calcio d'inizio. Nessuna previsione numerica."
+                  model_note = ("Servono almeno 4 partite storiche per ciascuna squadra prima "
+                                "del calcio d'inizio; non presentiamo il prior come previsione.")
               elif not match["historyEligible"]:
                   model_state = "esplorativa"
                   model_note = "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata."
@@ -2858,6 +2874,8 @@ jobs:
                   "note": model_note,
                   "homeGames": len(home_games),
                   "awayGames": len(away_games),
+                  "source": "storico_squadre_poisson_indipendente",
+                  "exactScoreEligible": can_display_score,
                   "expectedGoals": {"home": round(xh, 3) if xh is not None else None,
                                     "away": round(xa, 3) if xa is not None else None},
                   "probabilities": {
@@ -2881,17 +2899,19 @@ jobs:
                   "topScores": [
                       {"score": c["selection"].replace(":", "-"),
                        "probability": c["modelProbability"]}
-                      for c in raw_scores[:3]
-                  ]
+                      for c in (raw_scores[:3] if can_display_score else [])
+                  ],
+                  "scoreNote": ("Tre punteggi stimati da storico recente" if can_display_score
+                                else "Risultati esatti non mostrati: storico recente insufficiente")
               }
-
-
+          
+          
               # scarta mercati ordinari sotto indice minimo
               filtered = []
-
-
+          
+          
               for candidate in candidates:
-
+          
                   if (
                       candidate[
                           "market"
@@ -2899,11 +2919,11 @@ jobs:
                       ==
                       "Risultato Esatto"
                   ):
-
+          
                       filtered.append(
                           candidate
                       )
-
+          
                   elif (
                       candidate[
                           "index"
@@ -2911,28 +2931,28 @@ jobs:
                       >=
                       MIN_MARKET_INDEX
                   ):
-
+          
                       filtered.append(
                           candidate
                       )
-
-
+          
+          
               candidates = filtered
-
-
+          
+          
               if candidates:
-
+          
                   try:
-
+          
                       candidates = attach_best_odds(
                           match[
                               "fixtureId"
                           ],
                           candidates
                       )
-
+          
                   except Exception as exc:
-
+          
                       print(
                           "ERRORE QUOTE",
                           match["home"],
@@ -2941,8 +2961,19 @@ jobs:
                           ":",
                           exc
                       )
-
-
+          
+          
+              # Consulta al massimo 8 fixture importanti con storico insufficiente:
+              # consenso bookmaker, mai spacciare il mercato per previsione BETLAB.
+              if (not match["historyEligible"] and match["priority"] >= 4
+                  and reference_lookups < MARKET_REFERENCE_LIMIT):
+                  reference_lookups += 1
+                  try:
+                      get_fixture_odds(match["fixtureId"])
+                  except Exception as exc:
+                      print("Riferimento quote indisponibile:", match["fixtureId"],
+                            str(exc)[:100])
+          
               # solo candidati con quota
               market_consensus = market_1x2_consensus(match["fixtureId"])
               home_opp_strength = opponent_strength(home_games, match["date"])
@@ -2967,7 +2998,7 @@ jobs:
                   risk_signals["drawOdd"] is not None
                   and risk_signals["drawOdd"] <= 3.00
               )
-
+          
               quoted_candidates = [
                   c for c in candidates
                   if c.get("oddAvailable")
@@ -2976,8 +3007,8 @@ jobs:
                   and safe_float(c.get("modelProbability")) is not None
                   and safe_float(c.get("modelProbability")) >= MIN_RECOMMENDED_PROBABILITY
               ]
-
-
+          
+          
               # Controlli sul feed, indipendenti dalla pagina web.
               # Non pubblicare consigli su un vantaggio apparente enorme:
               # spesso e' un errore di stima o un prezzo non comparabile.
@@ -3031,45 +3062,55 @@ jobs:
                   if p_model - p_odd > 0.12 or p_model / p_odd > 1.40:
                       return False
                   return True
-
+          
               quoted_candidates = [c for c in quoted_candidates
                                    if passes_risk_controls(c)]
-
-              quoted_candidates.sort(
-                  key=lambda c: (
-
-                      -c[
-                          "index"
-                      ],
-
-                      -(
-                          c[
-                              "value"
-                          ]
-                          or
-                          0
-                      )
-
-                  )
-              )
-
-
+          
+              # La selezione e' decisa UNA VOLTA dal motore, non ricalcolata
+              # dalla pagina con filtri di una vecchia versione.
+              def selection_score(c):
+                  p = float(c["modelProbability"])
+                  odd = float(c["odd"])
+                  implied = 1.0 / odd
+                  n = min(len(home_games), len(away_games), 10)
+                  # Margine sperimentale e prudente, non EV certificato.
+                  conservative_p = implied + 0.40 * (n / 10.0) * (p - implied)
+                  edge = conservative_p * odd - 1.0
+                  return (edge * math.sqrt(max(0.0, conservative_p)) /
+                          (1.0 + 0.50 * math.log(odd)))
+          
+              for c in quoted_candidates:
+                  c["selectionScore"] = round(selection_score(c), 6)
+                  c["selectionApproved"] = c["selectionScore"] > 0
+                  c["selectionPolicy"] = "engine_only"
+              # Conserviamo la soglia corrente nel motore; non fingiamo valore
+              # economico quando la probabilita' non e' stata calibrata.
+              quoted_candidates = [c for c in quoted_candidates if
+                                   c["selectionApproved"] and
+                                   ((1.0 / c["odd"] + 0.40 *
+                                     (min(len(home_games), len(away_games), 10) / 10.0) *
+                                     (c["modelProbability"] - 1.0 / c["odd"])) *
+                                    c["odd"] - 1.0) >= 0.06]
+              quoted_candidates.sort(key=lambda c: (-c["selectionScore"],
+                                                    -c["modelProbability"]))
+          
+          
               if quoted_candidates:
-
+          
                   matches_with_candidates += 1
-
-
+          
+          
               total_market_candidates += len(
                   candidates
               )
-
+          
               total_candidates_with_odds += len(
                   quoted_candidates
               )
-
-
+          
+          
               exact_scores_with_odds += sum(
-
+          
                   1
                   for c in quoted_candidates
                   if c[
@@ -3077,183 +3118,183 @@ jobs:
                   ]
                   ==
                   "Risultato Esatto"
-
+          
               )
-
-
+          
+          
               # compatibilità temporanea con vecchia homepage:
               # primo candidato diventa prediction
               if quoted_candidates:
-
+          
                   best = quoted_candidates[0]
-
-
+          
+          
                   prediction = {
-
+          
                       "available":
                           True,
-
+          
                       "selection":
                           best[
                               "selection"
                           ],
-
+          
                       "market":
                           best[
                               "market"
                           ],
-
+          
                       "confidence":
                           best[
                               "index"
                           ],
-
+          
                       "oddAvailable":
                           True,
-
+          
                       "odd":
                           best[
                               "odd"
                           ],
-
+          
                       "bookmaker":
                           best[
                               "bookmaker"
                           ],
-
+          
                       "apiMarket":
                           best[
                               "apiMarket"
                           ],
-
+          
                       "apiSelection":
                           best[
                               "apiSelection"
                           ]
-
+          
                   }
-
+          
               else:
-
+          
                   prediction = {
-
+          
                       "available":
                           False,
-
+          
                       "selection":
                           None,
-
+          
                       "market":
                           None,
-
+          
                       "confidence":
                           None,
-
+          
                       "oddAvailable":
                           False,
-
+          
                       "odd":
                           None,
-
+          
                       "bookmaker":
                           None
-
+          
                   }
-
-
+          
+          
               analysis.append({
-
+          
                   "fixtureId":
                       match[
                           "fixtureId"
                       ],
-
+          
                   "date":
                       match[
                           "date"
                       ],
-
+          
                   "timestamp":
                       match[
                           "timestamp"
                       ],
-
+          
                   "country":
                       match[
                           "country"
                       ],
-
+          
                   "league":
                       match[
                           "league"
                       ],
-
+          
                   "priority":
                       match[
                           "priority"
                       ],
-
+          
                   "home": {
-
+          
                       "name":
                           match[
                               "home"
                           ],
-
+          
                       "form":
                           home_stats
-
+          
                   },
-
+          
                   "away": {
-
+          
                       "name":
                           match[
                               "away"
                           ],
-
+          
                       "form":
                           away_stats
-
+          
                   },
-
+          
                   "historyScore":
                       match[
                           "historyScore"
                       ],
-
+          
                   "historyEligible": match["historyEligible"],
                   "historyQuality": match["historyQuality"],
-
+          
                   "context": fixture_context(match),
                   "riskSignals": risk_signals,
                   "modelAnalysis": model_analysis,
-
+          
                   "prediction":
                       prediction,
-
+          
                   "candidates":
                       quoted_candidates
-
+          
               })
-
-
+          
+          
           print("Contesto indisponibili:", len(requested_injury_ids),
                 "fixture richieste |", injury_fetch_note,
                 "| stato:", injuries_api_status)
           print("Storico recente idoneo:", recent_eligible_matches,
                 "| esclusi per date/campione:", stale_or_insufficient_matches)
-
+          
           # ==========================================================
           # REGISTRO IMMUTABILE PRONOSTICI PRE-PARTITA
           # Una selezione per fixture, alla prima analisi disponibile.
           # ==========================================================
-
+          
           prediction_log_path = "data/betlab-predictions-log.json"
           prediction_log = load_json(prediction_log_path, [])
           if not isinstance(prediction_log, list):
               prediction_log = []
-
+          
           logged_ids = {
               str(row.get("fixtureId"))
               for row in prediction_log
@@ -3262,7 +3303,7 @@ jobs:
           recorded_at = datetime.now(ROME).isoformat()
           recorded_ts = int(datetime.now(ROME).timestamp())
           added_predictions = 0
-
+          
           for match in analysis:
               fixture_id = match.get("fixtureId")
               kickoff_ts = int(match.get("timestamp") or 0)
@@ -3291,7 +3332,7 @@ jobs:
               })
               logged_ids.add(str(fixture_id))
               added_predictions += 1
-
+          
           def grade_pick(market, selection, hg, ag):
               market = str(market or "").lower()
               selection = str(selection or "").strip().upper()
@@ -3323,7 +3364,7 @@ jobs:
               if market == "risultato esatto":
                   return selection.replace("-", ":") == f"{hg}:{ag}"
               return None
-
+          
           results_by_id = {}
           results_by_key = {}
           for item in all_api_matches:
@@ -3339,7 +3380,7 @@ jobs:
               result = (int(goals["home"]), int(goals["away"]))
               results_by_id[str(fixture.get("id"))] = result
               results_by_key[(str(fixture.get("date") or "")[:10], canonical(home), canonical(away))] = result
-
+          
           # Lo storico persistente consente anche la liquidazione nei run successivi.
           for record in history:
               hg, ag = historical_goals(record)
@@ -3349,7 +3390,7 @@ jobs:
               if record.get("fixtureId") is not None:
                   results_by_id[str(record["fixtureId"])] = result
               results_by_key[logical_history_key(record)] = result
-
+          
           settled_predictions = 0
           for row in prediction_log:
               if not isinstance(row, dict) or row.get("status") != "IN_ATTESA":
@@ -3368,16 +3409,92 @@ jobs:
               row["status"] = "VINTA" if verdict else "PERSA"
               row["settledAt"] = recorded_at
               settled_predictions += 1
-
+          
           save_json(prediction_log_path, prediction_log)
+          
+          # ==========================================================
+          # AUDIT DI QUALITA' IN PROSPETTIVA: UNA FOTO PRIMA DEL VIA
+          # ==========================================================
+          # Non attribuire successi retroattivi a pronostici calcolati
+          # dopo che la partita e' iniziata. Una fixture -> un solo snapshot.
+          FORECAST_LOG_PATH = "data/betlab-model-forecast-log.json"
+          forecast_log = load_json(FORECAST_LOG_PATH, [])
+          if not isinstance(forecast_log, list):
+              forecast_log = []
+          known_forecast_ids = {str(r.get("fixtureId")) for r in forecast_log
+                                if isinstance(r, dict) and r.get("fixtureId") is not None}
+          forecast_new = 0
+          for m in analysis:
+              fid = m.get("fixtureId")
+              if (fid is None or str(fid) in known_forecast_ids
+                  or int(m.get("timestamp") or 0) <= recorded_ts):
+                  continue
+              model = m.get("modelAnalysis") or {}
+              probabilities = model.get("probabilities") or {}
+              triple = [probabilities.get(k) for k in ("1", "X", "2")]
+              if model.get("status") != "campione_idoneo" or any(
+                      p is None or not 0 <= float(p) <= 1 for p in triple):
+                  continue
+              fair = ((m.get("riskSignals") or {}).get("market1X2") or {})
+              forecast_log.append({
+                  "fixtureId": fid, "timestamp": int(m.get("timestamp") or 0),
+                  "date": m.get("date"), "home": m["home"]["name"],
+                  "away": m["away"]["name"], "recordedAt": recorded_at,
+                  "source": "pre_kickoff_model_only", "status": "IN_ATTESA",
+                  "probabilities": {k: probabilities.get(k) for k in
+                                    ("1", "X", "2", "OVER 2.5", "UNDER 2.5")},
+                  "market": fair.get("probabilities") if fair.get("available") else None
+              })
+              known_forecast_ids.add(str(fid))
+              forecast_new += 1
+          
+          forecast_settled = 0
+          for r in forecast_log:
+              if not isinstance(r, dict) or r.get("status") != "IN_ATTESA":
+                  continue
+              fid = str(r.get("fixtureId"))
+              if fid not in results_by_id:
+                  continue
+              hg, ag = results_by_id[fid]
+              side = "1" if hg > ag else ("2" if ag > hg else "X")
+              pp = r.get("probabilities") or {}
+              r["outcome"] = side
+              r["homeGoals"] = hg
+              r["awayGoals"] = ag
+              r["status"] = "VALUTATO"
+              r["settledAt"] = recorded_at
+              r["correct1X2"] = max(("1", "X", "2"), key=lambda k: pp.get(k) or 0) == side
+              r["brier1X2"] = round(sum((float(pp.get(k) or 0) - int(k == side))**2
+                                          for k in ("1", "X", "2")), 6)
+              r["correctOver25"] = ((hg + ag > 2) ==
+                                     (float(pp.get("OVER 2.5") or 0) > 0.5))
+              forecast_settled += 1
+          
+          save_json(FORECAST_LOG_PATH, forecast_log)
+          evaluated_forecasts = [r for r in forecast_log if
+                                 isinstance(r, dict) and r.get("status") == "VALUTATO"
+                                 and r.get("brier1X2") is not None]
+          n_valid = len(evaluated_forecasts)
+          validation = {
+              "status": "campione_in_raccolta" if n_valid < 30 else "campione_valutabile",
+              "forecastRecorded": len(forecast_log),
+              "forecastEvaluated": n_valid,
+              "minimumForSummary": 30,
+              "correct1X2": sum(bool(r.get("correct1X2")) for r in evaluated_forecasts),
+              "meanBrier1X2": round(sum(float(r["brier1X2"]) for r in evaluated_forecasts)
+                                          / n_valid, 4) if n_valid else None,
+              "note": "Solo previsioni archiviate PRIMA del calcio d'inizio. Brier 1X2: minore e' meglio; nessuna prova di redditivita'."
+          }
+          print("Audit ex-ante:", forecast_new, "nuovi |", forecast_settled,
+                "valutati ora |", n_valid, "valutati complessivi")
           print("Pronostici pre-partita registrati:", added_predictions)
           print("Pronostici liquidati:", settled_predictions)
           print("Totale registro:", len(prediction_log))
-
+          
           # ==========================================================
           # SALVA ANALISI
           # ==========================================================
-
+          
           # Quanti incontri sono realmente analizzabili per campionato?
           from collections import Counter
           history_rejections = Counter()
@@ -3415,36 +3532,43 @@ jobs:
           save_json("data/betlab-history-coverage.json", history_coverage_report)
           print("COPERTURA STORICA:", recent_eligible_matches, "/", len(analysis),
                 "| motivi:", dict(history_rejections))
-
+          
           output = {
-
+              "schemaVersion": 1,
+              "releaseChannel": "stable",
+              "modelCalibration": "non_validato",
+              "predictionSource": "historical_poisson_with_market_sanity_checks",
+          
               "engine":
-                  "BETLAB V10.4 HISTORY COVERAGE + MARKET CONSENSUS EXPERIMENTAL",
-
+                  "BETLAB AI CORE - ANALISI VERIFICABILE",
+          
               "generatedAt":
                   datetime.now(
                       ROME
                   ).isoformat(),
-
+          
               "days":
                   DAYS,
               "calendarDaysUnavailable": unavailable_days,
               "calendarHorizonDays": DAYS_AHEAD + 1,
-
+          
+              "validation": validation,
+              "marketReferenceLookups": reference_lookups,
+          
               "historyCount":
                   len(history),
               "historyCoverage": history_coverage_report,
-
+          
               "matchesAnalyzed":
                   len(analysis),
-
+          
               "matchesWithCandidates":
                   matches_with_candidates,
-
+          
               "matchesHistoryRecent": recent_eligible_matches,
               "matchesHistoryUnreliable": stale_or_insufficient_matches,
               "selectionPolicy": {
-                  "model": "poisson_coherent_uncalibrated_with_market_veto",
+                  "model": "poisson_historical_transparent_market_veto",
                   "winStreakExcludeAt": 6,
                   "drawAttentionAtOrBelow": 3.0,
                   "maxProbabilityPriceGap": 0.12,
@@ -3465,163 +3589,163 @@ jobs:
                   "minRecentGamesPerTeam": MIN_RECENT_GAMES,
                   "maxDaysFromLastMatch": MAX_LAST_GAME_AGE_DAYS
               },
-
+          
               "marketCandidates":
                   total_market_candidates,
-
+          
               "candidatesWithOdds":
                   total_candidates_with_odds,
-
+          
               "exactScoresWithOdds":
                   exact_scores_with_odds,
-
+          
               "injuriesApiStatus": injuries_api_status,
               "injuriesApiNote": injury_fetch_note,
               "injuriesFixturesQueried": len(requested_injury_ids),
               "injuriesFixturesWithReports": len(injuries_by_fixture),
-
+          
               "analysis":
                   analysis
-
+          
           }
-
-
+          
+          
           save_json(
               "data/betlab-analysis.json",
               output
           )
-
-
+          
+          
           # shortlist semplice
           shortlist = [
-
+          
               {
                   "fixtureId":
                       m[
                           "fixtureId"
                       ],
-
+          
                   "date":
                       m[
                           "date"
                       ],
-
+          
                   "country":
                       m[
                           "country"
                       ],
-
+          
                   "league":
                       m[
                           "league"
                       ],
-
+          
                   "home":
                       m[
                           "home"
                       ],
-
+          
                   "away":
                       m[
                           "away"
                       ],
-
+          
                   "priority":
                       m[
                           "priority"
                       ],
-
+          
                   "historyScore":
                       m[
                           "historyScore"
                       ]
               }
-
+          
               for m in candidate_matches[:50]
-
+          
           ]
-
-
+          
+          
           save_json(
               "data/betlab-shortlist.json",
               shortlist
           )
-
-
+          
+          
           # ==========================================================
           # LOG
           # ==========================================================
-
+          
           print("")
           print("==============================================")
-          print("RISULTATO BETLAB V10.4")
+          print("RISULTATO BETLAB AI STABILE")
           print("==============================================")
-
+          
           print(
               "Storico totale:",
               len(history)
           )
-
+          
           print(
               "Partite analizzate:",
               len(analysis)
           )
-
+          
           print(
               "Partite con candidati:",
               matches_with_candidates
           )
-
+          
           print(
               "Candidati mercato generati:",
               total_market_candidates
           )
-
+          
           print(
               "Candidati con quota:",
               total_candidates_with_odds
           )
-
+          
           print(
               "Risultati esatti con quota:",
               exact_scores_with_odds
           )
-
-
+          
+          
           print("")
           print("TOP CANDIDATI PER PARTITA")
           print("")
-
-
+          
+          
           for index, match in enumerate(
               analysis,
               start=1
           ):
-
+          
               candidates = match.get(
                   "candidates"
               ) or []
-
-
+          
+          
               print(
                   f'{index}. '
                   f'{match["home"]["name"]}'
                   f' - '
                   f'{match["away"]["name"]}'
               )
-
-
+          
+          
               if not candidates:
-
+          
                   print(
                       "   NESSUN CANDIDATO CON QUOTA"
                   )
-
+          
                   continue
-
-
+          
+          
               for candidate in candidates[:8]:
-
+          
                   print(
                       "   "
                       +
@@ -3661,13 +3785,13 @@ jobs:
                           ]
                       )
                   )
-
-
+          
+          
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.4 OK")
+          print("BETLAB AI ENGINE STABILE OK")
           print("==============================================")
-
+          
           PY
 
       - name: Commit aggiornamenti BETLAB
@@ -3682,7 +3806,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V10.4 - recupero storico verificato"
+          git commit -m "Aggiorna BETLAB AI - dati e analisi"
 
           git pull --rebase origin main
 
