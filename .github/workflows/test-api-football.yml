@@ -2466,6 +2466,148 @@ jobs:
 
 
           # ==========================================================
+          # CALENDARIO NAZIONALE SUPPLEMENTARE / QUOTE DOCUMENTATE
+          # Football-Data.co.uk: gare future dei 19 campionati con storico.
+          # Non sostituisce né falsifica i dati API-Football; se indisponibile,
+          # si prosegue con il calendario API già acquisito.
+          # ==========================================================
+          import hashlib
+
+          csv_fixture_count = 0
+          csv_fixture_dates = set()
+          csv_fixture_quoted_count = 0
+          csv_fixture_status = "non_consultato"
+
+          # Il calendario del piano API gratuito copre solo alcuni giorni.
+          # Questa fonte consente di analizzare anche i prossimi weekend
+          # nei campionati che BETLAB sa già documentare storicamente.
+          try:
+              fixture_url = "https://www.football-data.co.uk/fixtures.csv"
+              request = urllib.request.Request(
+                  fixture_url,
+                  headers={"User-Agent": "BETLAB-AI (+domestic-fixtures)",
+                           "Accept": "text/csv"}
+              )
+              with urllib.request.urlopen(request, timeout=16) as response:
+                  fixture_blob = response.read(3_000_001)
+              if len(fixture_blob) > 3_000_000:
+                  raise ValueError("File calendario oltre 3 MB")
+              fixture_text = fixture_blob.decode("utf-8-sig", errors="replace")
+              fixture_rows = csv.DictReader(io.StringIO(fixture_text))
+              required_columns = {"Div", "Date", "HomeTeam", "AwayTeam", "Time"}
+              if not required_columns.issubset(set(fixture_rows.fieldnames or [])):
+                  raise ValueError("Colonne calendario mancanti oppure risposta non CSV")
+
+              from datetime import time as date_time
+              from zoneinfo import ZoneInfo
+              football_data_leagues = {code: (country, name)
+                                       for code, country, name in CSV_SOURCES}
+              known_api_games = set()
+              for api_item in all_api_matches:
+                  api_fixture = api_item.get("fixture") or {}
+                  api_teams = api_item.get("teams") or {}
+                  known_api_games.add((str(api_fixture.get("date") or "")[:10],
+                                       canonical((api_teams.get("home") or {}).get("name")),
+                                       canonical((api_teams.get("away") or {}).get("name"))))
+              supported_bookmakers = {
+                  "B365": "Bet365", "BFD": "Betfred", "BW": "Bwin",
+                  "PS": "Pinnacle", "WH": "William Hill", "VC": "BetVictor",
+                  "IW": "Interwetten", "LB": "Ladbrokes", "SJ": "Stan James",
+                  "1XB": "1xBet"
+              }
+              now_timestamp = int(datetime.now(ROME).timestamp())
+              end_date = TODAY + timedelta(days=DAYS_AHEAD)
+              for row in fixture_rows:
+                  if not isinstance(row, dict):
+                      continue
+                  division = str(row.get("Div") or "").strip()
+                  if division not in football_data_leagues:
+                      continue
+                  day = parse_csv_result_date(row.get("Date"))
+                  if day is None or not TODAY <= day <= end_date:
+                      continue
+                  home = str(row.get("HomeTeam") or "").strip()
+                  away = str(row.get("AwayTeam") or "").strip()
+                  if not home or not away or canonical(home) == canonical(away):
+                      continue
+                  time_value = str(row.get("Time") or "").strip()
+                  # Non inventare un orario mancante: si salta la riga.
+                  if not re.fullmatch(r"\d{1,2}:\d{2}(?::\d{2})?", time_value):
+                      continue
+                  try:
+                      hh, mm, *ss = map(int, time_value.split(":"))
+                      kickoff = datetime(day.year, day.month, day.day, hh, mm,
+                                         ss[0] if ss else 0,
+                                         tzinfo=ZoneInfo("Europe/London"))
+                  except ValueError:
+                      continue
+                  kickoff_timestamp = int(kickoff.timestamp())
+                  if kickoff_timestamp <= now_timestamp:
+                      continue
+                  iso_day = day.isoformat()
+                  identity = (iso_day, canonical(home), canonical(away))
+                  if identity in known_api_games:
+                      continue
+                  known_api_games.add(identity)
+                  country, league_name = football_data_leagues[division]
+                  # ID locale deterministicamente derivato dalle squadre e dalla data:
+                  # non e' un fixture ID di API-Football.
+                  digest = hashlib.sha256("|".join(identity).encode("utf-8")).digest()
+                  fixture_id = 900_000_000_000_000 + int.from_bytes(digest[:6], "big")
+
+                  bookmakers = []
+                  for prefix, bookmaker_name in supported_bookmakers.items():
+                      trio = [safe_float(row.get(prefix + x)) for x in ("H", "D", "A")]
+                      if any(v is None or not math.isfinite(v) or not 1.02 <= v <= 100
+                             for v in trio):
+                          continue
+                      margin = sum(1.0/v for v in trio)
+                      if not 1.005 <= margin <= 1.25:
+                          continue
+                      bets = [{"name": "Match Winner", "values": [
+                          {"value": selection, "odd": str(round(v,3))}
+                          for selection, v in zip(("Home", "Draw", "Away"), trio)]}]
+                      # Quote Under/Over 2.5 solo quando la fonte le documenta.
+                      over = safe_float(row.get(prefix + ">2.5"))
+                      under = safe_float(row.get(prefix + "<2.5"))
+                      if (over is not None and under is not None and
+                          math.isfinite(over) and math.isfinite(under) and
+                          1.02 <= over <= 100 and 1.02 <= under <= 100 and
+                          1.005 <= 1/over + 1/under <= 1.25):
+                          bets.append({"name": "Goals Over/Under", "values": [
+                              {"value": "Over 2.5", "odd": str(round(over,3))},
+                              {"value": "Under 2.5", "odd": str(round(under,3))}]})
+                      bookmakers.append({"name": bookmaker_name, "bets": bets})
+
+                  fixture = {
+                      "fixture": {"id": fixture_id,
+                                  "date": kickoff.isoformat(),
+                                  "timestamp": kickoff_timestamp,
+                                  "status": {"short": "NS"}, "venue": {}},
+                      "league": {"country": country, "name": league_name},
+                      "teams": {"home": {"name": home, "id": None},
+                                "away": {"name": away, "id": None}},
+                      "goals": {"home": None, "away": None},
+                      "_source": "Football-Data.co.uk: calendario e quote di piu bookmaker"
+                  }
+                  all_api_matches.append(fixture)
+                  # Precarica solo vere offerte raccolte dal CSV: il motore non
+                  # tenta API-Football con un ID interno non riconosciuto.
+                  odds_cache[fixture_id] = [
+                      {"bookmakers": bookmakers}] if bookmakers else []
+                  csv_fixture_count += 1
+                  csv_fixture_dates.add(iso_day)
+                  if bookmakers:
+                      csv_fixture_quoted_count += 1
+              unavailable_days[:] = [d for d in unavailable_days if d not in csv_fixture_dates]
+              csv_fixture_status = "disponibile"
+          except (OSError, ValueError, UnicodeError, csv.Error) as exc:
+              csv_fixture_status = "indisponibile: " + str(exc)[:120]
+          print("Calendario domestico supplementare:", csv_fixture_count,
+                "partite; con quote 1X2:", csv_fixture_quoted_count,
+                "| fonte:", csv_fixture_status)
+
+          # ==========================================================
           # COSTRUISCI CANDIDATE PARTITE
           # ==========================================================
 
@@ -2793,7 +2935,7 @@ jobs:
               home_gap = rest_before(match["homeGames"], match["date"])
               away_gap = rest_before(match["awayGames"], match["date"])
               return {
-                  "source": "API-Football + storico BETLAB",
+                  "source": raw.get("_source") or "API-Football + storico BETLAB",
                   "generatedAt": datetime.now(ROME).isoformat(),
                   "injuriesStatus": "disponibile" if has_reports else "non_verificato",
                   "injuriesRequestStatus": injuries_api_status,
@@ -3756,6 +3898,13 @@ jobs:
               "historicalBacktest": walk_forward,
               "marketReferenceLookups": reference_lookups,
 
+              "domesticFixtureSource": {
+                  "source": "Football-Data.co.uk/fixtures.csv",
+                  "status": csv_fixture_status,
+                  "fixturesAdded": csv_fixture_count,
+                  "fixturesWithQuotedMarkets": csv_fixture_quoted_count,
+                  "oddsType": "quote raccolte in CSV, non live",
+              },
               "historyCount":
                   len(history),
               "historyCoverage": history_coverage_report,
