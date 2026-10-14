@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BETLAB AI · Analisi verificabile</title>
+  <title>BETLAB AI · Analisi e verifica storica</title>
 
   <style>
     * {
@@ -1249,6 +1249,21 @@
 .quality-kpis strong{font-size:21px;color:#ecf8f4}
 .quality-note{font-size:11px;line-height:1.5;color:#a9c1cc;margin:10px 0 0}
 @media(max-width:650px){.quality-kpis{grid-template-columns:1fr}.quality-kpis>div{padding:9px}}
+
+/* BETLAB AI — prove visibili per ogni mercato, senza promozione automatica. */
+.market-evidence-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:9px}
+.market-evidence-list>div{padding:8px;background:#10273a;border:1px solid #33576d;border-radius:6px;min-width:0}
+.market-evidence-list strong,.market-evidence-list span{display:block;overflow-wrap:anywhere}
+.market-evidence-list strong{color:#e9fcf6;font-size:11px;margin-bottom:5px}
+.market-evidence-list span{font-size:10px;color:#bfd2db}
+@media(max-width:550px){.market-evidence-list{grid-template-columns:1fr}}
+/* BETLAB AI — auditing delle stime, non promessa di rendimento. */
+.backtest-line{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.backtest-line>div{padding:12px;border:1px solid #39566b;border-radius:9px;background:#0a2031}
+.backtest-line small{display:block;font-size:10px;font-weight:850;color:#9fbccc;margin-bottom:7px;letter-spacing:.3px}
+.backtest-line strong{display:block;font-size:19px;color:#f6fbff;line-height:1.2}
+.backtest-note{font-size:11px;color:#bed2dc;line-height:1.5;margin:11px 0 0}
+@media(max-width:650px){.backtest-line{grid-template-columns:1fr}.backtest-line>div{padding:10px}}
 </style>
 </head>
 
@@ -1308,6 +1323,12 @@
         <div><small>ACCURATEZZA 1X2 (DA 30 CASI)</small><strong id="qualityAccuracy">—</strong></div>
       </div>
       <p id="qualityNote" class="quality-note">La precisione si misura soltanto su previsioni archiviate prima dell'incontro.</p>
+      <div class="backtest-line" aria-label="Verifica retrospettiva cronologica">
+        <div><small>TEST CRONOLOGICO 1X2</small><strong id="backtestSamples">—</strong></div>
+        <div><small>PRECISIONE 1X2</small><strong id="backtestAccuracy">—</strong></div>
+        <div><small>BRIER BETLAB / BASE</small><strong id="backtestBrier">—</strong></div>
+      </div>
+      <p id="backtestStatus" class="backtest-note">In attesa dei risultati del test sulle partite passate.</p>
     </section>
     <div id="dailyMatches" class="daily-grid"></div>
     <section id="modelInsightsSection" class="model-insights-section" aria-label="Letture probabilistiche del modello">
@@ -1992,6 +2013,33 @@
       gap,marketProbability:hasConsensus ? fair : null};
   }
 
+  function renderHistoricalBacktest() {
+    const test = betlabData?.historicalBacktest || {};
+    const samples = Number(test.forecastsEvaluated || 0);
+    const percentage = value => Number.isFinite(Number(value)) && value !== null && value !== undefined
+      ? (100*Number(value)).toLocaleString("it-IT",{maximumFractionDigits:1}) + "%" : "n.d.";
+    const brier = value => value === null || value === undefined || !Number.isFinite(Number(value))
+      ? "n.d." : Number(value).toLocaleString("it-IT",{maximumFractionDigits:3});
+    document.getElementById("backtestSamples").textContent = String(samples);
+    document.getElementById("backtestAccuracy").textContent = samples > 0 ? percentage(test.accuracy1X2) : "—";
+    document.getElementById("backtestBrier").textContent = samples > 0
+      ? `${brier(test.brier1X2)} / ${brier(test.baselineBrier1X2)}` : "—";
+    const note = document.getElementById("backtestStatus");
+    if (!samples) {
+      note.textContent = "Nessuna partita storica idonea al test: non è possibile dimostrare la precisione del motore.";
+      return;
+    }
+    const comparison = Number(test.brier1X2), benchmark = Number(test.baselineBrier1X2);
+    const caution = (samples < 100) ? "Campione ancora insufficiente. " : "Risultati retrospettivi, non prova di rendimento futuro. ";
+    const comparisonText = Number.isFinite(comparison) && Number.isFinite(benchmark)
+      ? comparison < benchmark ? "Brier più basso della previsione-base, su questo campione." :
+        comparison > benchmark ? "Brier peggiore della previsione-base su questo campione." :
+        "Brier uguale alla previsione-base su questo campione."
+      : "Confronto con la previsione-base non disponibile.";
+    note.textContent = caution + comparisonText +
+      " Test su partite concluse: il modello non ha visto risultati futuri. Non è un backtest delle quote né della redditività.";
+  }
+
   function renderQualityDashboard() {
     const cover = betlabData?.historyCoverage || {};
     const metrics = betlabData?.validation || {};
@@ -2077,7 +2125,10 @@
     return `<div class="analysis-mini"><span>Gol medi del modello <b>${safeText(xg)}</b></span><span>Campione <b>${Number(model.homeGames || 0)} + ${Number(model.awayGames || 0)}</b></span></div>
       <div class="analysis-probability-grid">${groups.map(([label,items])=>`<div class="analysis-prob-group"><strong>${safeText(label)}</strong><div>${items.map(([name,p])=>`<span>${safeText(name)} <b>${modelPct(p)}</b></span>`).join("")}</div></div>`).join("")}</div>
       <div class="analysis-scores"><strong>Tre risultati esatti più probabili:</strong> ${scores.length ? scores.map(s=>`<span>${safeText(s.score)} <b>${modelPct(s.probability)}</b></span>`).join("") : "non disponibili"}</div>
-      <div class="analysis-caution">${safeText(model.note || 'Stime non calibrate.')}</div>`;
+      <div class="analysis-caution">${safeText(model.note || 'Stime non calibrate.')}</div>
+      ${Array.isArray(m.analyzedMarketOptions) && m.analyzedMarketOptions.length
+      ? `<details class="analysis-additional"><summary>Mercati quotati valutati dal motore (non approvati)</summary><div class="market-evidence-list">${m.analyzedMarketOptions.slice(0,6).map(o=>`<div><strong>${safeText(o.selection)} · ${safeText(o.market)}</strong><span>Stima ${modelPct(o.modelProbability)} · quota ${Number(o.odd).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})} · ${safeText(o.bookmaker || 'fonte non disponibile')}</span></div>`).join('')}</div><p>Queste sono opzioni considerate e poi scartate o non approvate: non sono pronostici consigliati.</p></details>`
+      : ''}`;
   }
 
   function renderMonitoredMatches() {
@@ -2570,6 +2621,7 @@
       renderDailyRecommendations();
       renderModelInsights();
       renderQualityDashboard();
+      renderHistoricalBacktest();
       renderMonitoredMatches();
       await refreshBetStatuses();
       renderSavedBets();
