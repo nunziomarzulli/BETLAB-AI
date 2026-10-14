@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB AI - Motore stabile e verifica pre-partita
+      - name: BETLAB - CALENDARIO NAZIONALE ATTIVO (verifica CSV)
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -2477,6 +2477,7 @@ jobs:
           csv_fixture_dates = set()
           csv_fixture_quoted_count = 0
           csv_fixture_status = "non_consultato"
+          print("BETLAB CALENDARIO SUPPLEMENTARE: modulo presente - avvio verifica della fonte")
 
           # Il calendario del piano API gratuito copre solo alcuni giorni.
           # Questa fonte consente di analizzare anche i prossimi weekend
