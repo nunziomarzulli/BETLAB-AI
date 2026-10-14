@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BETLAB AI · V9 e V7</title>
+  <title>BETLAB AI · Analisi verificabile</title>
 
   <style>
     * {
@@ -1241,6 +1241,14 @@
 @media(max-width:1100px){.model-insights-grid{grid-template-columns:1fr}}
 @media(max-width:650px){.model-insights-heading{flex-direction:column}.model-insight-metrics{grid-template-columns:1fr}.model-insight-metrics>div{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}.model-insight-metrics small{margin:0}.model-insight-metrics span{margin:0}}
 
+/* BETLAB AI Stable: qualità misurabile senza colore di affidabilità fittizia */
+.quality-dashboard{margin:12px 0 17px;border:1px solid #284557;border-radius:12px;background:#0e2434;padding:14px 16px}
+.quality-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.quality-kpis>div{border:1px solid #284152;border-radius:9px;padding:11px;background:#102d3b}
+.quality-kpis small{font-size:10px;color:#b1c9d1;font-weight:800;display:block;margin-bottom:5px}
+.quality-kpis strong{font-size:21px;color:#ecf8f4}
+.quality-note{font-size:11px;line-height:1.5;color:#a9c1cc;margin:10px 0 0}
+@media(max-width:650px){.quality-kpis{grid-template-columns:1fr}.quality-kpis>div{padding:9px}}
 </style>
 </head>
 
@@ -1263,8 +1271,8 @@
 
   <main>
     <nav class="engine-tabs" role="tablist" aria-label="Versione del motore BETLAB">
-      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB V10.3.1 · Analisi visibile</button>
-      <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">BETLAB V7 · Confronto</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="true" aria-controls="v9Panel" id="tabV9">BETLAB AI · Analisi</button>
+      <button class="engine-tab" type="button" role="tab" aria-selected="false" aria-controls="v7Panel" id="tabV7">Storico V7 · Confronto</button>
     </nav>
     <div class="main-grid" id="v9Panel" role="tabpanel" aria-labelledby="tabV9">
       <div class="main-left">
@@ -1284,7 +1292,7 @@
 
 
     <div class="daily-head">
-      <div><h2>Selezioni che superano i controlli</h2><p>Solo mercati quotati che superano i filtri sperimentali. Le analisi delle altre partite sono consultabili sotto, senza che diventino consigli di giocata.</p></div>
+      <div><h2>Selezioni che superano i controlli tecnici</h2><p>Solo mercati quotati che superano i controlli del motore. I controlli non garantiscono pronostici corretti. Le analisi delle altre partite sono consultabili sotto, senza che diventino consigli di giocata.</p></div>
       <button id="refreshButton" class="refresh-button" type="button">AGGIORNA DATI</button>
     </div>
     <div class="day-controls">
@@ -1293,16 +1301,24 @@
       <span id="calendarCoverage" class="calendar-coverage">Verifica disponibilità date...</span>
     </div>
     <div id="availability" class="availability" aria-live="polite">Caricamento analisi...</div>
+    <section id="qualityDashboard" class="quality-dashboard" aria-label="Qualità dei dati e risultati verificati">
+      <div class="quality-kpis">
+        <div><small>STORICO IDONEO</small><strong id="qualityCoverage">—</strong></div>
+        <div><small>PREVISIONI PRE-PARTITA VERIFICATE</small><strong id="qualityValidated">—</strong></div>
+        <div><small>ACCURATEZZA 1X2 (DA 30 CASI)</small><strong id="qualityAccuracy">—</strong></div>
+      </div>
+      <p id="qualityNote" class="quality-note">La precisione si misura soltanto su previsioni archiviate prima dell'incontro.</p>
+    </section>
     <div id="dailyMatches" class="daily-grid"></div>
     <section id="modelInsightsSection" class="model-insights-section" aria-label="Letture probabilistiche del modello">
       <div class="model-insights-heading"><div><h2>Letture del modello · anche senza giocate</h2>
-        <p>Per ogni partita con dati calcolabili: esito 1X2 più probabile, andamento dei gol e punteggio esatto più probabile. <strong>Non sono consigli di giocata e non hanno una quota implicita approvata.</strong></p></div>
+        <p>Per ogni partita con dati sufficienti: esito 1X2, andamento dei gol e, se giustificati dallo storico, risultati esatti. <strong>Non sono consigli di giocata e non hanno una quota implicita approvata.</strong></p></div>
         <span id="modelInsightsCount" class="model-insights-count">Caricamento...</span></div>
       <div id="modelInsightsCards" class="model-insights-grid"></div>
     </section>
     <details id="monitoredMatches" class="monitor-panel" open>
       <summary><span>ANALISI DELLE PARTITE · NON CONSIGLIATE</span><span id="monitorCount" class="monitor-count">Caricamento...</span></summary>
-      <p class="monitor-info">Per ogni incontro: stime 1X2, Under/Over, GOAL e PARI, tre risultati esatti più probabili e qualità dello storico. Le stime non quotate e non calibrate <strong>non sono consigli di giocata</strong>.</p>
+      <p class="monitor-info">Per ogni incontro: stime 1X2, Under/Over, GOAL e PARI, risultati esatti soltanto con storico idoneo e qualità dello storico. Le stime non quotate e non calibrate <strong>non sono consigli di giocata</strong>.</p>
       <div id="monitorList" class="monitor-grid"></div>
     </details>
     <section class="control-panel">
@@ -1460,9 +1476,9 @@
 
     <section id="v7Panel" class="v7-section" role="tabpanel" aria-labelledby="tabV7" hidden>
       <div class="eyebrow">SIMULAZIONE · VERSIONE STORICA</div>
-      <h1>Pronostici BETLAB V7</h1>
-      <p class="v7-intro">La schermata alternativa mostra i pronostici calcolati dal vecchio motore V7 e le quote conservate nel confronto offline, affiancati alle scelte V9 quando disponibili.</p>
-      <div class="v7-info"><strong>Come leggere questa pagina:</strong> la quota proviene dallo snapshot dei bookmaker raccolto da BETLAB, non è una quota creata dalla V7. Lo stesso criterio di scelta dei mercati viene applicato a V7 e V9, per confrontarli in modo omogeneo. Queste proposte <strong>non sono schedine giocabili</strong> e non dimostrano che un modello sia migliore.</div>
+      <h1>Confronto storico V7</h1>
+      <p class="v7-intro">La schermata alternativa mostra i pronostici calcolati dal vecchio motore V7 e le quote conservate nel confronto offline, affiancati alle scelte archiviate del motore corrente al momento del confronto, quando disponibili.</p>
+      <div class="v7-info"><strong>Come leggere questa pagina:</strong> la quota proviene dallo snapshot dei bookmaker raccolto da BETLAB, non è una quota creata dalla V7. Un criterio comune di scelta dei mercati viene applicato ai due motori confrontati, per confrontarli in modo omogeneo. Queste proposte <strong>non sono schedine giocabili</strong> e non dimostrano che un modello sia migliore.</div>
       <div class="v7-head"><h2>Analisi V7 e quote</h2><button type="button" id="refreshComparison" class="v7-refresh">AGGIORNA CONFRONTO</button></div>
       <p id="comparisonInfo" class="v7-summary" aria-live="polite">Caricamento confronto...</p>
       <div id="v7Cards" class="daily-grid"></div>
@@ -1661,7 +1677,7 @@
           <div class="v7-card-teams">${safeText(m.match || "Incontro")}</div>
           <div class="v7-pick"><div><span class="v7-tag">SCELTA V7 · CRITERIO COMUNE</span><strong class="v7-bet">${p.selection ? safeText(p.selection) : "Nessuna"}</strong><span class="v7-market">${safeText(p.market || "Nessun mercato quotato")}</span></div>
           <div class="v7-price"><span class="v7-tag">QUOTA ARCHIVIATA</span><strong>${comparisonOdd(p.odd)}</strong></div></div>
-          <div class="v7-comparison"><strong>Probabilità stimata V7:</strong> ${prob}<br><strong>Motore attuale nel confronto:</strong> ${v9Text}${same ? " · stesso pronostico" : ""}</div>
+          <div class="v7-comparison"><strong>Probabilità stimata V7:</strong> ${prob}<br><strong>Motore del confronto archiviato:</strong> ${v9Text}${same ? " · stesso pronostico" : ""}</div>
           <div class="v7-original"><strong>Pronostico principale originale V7:</strong> ${original}. Può differire dalla scelta del criterio comune.</div>
         </article>`;
       }).join("") : `<div class="v7-unavailable">In questo snapshot non ci sono mercati quotati confrontabili. Il test offline non inventa quote: riprova dopo il prossimo aggiornamento del feed.</div>`;
@@ -1669,7 +1685,7 @@
     } catch (error) {
       comparisonLoaded = false;
       comparisonInfo.textContent = "Confronto V7 non ancora disponibile";
-      v7Cards.innerHTML = `<div class="v7-unavailable">Per mostrare i pronostici V7 nel sito, esegui <strong>Actions → BETLAB Confronto V7 e V9 (offline)</strong> dopo aver installato il nuovo workflow. I dati appariranno qui senza scaricare file Excel.<br><small>${safeText(error.message || "")}</small></div>`;
+      v7Cards.innerHTML = `<div class="v7-unavailable">Per mostrare i pronostici V7 nel sito, esegui <strong>Actions → il workflow di confronto storico V7</strong> dopo aver installato il nuovo workflow. I dati appariranno qui senza scaricare file Excel.<br><small>${safeText(error.message || "")}</small></div>`;
     } finally {
       refreshComparison.disabled = false;
     }
@@ -1745,61 +1761,23 @@
   }
 
   function getCandidateAssessment(candidate, match) {
-    if (!/V10\.[23]/.test(String(betlabData?.engine || ""))) return null;
-    if (candidate?.oddAvailable !== true) return null;
+    // Interfaccia e motore comunicano tramite contratto, non "V10.X".
+    if (betlabData?.schemaVersion !== 1 ||
+        candidate?.selectionPolicy !== "engine_only" ||
+        candidate?.selectionApproved !== true ||
+        match?.historyEligible !== true) return null;
     const odd = Number(candidate.odd);
     const p = Number(candidate.modelProbability);
+    if (!candidate.oddAvailable || !Number.isFinite(odd) || !Number.isFinite(p) ||
+        odd < MIN_QUOTA || odd > MAX_RECOMMENDED_ODD || p < 0 || p > 1) return null;
+    const implied = 1 / odd;
     const homeGames = Number(match?.home?.form?.played || 0);
     const awayGames = Number(match?.away?.form?.played || 0);
-    const risk = match?.riskSignals || {};
-    if (!(Number.isFinite(odd) && odd >= MIN_QUOTA && odd <= MAX_RECOMMENDED_ODD &&
-          p >= MIN_RECOMMENDED_PROBABILITY && p < 1)) return null;
-    if (homeGames < 6 || awayGames < 6 || match.historyEligible !== true) return null;
-    // Risultati esatti esclusi dalle proposte finche' non esiste
-    // una verifica storica della calibrazione del modello.
-    if (candidate.market === "Risultato Esatto") return null;
-    const selection = String(candidate.selection || "").toUpperCase();
-    if (["1X2", "Doppia Chance"].includes(candidate.market)) {
-      const consensus = risk.market1X2 || {};
-      if (!consensus.available || Number(consensus.sourceCount) < 3) return null;
-      const ps = consensus.probabilities || {};
-      const fair = candidate.market === "1X2" ? Number(ps[selection]) :
-        selection === "1X" ? Number(ps["1"]) + Number(ps["X"]) :
-        selection === "X2" ? Number(ps["X"]) + Number(ps["2"]) :
-        selection === "12" ? Number(ps["1"]) + Number(ps["2"]) : NaN;
-      if (!Number.isFinite(fair) || p - fair > 0.075) return null;
-      const formDifference = Number(risk.relativeFormPPG || 0);
-      const ph = Number(ps["1"]), pa = Number(ps["2"]);
-      if (candidate.market === "Doppia Chance" && (
-        (selection === "X2" && formDifference >= 0.70 && ph >= 0.51 && ph-pa >= 0.22) ||
-        (selection === "1X" && formDifference <= -0.70 && pa >= 0.51 && pa-ph >= 0.22)
-      )) return null;
-    }
-    if (candidate.market === "1X2") {
-      // Regola concordata: dopo 6 vittorie consecutive non scegliere
-      // la vittoria secca della squadra. Gli altri mercati restano validi.
-      if (selection === "1" && Number(risk.homeWinStreak) >= 6) return null;
-      if (selection === "2" && Number(risk.awayWinStreak) >= 6) return null;
-      // X a 3.00 o meno: prudenza sulle vittorie secche, senza
-      // imporre PARI o doppia chance.
-      if ((selection === "1" || selection === "2") &&
-          Number(risk.drawOdd) > 1 && Number(risk.drawOdd) <= 3.00 && p < 0.63) return null;
-    }
-    // PARI viene valutato con una distribuzione di tutti i punteggi:
-    // ogni pareggio e' PARI, ma PARI include anche 2-0, 3-1, 4-2...
-    const implied = 1 / odd;
-    // Rigetta incongruenze come Cardiff 60% contro quota 2.71.
-    // Non sono probabilita' calibrate: niente grandi "value" fantasiosi.
-    if (p - implied > 0.12 || p / implied > 1.40) return null;
     const volume = Math.min(homeGames, awayGames, 10) / 10;
-    const shrink = 0.40 * volume;
-    const conservativeP = implied + shrink * (p - implied);
+    const conservativeP = implied + 0.40 * volume * (p-implied);
     const conservativeEdge = conservativeP * odd - 1;
-    if (conservativeEdge < 0.06) return null;
-    const score = conservativeEdge * Math.sqrt(conservativeP) /
-      (1 + 0.50 * Math.log(odd));
-    return { candidate, odd, rawP: p, implied, conservativeP,
-      conservativeEdge, score, homeGames, awayGames, exact: false };
+    return { candidate, odd, rawP:p, implied, conservativeP, conservativeEdge,
+      score:Number(candidate.selectionScore || 0), homeGames, awayGames, exact:false };
   }
 
   function chooseRecommendation(match) {
@@ -1973,7 +1951,19 @@
       const n = Number(p[key]);
       return Number.isFinite(n) && n >= 0 && n <= 1 ? n : null;
     };
-    if (model.status === "non_calcolabile") return null;
+    const consensus = m.riskSignals?.market1X2 || {};
+    if (model.status === "non_calcolabile") {
+      const cp = consensus?.probabilities || {};
+      const trio = [["1",cp["1"]],["X",cp["X"]],["2",cp["2"]]];
+      if (consensus.available !== true || Number(consensus.sourceCount) < 3 ||
+          trio.some(([k,v]) => v == null || !Number.isFinite(Number(v)))) return null;
+      trio.sort((a,b) => Number(b[1])-Number(a[1]));
+      const pick = trio[0][0];
+      return { teamLabel: pick === "1" ? "1 · "+m.home.name : pick === "2" ? "2 · "+m.away.name : "X · Pareggio",
+        teamProbability: Number(trio[0][1]), goals:{label:"Non stimabili",p:null},
+        scoreLabel:"—",scoreProbability:null,quality:"mercato_solo",homeGames:Number(model.homeGames||0),
+        awayGames:Number(model.awayGames||0),gap:null,marketProbability:null};
+    }
     const triple = [["1",prob("1")],["X",prob("X")],["2",prob("2")]];
     if (triple.some(([k,v])=>v === null)) return null;
     triple.sort((a,b)=>b[1]-a[1]);
@@ -2002,6 +1992,22 @@
       gap,marketProbability:hasConsensus ? fair : null};
   }
 
+  function renderQualityDashboard() {
+    const cover = betlabData?.historyCoverage || {};
+    const metrics = betlabData?.validation || {};
+    const total = Number(cover.matchesTotal || 0);
+    const eligible = Number(cover.matchesHistoryEligible || 0);
+    const evaluated = Number(metrics.forecastEvaluated || 0);
+    const correct = Number(metrics.correct1X2 || 0);
+    document.getElementById("qualityCoverage").textContent = `${eligible} / ${total}`;
+    document.getElementById("qualityValidated").textContent = String(evaluated);
+    document.getElementById("qualityAccuracy").textContent = evaluated >= 30
+      ? `${(100*correct/evaluated).toLocaleString("it-IT",{maximumFractionDigits:1})}%` : "In raccolta";
+    document.getElementById("qualityNote").textContent = evaluated < 30
+      ? `Servono almeno 30 esiti registrati prima dell'inizio per una prima verifica descrittiva. Ora: ${evaluated}. Nessuna affidabilità dimostrata.`
+      : `Accuratezza retrospettiva su previsioni archiviate prima dell'inizio. Brier 1X2: ${metrics.meanBrier1X2 ?? "n.d."}. Non misura un guadagno garantito.`;
+  }
+
   function renderModelInsights() {
     const fixtures = getMatches().filter(m => validFixture(m) &&
       (selectedDay === "all" || m.date === selectedDay));
@@ -2013,18 +2019,21 @@
     const approved = new Set(dailyRecommendations.map(x => String(x.match.fixtureId)));
     modelInsightsCount.textContent = `${readings.length} con stime su ${fixtures.length} partite`;
     modelInsightsCards.innerHTML = readings.length ? readings.map(({m,reading:r})=>{
+      const marketOnly = r.quality === "mercato_solo";
       const weak = r.quality !== "campione_idoneo";
       const discordant = r.gap !== null && Math.abs(r.gap) > 0.075;
       const approvedPick = approved.has(String(m.fixtureId));
-      const note = discordant
+      const note = marketOnly
+        ? `Indicazione ricavata esclusivamente dalle quote 1X2 normalizzate di più bookmaker: NON è una previsione autonoma BETLAB. Nessuna stima dei gol o del risultato esatto.`
+        : discordant
         ? `Attenzione: esito 1X2 stimato ${readablePercent(r.teamProbability)}, consenso bookmaker ${readablePercent(r.marketProbability)}. Scarto rilevante: non usare questa stima come consiglio.`
         : weak ? `Storico parziale (${r.homeGames} + ${r.awayGames} gare): stima esplorativa, non validata.`
         : `Storico ${r.homeGames} + ${r.awayGames} gare. Le stime non sono calibrate; lo scenario non e' una selezione quotata.`;
       return `<article class="model-insight-card">
         <div class="model-insight-title"><div><small>${safeText(m.league)} · ${formatDate(m)}</small><h3>${safeText(m.home?.name)} – ${safeText(m.away?.name)}</h3></div>
-          <span class="model-insight-tag ${weak ? "weak" : ""}">${weak ? "STIMA ESPLORATIVA" : approvedPick ? "GIOCATA APPROVATA A PARTE" : "SOLO ANALISI"}</span></div>
+          <span class="model-insight-tag ${weak ? "weak" : ""}">${marketOnly ? "SOLO QUOTE BOOKMAKER" : weak ? "STIMA ESPLORATIVA" : approvedPick ? "SUPERA FILTRI TECNICI" : "SOLO ANALISI"}</span></div>
         <div class="model-insight-metrics">
-          <div><small>ESITO 1X2 PIÙ PROBABILE</small><strong>${safeText(r.teamLabel)}</strong><span>${readablePercent(r.teamProbability)}</span></div>
+          <div><small>${marketOnly ? "ESITO FAVORITO DALLE QUOTE" : "ESITO 1X2 PIÙ PROBABILE"}</small><strong>${safeText(r.teamLabel)}</strong><span>${readablePercent(r.teamProbability)}${marketOnly ? " · mercato" : ""}</span></div>
           <div><small>TENDENZA GOL (LINEA 2.5)</small><strong>${safeText(r.goals.label)}</strong><span>${r.goals.p === null ? "n.d." : readablePercent(r.goals.p)}</span></div>
           <div><small>PUNTEGGIO ESATTO PIÙ PROBABILE</small><strong>${safeText(r.scoreLabel)}</strong><span>${r.scoreProbability === null ? "n.d." : readablePercent(r.scoreProbability)}</span></div>
         </div>
@@ -2560,6 +2569,7 @@
       refreshDayFilter();
       renderDailyRecommendations();
       renderModelInsights();
+      renderQualityDashboard();
       renderMonitoredMatches();
       await refreshBetStatuses();
       renderSavedBets();
