@@ -12837,8 +12837,8 @@
           "city": null
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
+          "long": "Technical loss",
+          "short": "AWD",
           "elapsed": null,
           "extra": null
         }
@@ -12868,8 +12868,8 @@
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "score": {
         "halftime": {
@@ -13887,9 +13887,9 @@
           "city": null
         },
         "status": {
-          "long": "Extra Time",
-          "short": "ET",
-          "elapsed": 111,
+          "long": "Match Finished",
+          "short": "PEN",
+          "elapsed": 120,
           "extra": null
         }
       },
@@ -13908,13 +13908,13 @@
           "id": 9410,
           "name": "Recreativo Huelva",
           "logo": "https://media.api-sports.io/football/teams/9410.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 5271,
           "name": "Navalcarnero",
           "logo": "https://media.api-sports.io/football/teams/5271.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
@@ -13935,8 +13935,8 @@
           "away": 0
         },
         "penalty": {
-          "home": null,
-          "away": null
+          "home": 5,
+          "away": 3
         }
       }
     },
@@ -14237,10 +14237,10 @@
           "city": null
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
+          "long": "Match Finished",
+          "short": "FT",
           "elapsed": 90,
-          "extra": 9
+          "extra": null
         }
       },
       "league": {
@@ -14277,8 +14277,8 @@
           "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 0
         },
         "extratime": {
           "home": null,
@@ -14517,10 +14517,10 @@
           "city": "Seville"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
+          "long": "Match Finished",
+          "short": "FT",
           "elapsed": 90,
-          "extra": 6
+          "extra": null
         }
       },
       "league": {
@@ -14557,8 +14557,8 @@
           "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 3,
+          "away": 2
         },
         "extratime": {
           "home": null,
@@ -14869,7 +14869,7 @@
         "status": {
           "long": "Second Half",
           "short": "2H",
-          "elapsed": 67,
+          "elapsed": 86,
           "extra": null
         }
       },
@@ -14898,7 +14898,7 @@
         }
       },
       "goals": {
-        "home": 2,
+        "home": 3,
         "away": 1
       },
       "score": {
@@ -14939,7 +14939,7 @@
         "status": {
           "long": "Second Half",
           "short": "2H",
-          "elapsed": 68,
+          "elapsed": 87,
           "extra": null
         }
       },
@@ -14968,7 +14968,7 @@
         }
       },
       "goals": {
-        "home": 1,
+        "home": 3,
         "away": 0
       },
       "score": {
@@ -15009,7 +15009,7 @@
         "status": {
           "long": "Second Half",
           "short": "2H",
-          "elapsed": 62,
+          "elapsed": 81,
           "extra": null
         }
       },
@@ -15028,18 +15028,18 @@
           "id": 27527,
           "name": "Atletico Avila FC",
           "logo": "https://media.api-sports.io/football/teams/27527.png",
-          "winner": null
+          "winner": false
         },
         "away": {
           "id": 18806,
           "name": "Anzoátegui FC",
           "logo": "https://media.api-sports.io/football/teams/18806.png",
-          "winner": null
+          "winner": true
         }
       },
       "goals": {
         "home": 1,
-        "away": 1
+        "away": 2
       },
       "score": {
         "halftime": {
@@ -15079,7 +15079,7 @@
         "status": {
           "long": "Second Half",
           "short": "2H",
-          "elapsed": 70,
+          "elapsed": 89,
           "extra": null
         }
       },
@@ -15109,7 +15109,7 @@
       },
       "goals": {
         "home": 1,
-        "away": 2
+        "away": 3
       },
       "score": {
         "halftime": {
@@ -15419,7 +15419,7 @@
         "timestamp": 1792008000,
         "periods": {
           "first": 1792008000,
-          "second": null
+          "second": 1792011600
         },
         "venue": {
           "id": null,
@@ -15427,10 +15427,10 @@
           "city": null
         },
         "status": {
-          "long": "Halftime",
-          "short": "HT",
-          "elapsed": 45,
-          "extra": 2
+          "long": "Second Half",
+          "short": "2H",
+          "elapsed": 55,
+          "extra": null
         }
       },
       "league": {
@@ -15489,7 +15489,7 @@
         "timestamp": 1792008000,
         "periods": {
           "first": 1792008000,
-          "second": null
+          "second": 1792011600
         },
         "venue": {
           "id": null,
@@ -15497,10 +15497,10 @@
           "city": null
         },
         "status": {
-          "long": "Halftime",
-          "short": "HT",
-          "elapsed": 45,
-          "extra": 3
+          "long": "Second Half",
+          "short": "2H",
+          "elapsed": 59,
+          "extra": null
         }
       },
       "league": {
@@ -15518,17 +15518,17 @@
           "id": 2829,
           "name": "Yaracuyanos FC",
           "logo": "https://media.api-sports.io/football/teams/2829.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 10091,
           "name": "Fundación Lara Deportiva",
           "logo": "https://media.api-sports.io/football/teams/10091.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
-        "home": 0,
+        "home": 1,
         "away": 0
       },
       "score": {
@@ -15567,9 +15567,9 @@
           "city": "Tangier"
         },
         "status": {
-          "long": "Halftime",
-          "short": "HT",
-          "elapsed": 45,
+          "long": "Second Half",
+          "short": "2H",
+          "elapsed": 54,
           "extra": null
         }
       },
@@ -15629,7 +15629,7 @@
         "timestamp": 1792008000,
         "periods": {
           "first": 1792008000,
-          "second": null
+          "second": 1792011600
         },
         "venue": {
           "id": null,
@@ -15637,10 +15637,10 @@
           "city": null
         },
         "status": {
-          "long": "Halftime",
-          "short": "HT",
-          "elapsed": 45,
-          "extra": 1
+          "long": "Second Half",
+          "short": "2H",
+          "elapsed": 58,
+          "extra": null
         }
       },
       "league": {
@@ -15668,7 +15668,7 @@
         }
       },
       "goals": {
-        "home": 1,
+        "home": 2,
         "away": 0
       },
       "score": {
