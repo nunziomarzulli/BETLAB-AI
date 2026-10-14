@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: BETLAB Prediction Engine V10.2 - Controllo consenso bookmaker e forma
+      - name: BETLAB Prediction Engine V10.4 - Recupero storico e identita squadre
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
@@ -202,7 +202,156 @@ jobs:
                   "atletico madrid",
 
               "atletico de madrid":
-                  "atletico madrid"
+                  "atletico madrid",
+              # Alias espliciti tra API-Football, Football-Data e OpenFootball.
+              # Non usiamo matching fuzzy: due club diversi non devono fondersi.
+              "queens park rangers": "qpr",
+              "queens park rangers fc": "qpr",
+              "derby county": "derby",
+              "derby county fc": "derby",
+              "cardiff city": "cardiff",
+              "cardiff city fc": "cardiff",
+              "bristol c": "bristol city",
+              "bristol city fc": "bristol city",
+              "blackburn rovers": "blackburn",
+              "blackburn rovers fc": "blackburn",
+              "burnley fc": "burnley",
+              "charlton athletic": "charlton",
+              "charlton athletic fc": "charlton",
+              "norwich city": "norwich",
+              "norwich city fc": "norwich",
+              "coventry city": "coventry",
+              "coventry city fc": "coventry",
+              "hull city": "hull",
+              "hull city fc": "hull",
+              "stoke city": "stoke",
+              "stoke city fc": "stoke",
+              "swansea city": "swansea",
+              "leicester city": "leicester",
+              "leicester city fc": "leicester",
+              "newcastle united": "newcastle",
+              "newcastle united fc": "newcastle",
+              "west ham united": "west ham",
+              "west ham united fc": "west ham",
+              "sheffield utd": "sheffield united",
+              "sheffield wed": "sheffield wednesday",
+              "sheffield weds": "sheffield wednesday",
+              "west bromwich albion": "west brom",
+              "west bromwich albion fc": "west brom",
+              "west brom": "west brom",
+              "wolverhampton": "wolves",
+              "wolverhampton wanderers fc": "wolves",
+              "nottingham forest": "nott forest",
+              "nott m forest": "nott forest",
+              "brighton and hove albion": "brighton",
+              "brighton hove albion": "brighton",
+              "tottenham hotspur": "tottenham",
+              "tottenham hotspur fc": "tottenham",
+              "manchester utd": "manchester united",
+              "manchester city fc": "manchester city",
+              "liverpool fc": "liverpool",
+              "arsenal fc": "arsenal",
+              "chelsea fc": "chelsea",
+              "everton fc": "everton",
+              "aston villa fc": "aston villa",
+              "atalanta bc": "atalanta",
+              "acf fiorentina": "fiorentina",
+              "fiorentina acf": "fiorentina",
+              "as roma": "roma",
+              "ss lazio": "lazio",
+              "ssc napoli": "napoli",
+              "ssc bari": "bari",
+              "juventus fc": "juventus",
+              "torino fc": "torino",
+              "bologna fc": "bologna",
+              "bologna 1909": "bologna",
+              "udinese calcio": "udinese",
+              "cagliari calcio": "cagliari",
+              "genoa cfc": "genoa",
+              "parma calcio 1913": "parma",
+              "parma calcio": "parma",
+              "us lecce": "lecce",
+              "us sassuolo": "sassuolo",
+              "ac monza": "monza",
+              "como 1907": "como",
+              "pisa sc": "pisa",
+              "pisa sporting club": "pisa",
+              "hellas verona": "verona",
+              "venezia fc": "venezia",
+              "frosinone calcio": "frosinone",
+              "palermo fc": "palermo",
+              "spezia calcio": "spezia",
+              "sampdoria genoa": "sampdoria",
+              "uc sampdoria": "sampdoria",
+              "real valladolid cf": "real valladolid",
+              "real betis": "betis",
+              "real betis balompie": "betis",
+              "rayo vallecano": "rayo vallecano",
+              "rayo vallecano de madrid": "rayo vallecano",
+              "rc celta": "celta vigo",
+              "celta": "celta vigo",
+              "celta de vigo": "celta vigo",
+              "athletic club": "athletic bilbao",
+              "athletic club bilbao": "athletic bilbao",
+              "rcd espanyol": "espanyol",
+              "espanyol barcelona": "espanyol",
+              "real madrid cf": "real madrid",
+              "fc barcelona": "barcelona",
+              "granada cf": "granada",
+              "cadiz cf": "cadiz",
+              "cd leganes": "leganes",
+              "deportivo alaves": "alaves",
+              "deportivo la coruna": "deportivo",
+              "deportivo de la coruna": "deportivo",
+              "bayer 04 leverkusen": "leverkusen",
+              "bayer leverkusen": "leverkusen",
+              "borussia dortmund": "dortmund",
+              "borussia m gladbach": "monchengladbach",
+              "borussia monchengladbach": "monchengladbach",
+              "vfb stuttgart": "stuttgart",
+              "rb leipzig": "leipzig",
+              "eintracht frankfurt": "frankfurt",
+              "sc freiburg": "freiburg",
+              "vfl wolfsburg": "wolfsburg",
+              "fc augsburg": "augsburg",
+              "fsv mainz 05": "mainz",
+              "mainz 05": "mainz",
+              "1 fc union berlin": "union berlin",
+              "fc union berlin": "union berlin",
+              "paris saint germain fc": "psg",
+              "paris saint germain": "psg",
+              "olympique marseille": "marseille",
+              "olympique de marseille": "marseille",
+              "olympique lyonnais": "lyon",
+              "losc lille": "lille",
+              "as monaco": "monaco",
+              "ogc nice": "nice",
+              "rc lens": "lens",
+              "fc nantes": "nantes",
+              "stade rennais": "rennes",
+              "stade brestois 29": "brest",
+              "sl benfica": "benfica",
+              "sport lisboa e benfica": "benfica",
+              "fc porto": "porto",
+              "sporting cp": "sporting lisbon",
+              "sporting clube de portugal": "sporting lisbon",
+              "sporting lisbon": "sporting lisbon",
+              "sc braga": "braga",
+              "vitoria guimaraes": "guimaraes",
+              "vitoria sc": "guimaraes",
+              "az alkmaar": "az",
+              "psv eindhoven": "psv",
+              "fc twente": "twente",
+              "feyenoord rotterdam": "feyenoord",
+              "ajax amsterdam": "ajax",
+              "club brugge": "club brugge",
+              "club brugge kv": "club brugge",
+              "royal antwerp": "antwerp",
+              "royal antwerp fc": "antwerp",
+              "fenerbahce sk": "fenerbahce",
+              "galatasaray sk": "galatasaray",
+              "besiktas jk": "besiktas",
+              "besiktas istanbul": "besiktas"
 
           }
 
@@ -338,7 +487,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.2")
+          print("BETLAB MULTI-MARKET ENGINE V10.4")
           print("==============================================")
           print("")
 
@@ -411,10 +560,12 @@ jobs:
           # STORICO
           # ==========================================================
 
-          history_payload = load_json(
-              "data/betlab-history.json",
-              []
-          )
+          # Non sostituire MAI uno storico corrotto/assente con [] e salvarlo.
+          HISTORY_PATH = "data/betlab-history.json"
+          if not os.path.isfile(HISTORY_PATH):
+              raise RuntimeError("Storico BETLAB assente: operazione fermata senza cancellare dati")
+          with open(HISTORY_PATH, encoding="utf-8") as _history_file:
+              history_payload = json.load(_history_file)
 
 
           if isinstance(
@@ -435,10 +586,9 @@ jobs:
               history = history_payload
 
 
-          print(
-              "Storico iniziale:",
-              len(history)
-          )
+          if not isinstance(history, list) or not history:
+              raise RuntimeError("Storico BETLAB vuoto o formato non valido: nessuna modifica")
+          print("Storico iniziale:", len(history))
 
 
           # ==========================================================
@@ -519,6 +669,118 @@ jobs:
                   canonical(away)
               )
 
+
+          # ==========================================================
+          # INTEGRAZIONE RISULTATI 2026-27 - FONTI CSV PUBBLICHE
+          # ==========================================================
+          # Indipendente dalla quota API-Football e dal workflow separato.
+          # Solo risultati FT con data PASSATA; mai esiti di oggi o futuri.
+          # Le fonti che non rispondono sono semplicemente saltate.
+          import csv
+          import io
+
+          CSV_SEASON = "2627"
+          CSV_SOURCES = [
+              ("E0", "England", "Premier League"),
+              ("E1", "England", "Championship"),
+              ("E2", "England", "League One"),
+              ("E3", "England", "League Two"),
+              ("SC0", "Scotland", "Premiership"),
+              ("SC1", "Scotland", "Championship"),
+              ("D1", "Germany", "Bundesliga"),
+              ("D2", "Germany", "2. Bundesliga"),
+              ("I1", "Italy", "Serie A"),
+              ("I2", "Italy", "Serie B"),
+              ("SP1", "Spain", "La Liga"),
+              ("SP2", "Spain", "Segunda Division"),
+              ("F1", "France", "Ligue 1"),
+              ("F2", "France", "Ligue 2"),
+              ("N1", "Netherlands", "Eredivisie"),
+              ("B1", "Belgium", "Jupiler Pro League"),
+              ("P1", "Portugal", "Primeira Liga"),
+              ("T1", "Turkey", "Super Lig"),
+              ("G1", "Greece", "Super League 1"),
+          ]
+
+          def parse_csv_result_date(text):
+              for fmt in ("%d/%m/%Y", "%d/%m/%y", "%Y-%m-%d"):
+                  try:
+                      return datetime.strptime(str(text or "").strip(), fmt).date()
+                  except ValueError:
+                      continue
+              return None
+
+          def parse_csv_goals(value):
+              value = str(value or "").strip()
+              if not re.fullmatch(r"\d+", value):
+                  return None
+              return int(value)
+
+          initial_keys = {
+              logical_history_key(record)
+              for record in history if isinstance(record, dict)
+          }
+          csv_import_added = 0
+          csv_sources_ok = 0
+          csv_sources_unavailable = 0
+          csv_results_examined = 0
+          for division, country, league_name in CSV_SOURCES:
+              url = f"https://www.football-data.co.uk/mmz4281/{CSV_SEASON}/{division}.csv"
+              try:
+                  request = urllib.request.Request(
+                      url,
+                      headers={"User-Agent": "BETLAB-AI/10.4 (+historical-results)",
+                               "Accept": "text/csv"}
+                  )
+                  with urllib.request.urlopen(request, timeout=12) as response:
+                      blob = response.read(2_500_001)
+                  if len(blob) > 2_500_000:
+                      raise ValueError("CSV troppo grande")
+                  text_csv = blob.decode("utf-8-sig", errors="replace")
+                  reader = csv.DictReader(io.StringIO(text_csv))
+                  if not {"Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"}.issubset(reader.fieldnames or []):
+                      raise ValueError("Colonne richieste non presenti")
+                  csv_sources_ok += 1
+                  for result in reader:
+                      if not isinstance(result, dict):
+                          continue
+                      day = parse_csv_result_date(result.get("Date"))
+                      if day is None or day >= TODAY:
+                          continue
+                      home = str(result.get("HomeTeam") or "").strip()
+                      away = str(result.get("AwayTeam") or "").strip()
+                      hg = parse_csv_goals(result.get("FTHG"))
+                      ag = parse_csv_goals(result.get("FTAG"))
+                      if (not home or not away or canonical(home) == canonical(away)
+                          or hg is None or ag is None):
+                          continue
+                      csv_results_examined += 1
+                      key = (day.isoformat(), canonical(home), canonical(away))
+                      if key in initial_keys:
+                          continue
+                      # Inserisci solo dati realmente presenti nel CSV verificato.
+                      history.append({
+                          "source": "Football-Data.co.uk",
+                          "fixtureId": f"FD-{division}-{day.isoformat()}-{normalize(home)}-{normalize(away)}",
+                          "date": day.isoformat(),
+                          "timestamp": 0,
+                          "status": "FT",
+                          "country": country,
+                          "league": league_name,
+                          "home": home,
+                          "away": away,
+                          "homeGoals": hg,
+                          "awayGoals": ag
+                      })
+                      initial_keys.add(key)
+                      csv_import_added += 1
+              except (OSError, ValueError, UnicodeError, csv.Error) as exc:
+                  csv_sources_unavailable += 1
+                  print(f"CSV {division} non disponibile: {str(exc)[:120]}")
+          print("CSV stagionali disponibili:", csv_sources_ok,
+                "| non disponibili:", csv_sources_unavailable,
+                "| risultati validi:", csv_results_examined,
+                "| nuovi:", csv_import_added)
 
           # ==========================================================
           # AGGIUNGI RISULTATI COMPLETATI API
@@ -1164,6 +1426,10 @@ jobs:
           if enrichment_added:
               history.sort(key=lambda r: str(r.get("date") or ""))
               save_json("data/betlab-history.json", history)
+          # team_games e' memorizzata in cache: senza questa pulizia,
+          # il recupero appena fatto viene ignorato fino al prossimo run.
+          team_games.cache_clear()
+          print("Cache statistiche squadre invalidata dopo aggiornamento storico")
           print("Ricerche storico supplementari:", attempted_requests,
                 "| Risultati aggiunti:", enrichment_added)
 
@@ -1531,8 +1797,9 @@ jobs:
               Metodo sperimentale Poisson indipendente, non calibrato.
               Evita che GOAL, PARI, Over e 1X2 si contraddicano.
               """
-              if (len(home_games) < MIN_TEAM_HISTORY or
-                  len(away_games) < MIN_TEAM_HISTORY):
+              # Analisi esplorativa anche con campioni incompleti.
+              # La selezione quotata continua a richiedere storia recente idonea.
+              if not home_games or not away_games:
                   return []
               home_xg, away_xg = expected_goals(home_games, away_games)
               if home_xg is None or away_xg is None:
@@ -2554,16 +2821,69 @@ jobs:
               )
 
 
-              # La scelta e' esplicitamente disabilitata se la forma di
-              # almeno una squadra e' datata o poco documentata.
-              # Queste fixture restano nell'array analysis ma senza quote
-              # utilizzabili; nessun ticket storico viene modificato.
+              # Due percorsi INDIPENDENTI:
+              # 1) distribuzione probabilistica mostrata anche se fragile;
+              # 2) selezione quotata solo con storia verificata.
+              raw_model_candidates = build_market_candidates(home_games, away_games)
               if match["historyEligible"]:
                   recent_eligible_matches += 1
-                  candidates = build_market_candidates(home_games, away_games)
+                  candidates = [dict(c) for c in raw_model_candidates]
               else:
                   stale_or_insufficient_matches += 1
                   candidates = []
+
+              # Una stima con pochi incontri non e' un consiglio di giocata.
+              # Il riepilogo e' derivato dalla medesima Poisson coerente per
+              # tutti i mercati; le quote non sono necessarie per descriverlo.
+              def model_probability(market, selection):
+                  return next((c["modelProbability"] for c in raw_model_candidates
+                               if c["market"] == market and c["selection"] == selection), None)
+
+              raw_scores = [c for c in raw_model_candidates
+                            if c["market"] == "Risultato Esatto"]
+              raw_scores.sort(key=lambda c: -c["modelProbability"])
+              sample_min = min(len(home_games), len(away_games))
+              if not raw_model_candidates:
+                  model_state = "non_calcolabile"
+                  model_note = "Una o entrambe le squadre non hanno partite valide nello storico prima del calcio d'inizio. Nessuna previsione numerica."
+              elif not match["historyEligible"]:
+                  model_state = "esplorativa"
+                  model_note = "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata."
+              else:
+                  model_state = "campione_idoneo"
+                  model_note = "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata."
+              xh, xa = expected_goals(home_games, away_games)
+              model_analysis = {
+                  "status": model_state,
+                  "note": model_note,
+                  "homeGames": len(home_games),
+                  "awayGames": len(away_games),
+                  "expectedGoals": {"home": round(xh, 3) if xh is not None else None,
+                                    "away": round(xa, 3) if xa is not None else None},
+                  "probabilities": {
+                      "1": model_probability("1X2", "1"),
+                      "X": model_probability("1X2", "X"),
+                      "2": model_probability("1X2", "2"),
+                      "1X": model_probability("Doppia Chance", "1X"),
+                      "X2": model_probability("Doppia Chance", "X2"),
+                      "12": model_probability("Doppia Chance", "12"),
+                      "GOAL": model_probability("Goal/No Goal", "GOAL"),
+                      "NO GOAL": model_probability("Goal/No Goal", "NO GOAL"),
+                      "OVER 1.5": model_probability("Totale Gol", "OVER 1.5"),
+                      "UNDER 1.5": model_probability("Totale Gol", "UNDER 1.5"),
+                      "OVER 2.5": model_probability("Totale Gol", "OVER 2.5"),
+                      "UNDER 2.5": model_probability("Totale Gol", "UNDER 2.5"),
+                      "OVER 3.5": model_probability("Totale Gol", "OVER 3.5"),
+                      "UNDER 3.5": model_probability("Totale Gol", "UNDER 3.5"),
+                      "PARI": model_probability("Pari/Dispari", "PARI"),
+                      "DISPARI": model_probability("Pari/Dispari", "DISPARI")
+                  },
+                  "topScores": [
+                      {"score": c["selection"].replace(":", "-"),
+                       "probability": c["modelProbability"]}
+                      for c in raw_scores[:3]
+                  ]
+              }
 
 
               # scarta mercati ordinari sotto indice minimo
@@ -2907,6 +3227,7 @@ jobs:
 
                   "context": fixture_context(match),
                   "riskSignals": risk_signals,
+                  "modelAnalysis": model_analysis,
 
                   "prediction":
                       prediction,
@@ -3057,10 +3378,48 @@ jobs:
           # SALVA ANALISI
           # ==========================================================
 
+          # Quanti incontri sono realmente analizzabili per campionato?
+          from collections import Counter
+          history_rejections = Counter()
+          history_by_league = {}
+          for item in analysis:
+              k = f"{item.get('country') or '?'} / {item.get('league') or '?'}"
+              row = history_by_league.setdefault(k, {"fixtures": 0, "eligible": 0})
+              row["fixtures"] += 1
+              if item.get("historyEligible"):
+                  row["eligible"] += 1
+              else:
+                  quality = item.get("historyQuality") or {}
+                  for side in ("home", "away"):
+                      item_quality = quality.get(side) or {}
+                      if not item_quality.get("eligible"):
+                          history_rejections[item_quality.get("reason") or "sconosciuto"] += 1
+          history_coverage_report = {
+              "matchesTotal": len(analysis),
+              "matchesHistoryEligible": recent_eligible_matches,
+              "matchesHistoryInsufficient": stale_or_insufficient_matches,
+              "rejectedTeamReasons": dict(history_rejections),
+              "byLeague": history_by_league,
+              "csv2026_27": {
+                  "sourcesAvailable": csv_sources_ok,
+                  "sourcesUnavailable": csv_sources_unavailable,
+                  "resultsRead": csv_results_examined,
+                  "resultsAdded": csv_import_added
+              },
+              "apiTeamEnrichment": {
+                  "requests": attempted_requests,
+                  "resultsAdded": enrichment_added
+              },
+              "policy": "Nessuna riduzione delle soglie minime: i match senza dati restano non consigliati"
+          }
+          save_json("data/betlab-history-coverage.json", history_coverage_report)
+          print("COPERTURA STORICA:", recent_eligible_matches, "/", len(analysis),
+                "| motivi:", dict(history_rejections))
+
           output = {
 
               "engine":
-                  "BETLAB V10.2 POISSON MARKET CONSENSUS EXPERIMENTAL",
+                  "BETLAB V10.4 HISTORY COVERAGE + MARKET CONSENSUS EXPERIMENTAL",
 
               "generatedAt":
                   datetime.now(
@@ -3074,6 +3433,7 @@ jobs:
 
               "historyCount":
                   len(history),
+              "historyCoverage": history_coverage_report,
 
               "matchesAnalyzed":
                   len(analysis),
@@ -3194,7 +3554,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("RISULTATO BETLAB V9")
+          print("RISULTATO BETLAB V10.4")
           print("==============================================")
 
           print(
@@ -3305,7 +3665,7 @@ jobs:
 
           print("")
           print("==============================================")
-          print("BETLAB MULTI-MARKET ENGINE V10.2 OK")
+          print("BETLAB MULTI-MARKET ENGINE V10.4 OK")
           print("==============================================")
 
           PY
@@ -3322,7 +3682,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Aggiorna BETLAB V10.2 - verifica quote 1X2 e contesto"
+          git commit -m "Aggiorna BETLAB V10.4 - recupero storico verificato"
 
           git pull --rebase origin main
 
