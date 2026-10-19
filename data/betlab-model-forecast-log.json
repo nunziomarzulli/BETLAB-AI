@@ -3771,7 +3771,7 @@
     "away": "Lazio",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.37368,
       "X": 0.26452,
@@ -3779,7 +3779,14 @@
       "OVER 2.5": 0.47892,
       "UNDER 2.5": 0.52108
     },
-    "market": null
+    "market": null,
+    "outcome": "2",
+    "homeGoals": 0,
+    "awayGoals": 3,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": false,
+    "brier1X2": 0.616907,
+    "correctOver25": false
   },
   {
     "fixtureId": 1552788,
@@ -3789,7 +3796,7 @@
     "away": "Nice",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.60858,
       "X": 0.22437,
@@ -3797,7 +3804,14 @@
       "OVER 2.5": 0.49767,
       "UNDER 2.5": 0.50233
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 2,
+    "awayGoals": 1,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": true,
+    "brier1X2": 0.231457,
+    "correctOver25": false
   },
   {
     "fixtureId": 1570420,
@@ -3807,7 +3821,7 @@
     "away": "Sevilla",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.55537,
       "X": 0.21259,
@@ -3815,7 +3829,14 @@
       "OVER 2.5": 0.64229,
       "UNDER 2.5": 0.35771
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 4,
+    "awayGoals": 1,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": true,
+    "brier1X2": 0.296733,
+    "correctOver25": true
   },
   {
     "fixtureId": 1552194,
@@ -3950,7 +3971,7 @@
     "away": "Utrecht",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.61719,
       "X": 0.1966,
@@ -3958,7 +3979,14 @@
       "OVER 2.5": 0.65435,
       "UNDER 2.5": 0.34565
     },
-    "market": null
+    "market": null,
+    "outcome": "2",
+    "homeGoals": 1,
+    "awayGoals": 2,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": false,
+    "brier1X2": 1.081829,
+    "correctOver25": true
   },
   {
     "fixtureId": 1593335,
@@ -3993,7 +4021,7 @@
     "away": "Sabadell",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.39609,
       "X": 0.28048,
@@ -4001,7 +4029,14 @@
       "OVER 2.5": 0.4121,
       "UNDER 2.5": 0.5879
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 1,
+    "awayGoals": 0,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": true,
+    "brier1X2": 0.547983,
+    "correctOver25": true
   },
   {
     "fixtureId": 1552195,
@@ -4061,7 +4096,7 @@
     "away": "Arezzo",
     "recordedAt": "2026-10-17T11:31:05.980656+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.45592,
       "X": 0.25735,
@@ -4069,7 +4104,14 @@
       "OVER 2.5": 0.48764,
       "UNDER 2.5": 0.51236
     },
-    "market": null
+    "market": null,
+    "outcome": "2",
+    "homeGoals": 1,
+    "awayGoals": 2,
+    "settledAt": "2026-10-19T12:51:57.368183+02:00",
+    "correct1X2": false,
+    "brier1X2": 0.78286,
+    "correctOver25": false
   },
   {
     "fixtureId": 1550153,
@@ -4178,5 +4220,115 @@
       "UNDER 2.5": 0.51947
     },
     "market": null
+  },
+  {
+    "fixtureId": 1635655,
+    "timestamp": 1792522800,
+    "date": "2026-10-20",
+    "home": "FC Porto",
+    "away": "PSV Eindhoven",
+    "recordedAt": "2026-10-19T12:51:57.368183+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.38484,
+      "X": 0.21864,
+      "2": 0.39652,
+      "OVER 2.5": 0.70084,
+      "UNDER 2.5": 0.29916
+    },
+    "market": {
+      "1": 0.57824,
+      "X": 0.21489,
+      "2": 0.20687
+    }
+  },
+  {
+    "fixtureId": 1635688,
+    "timestamp": 1792522800,
+    "date": "2026-10-20",
+    "home": "Liverpool",
+    "away": "Villarreal",
+    "recordedAt": "2026-10-19T12:51:57.368183+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.40315,
+      "X": 0.26375,
+      "2": 0.3331,
+      "OVER 2.5": 0.47854,
+      "UNDER 2.5": 0.52146
+    },
+    "market": {
+      "1": 0.64558,
+      "X": 0.19859,
+      "2": 0.15583
+    }
+  },
+  {
+    "fixtureId": 1635702,
+    "timestamp": 1792522800,
+    "date": "2026-10-20",
+    "home": "Paris Saint Germain",
+    "away": "Barcelona",
+    "recordedAt": "2026-10-19T12:51:57.368183+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.29935,
+      "X": 0.19967,
+      "2": 0.50097,
+      "OVER 2.5": 0.76819,
+      "UNDER 2.5": 0.23181
+    },
+    "market": {
+      "1": 0.39424,
+      "X": 0.21311,
+      "2": 0.39265
+    }
+  },
+  {
+    "fixtureId": 1563150,
+    "timestamp": 1792521900,
+    "date": "2026-10-20",
+    "home": "Wolves",
+    "away": "Portsmouth",
+    "recordedAt": "2026-10-19T12:51:57.368183+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.39962,
+      "X": 0.26996,
+      "2": 0.33042,
+      "OVER 2.5": 0.45302,
+      "UNDER 2.5": 0.54698
+    },
+    "market": {
+      "1": 0.59058,
+      "X": 0.22962,
+      "2": 0.1798
+    }
+  },
+  {
+    "fixtureId": 1556863,
+    "timestamp": 1792521900,
+    "date": "2026-10-20",
+    "home": "Dunfermline",
+    "away": "Partick",
+    "recordedAt": "2026-10-19T12:51:57.368183+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.29257,
+      "X": 0.32387,
+      "2": 0.38356,
+      "OVER 2.5": 0.27752,
+      "UNDER 2.5": 0.72248
+    },
+    "market": {
+      "1": 0.32415,
+      "X": 0.29813,
+      "2": 0.37771
+    }
   }
 ]
