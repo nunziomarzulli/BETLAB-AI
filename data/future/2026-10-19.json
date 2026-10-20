@@ -4,7 +4,7 @@
     "date": "2026-10-19"
   },
   "errors": [],
-  "results": 199,
+  "results": 200,
   "paging": {
     "current": 1,
     "total": 1
@@ -6382,6 +6382,76 @@
     },
     {
       "fixture": {
+        "id": 1646837,
+        "referee": null,
+        "timezone": "UTC",
+        "date": "2026-10-19T15:30:00+00:00",
+        "timestamp": 1792423800,
+        "periods": {
+          "first": 1792423800,
+          "second": 1792427400
+        },
+        "venue": {
+          "id": null,
+          "name": null,
+          "city": null
+        },
+        "status": {
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
+          "extra": null
+        }
+      },
+      "league": {
+        "id": 386,
+        "name": "Ligue 1",
+        "country": "Ivory-Coast",
+        "logo": "https://media.api-sports.io/football/leagues/386.png",
+        "flag": "https://media.api-sports.io/flags/ci.svg",
+        "season": 2026,
+        "round": "Regular Season - 4",
+        "standings": true
+      },
+      "teams": {
+        "home": {
+          "id": 26340,
+          "name": "ES Agboville",
+          "logo": "https://media.api-sports.io/football/teams/26340.png",
+          "winner": false
+        },
+        "away": {
+          "id": 22583,
+          "name": "Mouna",
+          "logo": "https://media.api-sports.io/football/teams/22583.png",
+          "winner": true
+        }
+      },
+      "goals": {
+        "home": 0,
+        "away": 1
+      },
+      "score": {
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": 0,
+          "away": 1
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "fixture": {
         "id": 1547641,
         "referee": null,
         "timezone": "UTC",
@@ -11143,13 +11213,13 @@
     {
       "fixture": {
         "id": 1569971,
-        "referee": "Gonzalo Romero Freixas",
+        "referee": "G. Romero",
         "timezone": "UTC",
         "date": "2026-10-19T18:30:00+00:00",
         "timestamp": 1792434600,
         "periods": {
-          "first": null,
-          "second": null
+          "first": 1792434600,
+          "second": 1792438200
         },
         "venue": {
           "id": 22784,
