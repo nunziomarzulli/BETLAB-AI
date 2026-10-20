@@ -1,17 +1,17 @@
 {
   "method": "walk_forward_by_date_no_same_day_or_future_results",
   "type": "retrospective_exploratory_not_out_of_sample_final_validation",
-  "historicalResultsTotal": 21073,
-  "fixturesDuringTestPeriod": 15257,
-  "historyEligibleDuringTestPeriod": 5061,
-  "forecastsEvaluated": 5061,
-  "startOfTestWindow": "2026-01-22",
-  "cutoffDateExclusive": "2026-10-19",
-  "accuracy1X2": 0.4728,
+  "historicalResultsTotal": 21324,
+  "fixturesDuringTestPeriod": 15507,
+  "historyEligibleDuringTestPeriod": 5129,
+  "forecastsEvaluated": 5129,
+  "startOfTestWindow": "2026-01-23",
+  "cutoffDateExclusive": "2026-10-20",
+  "accuracy1X2": 0.473,
   "baselineAccuracy1X2": 0.4363,
-  "brier1X2": 0.6256,
+  "brier1X2": 0.6255,
   "baselineBrier1X2": 0.6518,
-  "logLoss1X2": 1.0406,
+  "logLoss1X2": 1.0404,
   "baselineLogLoss1X2": 1.077,
   "requiredMinimum": 100,
   "status": "measured_not_proven",
@@ -24,70 +24,70 @@
       "baselineBrier": 0.66
     },
     "Spain / La Liga": {
-      "n": 401,
-      "accuracy": 0.4788,
-      "brier": 0.6153,
-      "baselineBrier": 0.6283
+      "n": 408,
+      "accuracy": 0.4755,
+      "brier": 0.6171,
+      "baselineBrier": 0.6309
     },
     "Portugal / Primeira Liga": {
-      "n": 319,
-      "accuracy": 0.511,
-      "brier": 0.6107,
-      "baselineBrier": 0.6606
+      "n": 320,
+      "accuracy": 0.5094,
+      "brier": 0.611,
+      "baselineBrier": 0.6607
     },
     "England / League Two": {
-      "n": 307,
-      "accuracy": 0.4821,
-      "brier": 0.6233,
-      "baselineBrier": 0.6461
+      "n": 312,
+      "accuracy": 0.4808,
+      "brier": 0.6225,
+      "baselineBrier": 0.6457
     },
     "Netherlands / Eredivisie": {
-      "n": 305,
-      "accuracy": 0.4787,
-      "brier": 0.6202,
-      "baselineBrier": 0.6548
+      "n": 308,
+      "accuracy": 0.474,
+      "brier": 0.6222,
+      "baselineBrier": 0.6544
     },
     "England / League One": {
-      "n": 297,
-      "accuracy": 0.4411,
-      "brier": 0.633,
-      "baselineBrier": 0.6558
-    },
-    "Italy / Serie B": {
-      "n": 293,
-      "accuracy": 0.4983,
-      "brier": 0.6177,
-      "baselineBrier": 0.6451
+      "n": 300,
+      "accuracy": 0.44,
+      "brier": 0.6334,
+      "baselineBrier": 0.6575
     },
     "England / Premier League": {
-      "n": 293,
-      "accuracy": 0.4608,
-      "brier": 0.6472,
-      "baselineBrier": 0.6681
+      "n": 295,
+      "accuracy": 0.461,
+      "brier": 0.6477,
+      "baselineBrier": 0.6679
+    },
+    "Italy / Serie B": {
+      "n": 294,
+      "accuracy": 0.4966,
+      "brier": 0.619,
+      "baselineBrier": 0.6454
     },
     "France / Ligue 1": {
-      "n": 287,
-      "accuracy": 0.4216,
-      "brier": 0.6457,
-      "baselineBrier": 0.6657
+      "n": 288,
+      "accuracy": 0.4236,
+      "brier": 0.6453,
+      "baselineBrier": 0.6661
     },
     "Germany / Bundesliga": {
-      "n": 279,
-      "accuracy": 0.5376,
-      "brier": 0.6031,
-      "baselineBrier": 0.6561
+      "n": 285,
+      "accuracy": 0.5368,
+      "brier": 0.6039,
+      "baselineBrier": 0.6554
     },
     "Italy / Serie A": {
-      "n": 278,
-      "accuracy": 0.5288,
-      "brier": 0.5927,
-      "baselineBrier": 0.6463
+      "n": 280,
+      "accuracy": 0.525,
+      "brier": 0.5931,
+      "baselineBrier": 0.6459
     },
     "Spain / Segunda Division": {
-      "n": 249,
-      "accuracy": 0.4859,
-      "brier": 0.6234,
-      "baselineBrier": 0.634
+      "n": 254,
+      "accuracy": 0.4882,
+      "brier": 0.6213,
+      "baselineBrier": 0.6344
     },
     "Brazil / Serie A": {
       "n": 202,
@@ -95,47 +95,47 @@
       "brier": 0.6408,
       "baselineBrier": 0.6393
     },
+    "France / Ligue 2": {
+      "n": 169,
+      "accuracy": 0.3669,
+      "brier": 0.6516,
+      "baselineBrier": 0.6692
+    },
+    "Germany / 2. Bundesliga": {
+      "n": 169,
+      "accuracy": 0.4379,
+      "brier": 0.6457,
+      "baselineBrier": 0.6458
+    },
     "Belgium / Jupiler Pro League": {
       "n": 167,
       "accuracy": 0.4072,
       "brier": 0.6349,
       "baselineBrier": 0.6572
     },
-    "France / Ligue 2": {
-      "n": 165,
-      "accuracy": 0.3636,
-      "brier": 0.6513,
-      "baselineBrier": 0.6683
-    },
-    "Germany / 2. Bundesliga": {
-      "n": 160,
-      "accuracy": 0.4313,
-      "brier": 0.6475,
-      "baselineBrier": 0.6491
-    },
     "Turkey / Super Lig": {
-      "n": 156,
-      "accuracy": 0.5256,
-      "brier": 0.6169,
-      "baselineBrier": 0.6445
+      "n": 163,
+      "accuracy": 0.5337,
+      "brier": 0.608,
+      "baselineBrier": 0.6412
     },
     "Greece / Super League 1": {
-      "n": 125,
-      "accuracy": 0.432,
-      "brier": 0.6235,
-      "baselineBrier": 0.6654
+      "n": 130,
+      "accuracy": 0.4385,
+      "brier": 0.6237,
+      "baselineBrier": 0.6651
     },
     "Scotland / Premiership": {
-      "n": 117,
-      "accuracy": 0.5214,
-      "brier": 0.6073,
-      "baselineBrier": 0.6406
+      "n": 119,
+      "accuracy": 0.521,
+      "brier": 0.6082,
+      "baselineBrier": 0.6407
     },
     "Scotland / Championship": {
-      "n": 97,
-      "accuracy": 0.4433,
-      "brier": 0.6361,
-      "baselineBrier": 0.6576
+      "n": 101,
+      "accuracy": 0.4554,
+      "brier": 0.6315,
+      "baselineBrier": 0.657
     },
     "Spain / Segunda División": {
       "n": 17,
@@ -144,5 +144,5 @@
       "baselineBrier": 0.6247
     }
   },
-  "generatedAt": "2026-10-19T23:04:52.662072+02:00"
+  "generatedAt": "2026-10-20T12:08:42.151537+02:00"
 }
