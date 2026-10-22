@@ -4474,7 +4474,7 @@
     "away": "Arsenal",
     "recordedAt": "2026-10-20T12:08:38.895993+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.70687,
       "X": 0.1636,
@@ -4486,7 +4486,14 @@
       "1": 0.46159,
       "X": 0.24925,
       "2": 0.28916
-    }
+    },
+    "outcome": "X",
+    "homeGoals": 2,
+    "awayGoals": 2,
+    "settledAt": "2026-10-22T12:17:33.025127+02:00",
+    "correct1X2": false,
+    "brier1X2": 1.216008,
+    "correctOver25": true
   },
   {
     "fixtureId": 1635636,
@@ -4496,7 +4503,7 @@
     "away": "Feyenoord",
     "recordedAt": "2026-10-20T12:08:38.895993+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.25076,
       "X": 0.1865,
@@ -4508,7 +4515,14 @@
       "1": 0.60619,
       "X": 0.20431,
       "2": 0.1895
-    }
+    },
+    "outcome": "1",
+    "homeGoals": 1,
+    "awayGoals": 0,
+    "settledAt": "2026-10-22T12:17:33.025127+02:00",
+    "correct1X2": false,
+    "brier1X2": 0.912819,
+    "correctOver25": false
   },
   {
     "fixtureId": 1635645,
@@ -4518,7 +4532,7 @@
     "away": "Lens",
     "recordedAt": "2026-10-20T12:08:38.895993+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.53849,
       "X": 0.22257,
@@ -4530,7 +4544,14 @@
       "1": 0.46856,
       "X": 0.23859,
       "2": 0.29285
-    }
+    },
+    "outcome": "1",
+    "homeGoals": 3,
+    "awayGoals": 0,
+    "settledAt": "2026-10-22T12:17:33.025127+02:00",
+    "correct1X2": true,
+    "brier1X2": 0.319621,
+    "correctOver25": true
   },
   {
     "fixtureId": 1635716,
@@ -4540,7 +4561,7 @@
     "away": "RB Leipzig",
     "recordedAt": "2026-10-20T12:08:38.895993+02:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.58607,
       "X": 0.18913,
@@ -4552,7 +4573,14 @@
       "1": 0.76367,
       "X": 0.13696,
       "2": 0.09937
-    }
+    },
+    "outcome": "1",
+    "homeGoals": 4,
+    "awayGoals": 1,
+    "settledAt": "2026-10-22T12:17:33.025127+02:00",
+    "correct1X2": true,
+    "brier1X2": 0.257643,
+    "correctOver25": true
   },
   {
     "fixtureId": 1153736998586223,
@@ -4689,6 +4717,260 @@
       "2": 0.35094,
       "OVER 2.5": 0.58905,
       "UNDER 2.5": 0.41095
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1575196,
+    "timestamp": 1792780200,
+    "date": "2026-10-23",
+    "home": "VfB Stuttgart",
+    "away": "Borussia Mönchengladbach",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.5879,
+      "X": 0.22019,
+      "2": 0.19191,
+      "OVER 2.5": 0.55351,
+      "UNDER 2.5": 0.44649
+    },
+    "market": {
+      "1": 0.68841,
+      "X": 0.17062,
+      "2": 0.14097
+    }
+  },
+  {
+    "fixtureId": 1550165,
+    "timestamp": 1792781100,
+    "date": "2026-10-23",
+    "home": "Torino",
+    "away": "Monza",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.47225,
+      "X": 0.23033,
+      "2": 0.29742,
+      "OVER 2.5": 0.61426,
+      "UNDER 2.5": 0.38574
+    },
+    "market": {
+      "1": 0.44299,
+      "X": 0.27721,
+      "2": 0.2798
+    }
+  },
+  {
+    "fixtureId": 1552794,
+    "timestamp": 1792781100,
+    "date": "2026-10-23",
+    "home": "Stade Brestois 29",
+    "away": "Nice",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.52521,
+      "X": 0.23714,
+      "2": 0.23765,
+      "OVER 2.5": 0.5356,
+      "UNDER 2.5": 0.4644
+    },
+    "market": {
+      "1": 0.42333,
+      "X": 0.27501,
+      "2": 0.30166
+    }
+  },
+  {
+    "fixtureId": 1557443,
+    "timestamp": 1792782000,
+    "date": "2026-10-23",
+    "home": "Ipswich",
+    "away": "Nottingham Forest",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.45761,
+      "X": 0.24238,
+      "2": 0.30001,
+      "OVER 2.5": 0.55926,
+      "UNDER 2.5": 0.44074
+    },
+    "market": {
+      "1": 0.29745,
+      "X": 0.27578,
+      "2": 0.42677
+    }
+  },
+  {
+    "fixtureId": 1570423,
+    "timestamp": 1792782000,
+    "date": "2026-10-23",
+    "home": "Alaves",
+    "away": "Malaga",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.5099,
+      "X": 0.24365,
+      "2": 0.24645,
+      "OVER 2.5": 0.51614,
+      "UNDER 2.5": 0.48386
+    },
+    "market": {
+      "1": 0.53645,
+      "X": 0.2644,
+      "2": 0.19915
+    }
+  },
+  {
+    "fixtureId": 1584439,
+    "timestamp": 1792774800,
+    "date": "2026-10-23",
+    "home": "Alanyaspor",
+    "away": "Kocaelispor",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.41901,
+      "X": 0.29745,
+      "2": 0.28354,
+      "OVER 2.5": 0.34583,
+      "UNDER 2.5": 0.65417
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1552198,
+    "timestamp": 1792778400,
+    "date": "2026-10-23",
+    "home": "GO Ahead Eagles",
+    "away": "Telstar",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.43871,
+      "X": 0.23473,
+      "2": 0.32656,
+      "OVER 2.5": 0.60721,
+      "UNDER 2.5": 0.39279
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1552507,
+    "timestamp": 1792778400,
+    "date": "2026-10-23",
+    "home": "Dunkerque",
+    "away": "Metz",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.43403,
+      "X": 0.24839,
+      "2": 0.31758,
+      "OVER 2.5": 0.54004,
+      "UNDER 2.5": 0.45996
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1552509,
+    "timestamp": 1792778400,
+    "date": "2026-10-23",
+    "home": "Nancy",
+    "away": "Laval",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.53889,
+      "X": 0.21749,
+      "2": 0.24362,
+      "OVER 2.5": 0.63164,
+      "UNDER 2.5": 0.36836
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1569988,
+    "timestamp": 1792780200,
+    "date": "2026-10-23",
+    "home": "Granada CF",
+    "away": "Valladolid",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.46805,
+      "X": 0.24391,
+      "2": 0.28804,
+      "OVER 2.5": 0.54568,
+      "UNDER 2.5": 0.45432
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1563216,
+    "timestamp": 1792782000,
+    "date": "2026-10-23",
+    "home": "Bolton",
+    "away": "Middlesbrough",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.37697,
+      "X": 0.24007,
+      "2": 0.38296,
+      "OVER 2.5": 0.59111,
+      "UNDER 2.5": 0.40889
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1552511,
+    "timestamp": 1792778400,
+    "date": "2026-10-23",
+    "home": "Sochaux",
+    "away": "Annecy",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.40966,
+      "X": 0.28048,
+      "2": 0.30986,
+      "OVER 2.5": 0.40887,
+      "UNDER 2.5": 0.59113
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1575526,
+    "timestamp": 1792784700,
+    "date": "2026-10-23",
+    "home": "Vitória SC",
+    "away": "Maritimo",
+    "recordedAt": "2026-10-22T12:17:33.025127+02:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42723,
+      "X": 0.27924,
+      "2": 0.29352,
+      "OVER 2.5": 0.40795,
+      "UNDER 2.5": 0.59205
     },
     "market": null
   }
