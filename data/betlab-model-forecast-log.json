@@ -15605,7 +15605,7 @@
     "away": "Santos",
     "recordedAt": "2026-11-01T12:57:35.763676+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.40056,
       "X": 0.25871,
@@ -15613,7 +15613,14 @@
       "OVER 2.5": 0.50126,
       "UNDER 2.5": 0.49874
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 2,
+    "awayGoals": 1,
+    "settledAt": "2026-11-03T13:52:53.147109+01:00",
+    "correct1X2": true,
+    "brier1X2": 0.542356,
+    "correctOver25": true
   },
   {
     "fixtureId": 1629963,
@@ -16118,7 +16125,7 @@
     "away": "Ratchaburi",
     "recordedAt": "2026-11-02T14:35:54.257072+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.41303,
       "X": 0.24507,
@@ -16126,7 +16133,14 @@
       "OVER 2.5": 0.56268,
       "UNDER 2.5": 0.43732
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 3,
+    "awayGoals": 2,
+    "settledAt": "2026-11-03T13:52:53.147109+01:00",
+    "correct1X2": true,
+    "brier1X2": 0.521489,
+    "correctOver25": true
   },
   {
     "fixtureId": 1629967,
@@ -16136,7 +16150,7 @@
     "away": "Daejeon Citizen",
     "recordedAt": "2026-11-02T14:35:54.257072+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.51954,
       "X": 0.2443,
@@ -16144,7 +16158,14 @@
       "OVER 2.5": 0.50408,
       "UNDER 2.5": 0.49592
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 2,
+    "awayGoals": 0,
+    "settledAt": "2026-11-03T13:52:53.147109+01:00",
+    "correct1X2": true,
+    "brier1X2": 0.346291,
+    "correctOver25": false
   },
   {
     "fixtureId": 1629969,
@@ -16208,7 +16229,7 @@
     "away": "Johor Darul Takzim FC",
     "recordedAt": "2026-11-02T14:35:54.257072+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.21453,
       "X": 0.24887,
@@ -16216,7 +16237,14 @@
       "OVER 2.5": 0.46464,
       "UNDER 2.5": 0.53536
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 2,
+    "awayGoals": 0,
+    "settledAt": "2026-11-03T13:52:53.147109+01:00",
+    "correct1X2": false,
+    "brier1X2": 0.966839,
+    "correctOver25": true
   },
   {
     "fixtureId": 1630391,
@@ -16279,5 +16307,393 @@
       "X": 0.25422,
       "2": 0.40638
     }
+  },
+  {
+    "fixtureId": 1636324,
+    "timestamp": 1793806200,
+    "date": "2026-11-04",
+    "home": "Rennes",
+    "away": "Olympiakos Piraeus",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.3509,
+      "X": 0.23498,
+      "2": 0.41412,
+      "OVER 2.5": 0.61316,
+      "UNDER 2.5": 0.38684
+    },
+    "market": {
+      "1": 0.42372,
+      "X": 0.26753,
+      "2": 0.30874
+    }
+  },
+  {
+    "fixtureId": 1635658,
+    "timestamp": 1793814300,
+    "date": "2026-11-04",
+    "home": "Fenerbahçe",
+    "away": "Liverpool",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.38933,
+      "X": 0.23532,
+      "2": 0.37535,
+      "OVER 2.5": 0.61463,
+      "UNDER 2.5": 0.38537
+    },
+    "market": {
+      "1": 0.17198,
+      "X": 0.20351,
+      "2": 0.6245
+    }
+  },
+  {
+    "fixtureId": 1635651,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "Borussia Dortmund",
+    "away": "Real Betis",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.45978,
+      "X": 0.2593,
+      "2": 0.28092,
+      "OVER 2.5": 0.47665,
+      "UNDER 2.5": 0.52335
+    },
+    "market": {
+      "1": 0.54965,
+      "X": 0.23145,
+      "2": 0.2189
+    }
+  },
+  {
+    "fixtureId": 1635656,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "FC Porto",
+    "away": "Napoli",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42905,
+      "X": 0.23955,
+      "2": 0.3314,
+      "OVER 2.5": 0.58578,
+      "UNDER 2.5": 0.41422
+    },
+    "market": {
+      "1": 0.48265,
+      "X": 0.25767,
+      "2": 0.25968
+    }
+  },
+  {
+    "fixtureId": 1635681,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "Lens",
+    "away": "Como",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.32605,
+      "X": 0.247,
+      "2": 0.42695,
+      "OVER 2.5": 0.54931,
+      "UNDER 2.5": 0.45069
+    },
+    "market": {
+      "1": 0.31885,
+      "X": 0.24756,
+      "2": 0.43359
+    }
+  },
+  {
+    "fixtureId": 1635707,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "PSV Eindhoven",
+    "away": "Club Brugge KV",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.46308,
+      "X": 0.21001,
+      "2": 0.32691,
+      "OVER 2.5": 0.73129,
+      "UNDER 2.5": 0.26871
+    },
+    "market": {
+      "1": 0.46094,
+      "X": 0.22519,
+      "2": 0.31388
+    }
+  },
+  {
+    "fixtureId": 1635710,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "RB Leipzig",
+    "away": "Manchester City",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.57904,
+      "X": 0.20447,
+      "2": 0.2165,
+      "OVER 2.5": 0.66213,
+      "UNDER 2.5": 0.33787
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1563248,
+    "timestamp": 1793821500,
+    "date": "2026-11-04",
+    "home": "Cardiff",
+    "away": "West Ham",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.3738,
+      "X": 0.23292,
+      "2": 0.39328,
+      "OVER 2.5": 0.62663,
+      "UNDER 2.5": 0.37337
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1563250,
+    "timestamp": 1793821500,
+    "date": "2026-11-04",
+    "home": "Wrexham",
+    "away": "Middlesbrough",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.31548,
+      "X": 0.23178,
+      "2": 0.45275,
+      "OVER 2.5": 0.61689,
+      "UNDER 2.5": 0.38311
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1563247,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "Bristol City",
+    "away": "Wolves",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.32995,
+      "X": 0.30727,
+      "2": 0.36278,
+      "OVER 2.5": 0.32632,
+      "UNDER 2.5": 0.67368
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1635726,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "Slavia Praha",
+    "away": "Arsenal",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.54951,
+      "X": 0.24846,
+      "2": 0.20204,
+      "OVER 2.5": 0.45272,
+      "UNDER 2.5": 0.54728
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1635606,
+    "timestamp": 1793814300,
+    "date": "2026-11-04",
+    "home": "AEK Athens FC",
+    "away": "Real Madrid",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.27684,
+      "X": 0.22307,
+      "2": 0.50009,
+      "OVER 2.5": 0.63521,
+      "UNDER 2.5": 0.36479
+    },
+    "market": {
+      "1": 0.09126,
+      "X": 0.14084,
+      "2": 0.7679
+    }
+  },
+  {
+    "fixtureId": 1637494,
+    "timestamp": 1793778300,
+    "date": "2026-11-04",
+    "home": "Melbourne Victory",
+    "away": "Persib Bandung",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.30945,
+      "X": 0.27697,
+      "2": 0.41358,
+      "OVER 2.5": 0.4213,
+      "UNDER 2.5": 0.5787
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1629973,
+    "timestamp": 1793786400,
+    "date": "2026-11-04",
+    "home": "Pohang Steelers",
+    "away": "Gamba Osaka",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.32904,
+      "X": 0.27783,
+      "2": 0.39313,
+      "OVER 2.5": 0.4228,
+      "UNDER 2.5": 0.5772
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1629974,
+    "timestamp": 1793794500,
+    "date": "2026-11-04",
+    "home": "Buriram United",
+    "away": "Kashima",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42244,
+      "X": 0.23061,
+      "2": 0.34695,
+      "OVER 2.5": 0.63393,
+      "UNDER 2.5": 0.36607
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1630397,
+    "timestamp": 1793816100,
+    "date": "2026-11-04",
+    "home": "Muharraq",
+    "away": "Al-Jazira",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.41949,
+      "X": 0.23004,
+      "2": 0.35047,
+      "OVER 2.5": 0.63764,
+      "UNDER 2.5": 0.36236
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1635745,
+    "timestamp": 1793822400,
+    "date": "2026-11-04",
+    "home": "Viking",
+    "away": "Sabah FA",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42346,
+      "X": 0.23044,
+      "2": 0.3461,
+      "OVER 2.5": 0.63457,
+      "UNDER 2.5": 0.36543
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1645611,
+    "timestamp": 1793804400,
+    "date": "2026-11-04",
+    "home": "Al Nasr",
+    "away": "Qatar SC",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.57015,
+      "X": 0.23785,
+      "2": 0.192,
+      "OVER 2.5": 0.48069,
+      "UNDER 2.5": 0.51931
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1630398,
+    "timestamp": 1793816100,
+    "date": "2026-11-04",
+    "home": "Al Taawon",
+    "away": "Al Faisaly",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42138,
+      "X": 0.27515,
+      "2": 0.30347,
+      "OVER 2.5": 0.42608,
+      "UNDER 2.5": 0.57392
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1630392,
+    "timestamp": 1793786400,
+    "date": "2026-11-04",
+    "home": "FC Seoul",
+    "away": "Viettel",
+    "recordedAt": "2026-11-03T13:52:53.147109+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.59308,
+      "X": 0.22227,
+      "2": 0.18464,
+      "OVER 2.5": 0.5337,
+      "UNDER 2.5": 0.4663
+    },
+    "market": null
   }
 ]
