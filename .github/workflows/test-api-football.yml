@@ -3019,6 +3019,18 @@ jobs:
                   model_state = "campione_idoneo"
                   model_note = "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata."
               xh, xa = expected_goals(home_games, away_games)
+              # L'1-1 e' spesso la moda della Poisson indipendente, ma una moda
+              # del 12% non e' una previsione forte. Rendiamo esplicita la
+              # distanza dal secondo risultato, senza deformare il modello.
+              score_lead = (
+                  raw_scores[0]["modelProbability"] - raw_scores[1]["modelProbability"]
+                  if len(raw_scores) >= 2 else 0.0
+              )
+              score_dominant = bool(
+                  can_display_score and raw_scores and
+                  raw_scores[0]["modelProbability"] >= 0.16 and
+                  score_lead >= 0.025
+              )
               model_analysis = {
                   "status": model_state,
                   "note": model_note,
@@ -3051,8 +3063,13 @@ jobs:
                        "probability": c["modelProbability"]}
                       for c in (raw_scores[:3] if can_display_score else [])
                   ],
-                  "scoreNote": ("Tre punteggi stimati da storico recente" if can_display_score
-                                else "Risultati esatti non mostrati: storico recente insufficiente")
+                  "topScoreDominant": score_dominant,
+                  "topScoreLead": round(score_lead, 5) if can_display_score else None,
+                  "scoreNote": (
+                      "Punteggio dominante nei parametri sperimentali" if score_dominant
+                      else "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro" if can_display_score
+                      else "Risultati esatti non mostrati: storico recente insufficiente"
+                  )
               }
 
 
@@ -3721,6 +3738,27 @@ jobs:
               log_total = 0.0
               baseline_log_total = 0.0
               equal_score_predictions = 0
+              exact_score_correct = 0
+              exact_score_dominant = 0
+              exact_score_evaluated = 0
+              # Binary market metrics: occurrence and Brier, not stake returns.
+              binary_specs = (
+                  ('GOAL', 'Goal/No Goal', 'GOAL', lambda h,a: h>0 and a>0),
+                  ('NO GOAL', 'Goal/No Goal', 'NO GOAL', lambda h,a: h==0 or a==0),
+                  ('OVER 1.5', 'Totale Gol', 'OVER 1.5', lambda h,a: h+a>=2),
+                  ('UNDER 1.5', 'Totale Gol', 'UNDER 1.5', lambda h,a: h+a<=1),
+                  ('OVER 2.5', 'Totale Gol', 'OVER 2.5', lambda h,a: h+a>=3),
+                  ('UNDER 2.5', 'Totale Gol', 'UNDER 2.5', lambda h,a: h+a<=2),
+                  ('OVER 3.5', 'Totale Gol', 'OVER 3.5', lambda h,a: h+a>=4),
+                  ('UNDER 3.5', 'Totale Gol', 'UNDER 3.5', lambda h,a: h+a<=3),
+                  ('PARI', 'Pari/Dispari', 'PARI', lambda h,a: (h+a)%2==0),
+                  ('DISPARI', 'Pari/Dispari', 'DISPARI', lambda h,a: (h+a)%2!=0),
+              )
+              binary_totals = {key: {'n':0, 'correct':0, 'brier':0.0,
+                                    'baselineCorrect':0, 'baselineBrier':0.0}
+                               for key,_,_,_ in binary_specs}
+              league_binary_history = defaultdict(lambda: defaultdict(lambda: [0,0]))
+              global_binary_history = defaultdict(lambda: [0,0])
               markets_by_league = defaultdict(lambda: {'n':0,'brier':0.0,'baseline':0.0,'hit':0})
               observations = []
               min_day = today - timedelta(days=recent_test_days)
@@ -3776,9 +3814,45 @@ jobs:
                           accurate += int(hit);baseline_accurate += int(bhit)
                           brier_total += score;baseline_brier_total += base_score
                           log_total += logloss;baseline_log_total += base_logloss
-                          top_exact = next((c['selection'] for c in candidates
-                              if c.get('market')=='Risultato Esatto'), None)
-                          equal_score_predictions += int(top_exact in {'1:1','1-1'})
+                          # Probabilita' model-only: nessuna quota futura e nessuna
+                          # conoscenza del risultato del giorno nella previsione.
+                          candidate_map = {
+                              (c.get('market'), c.get('selection')): c.get('modelProbability')
+                              for c in candidates
+                          }
+                          for key, family, selection, predicate in binary_specs:
+                              raw_probability = candidate_map.get((family, selection))
+                              if raw_probability is None:
+                                  continue
+                              p = float(raw_probability)
+                              if not 0 <= p <= 1:
+                                  continue
+                              actual = int(predicate(hg, ag))
+                              old_league = league_binary_history[lk][key]
+                              old_global = global_binary_history[key]
+                              previous = old_league if old_league[1] >= 30 else old_global
+                              # Prior neutrale con 40 pseudocasi; solo passato.
+                              baseline_p = (previous[0] + 20.0) / (previous[1] + 40.0)
+                              metric = binary_totals[key]
+                              metric['n'] += 1
+                              metric['correct'] += int((p >= .5) == bool(actual))
+                              metric['brier'] += (p - actual)**2
+                              metric['baselineCorrect'] += int((baseline_p >= .5) == bool(actual))
+                              metric['baselineBrier'] += (baseline_p - actual)**2
+                          exact_rows = sorted(
+                              (c for c in candidates if c.get('market') == 'Risultato Esatto'),
+                              key=lambda c: -float(c['modelProbability'])
+                          )
+                          if exact_rows:
+                              top_exact = str(exact_rows[0]['selection']).replace('-', ':')
+                              exact_score_evaluated += 1
+                              exact_score_correct += int(top_exact == f'{hg}:{ag}')
+                              equal_score_predictions += int(top_exact == '1:1')
+                              lead = (float(exact_rows[0]['modelProbability']) -
+                                      float(exact_rows[1]['modelProbability'])) if len(exact_rows)>1 else 0
+                              exact_score_dominant += int(
+                                  float(exact_rows[0]['modelProbability']) >= .16 and lead >= .025
+                              )
                           observations.append({'date':day.isoformat(), 'home':hn, 'away':an,
                               'outcome':label, 'probabilities':{k:round(dist[k],5) for k in outcomes},
                               'brier':round(score,5)})
@@ -3791,6 +3865,13 @@ jobs:
                       label = '1' if hg>ag else '2' if ag>hg else 'X'
                       league_outcomes[(country.strip().casefold(), league.strip().casefold())][label] += 1
                       global_outcomes[label] += 1
+                      lkey = (country.strip().casefold(), league.strip().casefold())
+                      for key, _, _, predicate in binary_specs:
+                          hit = int(predicate(hg, ag))
+                          league_binary_history[lkey][key][0] += hit
+                          league_binary_history[lkey][key][1] += 1
+                          global_binary_history[key][0] += hit
+                          global_binary_history[key][1] += 1
 
               n = len(observations)
               summary = {
@@ -3810,7 +3891,25 @@ jobs:
                   'baselineLogLoss1X2':round(baseline_log_total/n,4) if n else None,
                   'requiredMinimum': 100,
                   'status': ('measured_not_proven' if n >= 100 else 'insufficient_sample'),
-                  'note': 'Valutazione retrospettiva senza lookahead, non prova un vantaggio sulle quote o un profitto. Solo 1X2.',
+                  'note': ('Valutazione retrospettiva cronologica 1X2 e mercati binari: '
+                           'nessuna quota storica inclusa, nessuna prova di profitto.'),
+                  'marketMetrics': {
+                      key: {
+                          'n': row['n'],
+                          'accuracy': round(row['correct']/row['n'],4) if row['n'] else None,
+                          'baselineAccuracy': round(row['baselineCorrect']/row['n'],4) if row['n'] else None,
+                          'brier': round(row['brier']/row['n'],4) if row['n'] else None,
+                          'baselineBrier': round(row['baselineBrier']/row['n'],4) if row['n'] else None,
+                          'status': 'exploratory' if row['n'] >= 100 else 'insufficient_sample'
+                      } for key,row in binary_totals.items()
+                  },
+                  'exactScoreDiagnostic': {
+                      'n': exact_score_evaluated,
+                      'topOneAccuracy': round(exact_score_correct/exact_score_evaluated,4) if exact_score_evaluated else None,
+                      'shareTopOneIs1to1': round(equal_score_predictions/exact_score_evaluated,4) if exact_score_evaluated else None,
+                      'shareTopOneDominant': round(exact_score_dominant/exact_score_evaluated,4) if exact_score_evaluated else None,
+                      'note': 'Punteggio esatto: scenario piu probabile, non esito sicuro.'
+                  },
                   'byLeague': {k: {'n':v['n'],'accuracy':round(v['hit']/v['n'],4),
                                     'brier':round(v['brier']/v['n'],4),
                                     'baselineBrier':round(v['baseline']/v['n'],4)}
@@ -3832,6 +3931,10 @@ jobs:
           print("BACKTEST CRONOLOGICO:", walk_forward["forecastsEvaluated"],
                 "campioni | Brier:", walk_forward["brier1X2"],
                 "| Brier baseline:",walk_forward["baselineBrier1X2"])
+          print("BACKTEST MERCATI:",
+                {k:{'n':v['n'],'brier':v['brier'],'base':v['baselineBrier']}
+                 for k,v in walk_forward['marketMetrics'].items()})
+          print("RISULTATI ESATTI - DIAGNOSTICA:", walk_forward['exactScoreDiagnostic'])
 
           # ==========================================================
           # SALVA ANALISI
