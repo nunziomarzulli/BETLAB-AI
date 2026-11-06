@@ -1264,6 +1264,14 @@
 .backtest-line strong{display:block;font-size:19px;color:#f6fbff;line-height:1.2}
 .backtest-note{font-size:11px;color:#bed2dc;line-height:1.5;margin:11px 0 0}
 @media(max-width:650px){.backtest-line{grid-template-columns:1fr}.backtest-line>div{padding:10px}}
+.market-backtest{margin-top:14px;border:1px solid #365064;border-radius:10px;overflow:hidden}
+.market-backtest h3{margin:0;padding:10px 12px;background:#10283a;font-size:13px;color:#edf9fa}
+.market-backtest table{width:100%;border-collapse:collapse;font-size:12px}
+.market-backtest th,.market-backtest td{padding:8px 10px;text-align:left;border-top:1px solid #2b4153;white-space:nowrap}
+.market-backtest th{color:#a6c6d2;font-size:10px}
+.market-backtest .table-scroll{overflow-x:auto}
+.market-backtest p{margin:0;padding:9px 12px;color:#b5cfdb;font-size:11px}
+@media(max-width:650px){.market-backtest th,.market-backtest td{padding:6px}}
 </style>
 </head>
 
@@ -1329,6 +1337,11 @@
         <div><small>BRIER BETLAB / BASE</small><strong id="backtestBrier">—</strong></div>
       </div>
       <p id="backtestStatus" class="backtest-note">In attesa dei risultati del test sulle partite passate.</p>
+      <section class="market-backtest" aria-label="Test cronologico per mercato">
+        <h3>TEST STORICO PER MERCATO · Solo probabilità, senza quote</h3>
+        <div class="table-scroll"><table><thead><tr><th>Mercato</th><th>Casi</th><th>Precisione</th><th>Brier BETLAB</th><th>Brier base</th></tr></thead><tbody id="marketBacktestRows"><tr><td colspan="5">In attesa dei dati</td></tr></tbody></table></div>
+        <p id="exactScoreAudit">I risultati esatti sono scenari statistici, non consigli di giocata.</p>
+      </section>
     </section>
     <div id="dailyMatches" class="daily-grid"></div>
     <section id="modelInsightsSection" class="model-insights-section" aria-label="Letture probabilistiche del modello">
@@ -1993,8 +2006,13 @@
       /^\d+-\d+$/.test(String(x.score || "")) &&
       x.probability != null && Number.isFinite(Number(x.probability)) &&
       Number(x.probability) >= 0 && Number(x.probability) <= 1) : null;
-    const scoreLabel = top ? String(top.score) : "—";
-    const scoreProbability = top ? Number(top.probability) : null;
+    const top2 = Array.isArray(model.topScores) ? model.topScores.slice(0,2) : [];
+    const p1 = Number(top2[0]?.probability), p2 = Number(top2[1]?.probability);
+    const dominant = model.topScoreDominant === true ||
+      (model.topScoreDominant == null && top2.length >= 2 && Number.isFinite(p1) &&
+       p1 >= .16 && p1-p2 >= .025);
+    const scoreLabel = top && dominant ? String(top.score) : top ? "Nessun esatto dominante" : "—";
+    const scoreProbability = top && dominant ? Number(top.probability) : null;
     const goals = goalUnder !== null && goalOver !== null
       ? (goalUnder >= goalOver ? {label:"UNDER 2.5", p:goalUnder} : {label:"OVER 2.5", p:goalOver})
       : {label:"Non calcolabile",p:null};
@@ -2025,6 +2043,22 @@
     document.getElementById("backtestBrier").textContent = samples > 0
       ? `${brier(test.brier1X2)} / ${brier(test.baselineBrier1X2)}` : "—";
     const note = document.getElementById("backtestStatus");
+    const rows = document.getElementById("marketBacktestRows");
+    const metrics = test.marketMetrics || {};
+    const marketOrder = ["GOAL","NO GOAL","OVER 1.5","UNDER 1.5","OVER 2.5",
+      "UNDER 2.5","OVER 3.5","UNDER 3.5","PARI","DISPARI"];
+    const formatMetric = x => x == null || !Number.isFinite(Number(x)) ? "—" :
+      Number(x).toLocaleString("it-IT", {maximumFractionDigits:3});
+    rows.innerHTML = marketOrder.filter(key => metrics[key]?.n > 0).map(key => {
+      const m = metrics[key];
+      return `<tr><td>${safeText(key)}</td><td>${Number(m.n)}</td>
+        <td>${percentage(m.accuracy)}</td><td>${formatMetric(m.brier)}</td>
+        <td>${formatMetric(m.baselineBrier)}</td></tr>`;
+    }).join("") || `<tr><td colspan="5">Metriche per mercato non disponibili: aggiornare il motore.</td></tr>`;
+    const diagnostic = test.exactScoreDiagnostic || {};
+    document.getElementById("exactScoreAudit").textContent = Number(diagnostic.n) > 0
+      ? `Risultati esatti: ${diagnostic.n} casi. Il più probabile era 1-1 nel ${percentage(diagnostic.shareTopOneIs1to1)} dei casi; previsione esatta corretta nel ${percentage(diagnostic.topOneAccuracy)}. Un punteggio non è una scommessa ad alta probabilità.`
+      : "Nessuna statistica disponibile sui risultati esatti.";
     if (!samples) {
       note.textContent = "Nessuna partita storica idonea al test: non è possibile dimostrare la precisione del motore.";
       return;
@@ -2037,7 +2071,8 @@
         "Brier uguale alla previsione-base su questo campione."
       : "Confronto con la previsione-base non disponibile.";
     note.textContent = caution + comparisonText +
-      " Test su partite concluse: il modello non ha visto risultati futuri. Non è un backtest delle quote né della redditività.";
+      " Test su partite concluse, con analisi dei mercati separati. " +
+      "Brier più basso è migliore. Il test non usa le quote e non dimostra redditività.";
   }
 
   function renderQualityDashboard() {
@@ -2083,7 +2118,7 @@
         <div class="model-insight-metrics">
           <div><small>${marketOnly ? "ESITO FAVORITO DALLE QUOTE" : "ESITO 1X2 PIÙ PROBABILE"}</small><strong>${safeText(r.teamLabel)}</strong><span>${readablePercent(r.teamProbability)}${marketOnly ? " · mercato" : ""}</span></div>
           <div><small>TENDENZA GOL (LINEA 2.5)</small><strong>${safeText(r.goals.label)}</strong><span>${r.goals.p === null ? "n.d." : readablePercent(r.goals.p)}</span></div>
-          <div><small>PUNTEGGIO ESATTO PIÙ PROBABILE</small><strong>${safeText(r.scoreLabel)}</strong><span>${r.scoreProbability === null ? "n.d." : readablePercent(r.scoreProbability)}</span></div>
+          <div><small>SCENARIO RISULTATO ESATTO</small><strong>${safeText(r.scoreLabel)}</strong><span>${r.scoreProbability === null ? "n.d." : readablePercent(r.scoreProbability)}</span></div>
         </div>
         <p class="model-insight-caution ${discordant || weak ? "alert" : ""}">${safeText(note)}</p>
       </article>`;
@@ -2113,6 +2148,10 @@
     const model = m.modelAnalysis || {};
     const probs = model.probabilities || {};
     const scores = Array.isArray(model.topScores) ? model.topScores.slice(0,3) : [];
+    const leading = scores.length >= 2 && Number(scores[0].probability) >= .16 &&
+      Number(scores[0].probability) - Number(scores[1].probability) >= .025;
+    const scoreDominant = model.topScoreDominant === true ||
+      (model.topScoreDominant == null && leading);
     const hasAnalysis = [probs["1"],probs["X"],probs["2"]].every(x => x != null && Number.isFinite(Number(x)));
     if (!hasAnalysis) return `<p class="analysis-unavailable">Nessuna probabilità calcolabile: ${safeText(model.note || 'Storico incompleto')}. Non vengono inventati valori.</p>`;
     const h = model.expectedGoals?.home, a = model.expectedGoals?.away;
@@ -2124,7 +2163,7 @@
     ];
     return `<div class="analysis-mini"><span>Gol medi del modello <b>${safeText(xg)}</b></span><span>Campione <b>${Number(model.homeGames || 0)} + ${Number(model.awayGames || 0)}</b></span></div>
       <div class="analysis-probability-grid">${groups.map(([label,items])=>`<div class="analysis-prob-group"><strong>${safeText(label)}</strong><div>${items.map(([name,p])=>`<span>${safeText(name)} <b>${modelPct(p)}</b></span>`).join("")}</div></div>`).join("")}</div>
-      <div class="analysis-scores"><strong>Tre risultati esatti più probabili:</strong> ${scores.length ? scores.map(s=>`<span>${safeText(s.score)} <b>${modelPct(s.probability)}</b></span>`).join("") : "non disponibili"}</div>
+      <div class="analysis-scores"><strong>${scoreDominant ? "Tre possibili risultati esatti:" : "Punteggi possibili, nessuno dominante:"}</strong> ${scores.length ? scores.map(s=>`<span>${safeText(s.score)} <b>${modelPct(s.probability)}</b></span>`).join("") : "non disponibili"}</div>
       <div class="analysis-caution">${safeText(model.note || 'Stime non calibrate.')}</div>
       ${Array.isArray(m.analyzedMarketOptions) && m.analyzedMarketOptions.length
       ? `<details class="analysis-additional"><summary>Mercati quotati valutati dal motore (non approvati)</summary><div class="market-evidence-list">${m.analyzedMarketOptions.slice(0,6).map(o=>`<div><strong>${safeText(o.selection)} · ${safeText(o.market)}</strong><span>Stima ${modelPct(o.modelProbability)} · quota ${Number(o.odd).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})} · ${safeText(o.bookmaker || 'fonte non disponibile')}</span></div>`).join('')}</div><p>Queste sono opzioni considerate e poi scartate o non approvate: non sono pronostici consigliati.</p></details>`
