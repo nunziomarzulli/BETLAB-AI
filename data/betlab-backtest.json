@@ -15,7 +15,96 @@
   "baselineLogLoss1X2": 1.0731,
   "requiredMinimum": 100,
   "status": "measured_not_proven",
-  "note": "Valutazione retrospettiva senza lookahead, non prova un vantaggio sulle quote o un profitto. Solo 1X2.",
+  "note": "Valutazione retrospettiva cronologica 1X2 e mercati binari: nessuna quota storica inclusa, nessuna prova di profitto.",
+  "marketMetrics": {
+    "GOAL": {
+      "n": 5073,
+      "accuracy": 0.5269,
+      "baselineAccuracy": 0.5573,
+      "brier": 0.2494,
+      "baselineBrier": 0.2464,
+      "status": "exploratory"
+    },
+    "NO GOAL": {
+      "n": 5073,
+      "accuracy": 0.5267,
+      "baselineAccuracy": 0.5569,
+      "brier": 0.2494,
+      "baselineBrier": 0.2464,
+      "status": "exploratory"
+    },
+    "OVER 1.5": {
+      "n": 5073,
+      "accuracy": 0.7773,
+      "baselineAccuracy": 0.7776,
+      "brier": 0.1762,
+      "baselineBrier": 0.1752,
+      "status": "exploratory"
+    },
+    "UNDER 1.5": {
+      "n": 5073,
+      "accuracy": 0.7773,
+      "baselineAccuracy": 0.7776,
+      "brier": 0.1762,
+      "baselineBrier": 0.1752,
+      "status": "exploratory"
+    },
+    "OVER 2.5": {
+      "n": 5073,
+      "accuracy": 0.5285,
+      "baselineAccuracy": 0.5291,
+      "brier": 0.2506,
+      "baselineBrier": 0.2482,
+      "status": "exploratory"
+    },
+    "UNDER 2.5": {
+      "n": 5073,
+      "accuracy": 0.5285,
+      "baselineAccuracy": 0.5265,
+      "brier": 0.2506,
+      "baselineBrier": 0.2482,
+      "status": "exploratory"
+    },
+    "OVER 3.5": {
+      "n": 5073,
+      "accuracy": 0.6901,
+      "baselineAccuracy": 0.6891,
+      "brier": 0.2133,
+      "baselineBrier": 0.2126,
+      "status": "exploratory"
+    },
+    "UNDER 3.5": {
+      "n": 5073,
+      "accuracy": 0.6901,
+      "baselineAccuracy": 0.6891,
+      "brier": 0.2133,
+      "baselineBrier": 0.2126,
+      "status": "exploratory"
+    },
+    "PARI": {
+      "n": 5073,
+      "accuracy": 0.5023,
+      "baselineAccuracy": 0.4837,
+      "brier": 0.25,
+      "baselineBrier": 0.2514,
+      "status": "exploratory"
+    },
+    "DISPARI": {
+      "n": 5073,
+      "accuracy": 0.5023,
+      "baselineAccuracy": 0.4835,
+      "brier": 0.25,
+      "baselineBrier": 0.2514,
+      "status": "exploratory"
+    }
+  },
+  "exactScoreDiagnostic": {
+    "n": 5073,
+    "topOneAccuracy": 0.111,
+    "shareTopOneIs1to1": 0.7169,
+    "shareTopOneDominant": 0.0104,
+    "note": "Punteggio esatto: scenario piu probabile, non esito sicuro."
+  },
   "byLeague": {
     "England / Championship": {
       "n": 483,
@@ -162,5 +251,5 @@
       "baselineBrier": 0.5931
     }
   },
-  "generatedAt": "2026-11-06T19:04:35.962938+01:00"
+  "generatedAt": "2026-11-06T22:25:17.597283+01:00"
 }
