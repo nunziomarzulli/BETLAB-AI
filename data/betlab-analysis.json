@@ -4,7 +4,7 @@
   "modelCalibration": "non_validato",
   "predictionSource": "historical_poisson_with_market_sanity_checks",
   "engine": "BETLAB AI CORE - PREVISIONI + TEST CRONOLOGICO",
-  "generatedAt": "2026-11-09T14:57:44.235208+01:00",
+  "generatedAt": "2026-11-09T22:26:57.360813+01:00",
   "days": [
     "2026-11-08",
     "2026-11-09",
@@ -357,63 +357,35 @@
         "baselineBrier": 0.6291
       }
     },
-    "generatedAt": "2026-11-09T14:57:44.234086+01:00"
+    "generatedAt": "2026-11-09T22:26:57.359723+01:00"
   },
-  "marketReferenceLookups": 8,
+  "marketReferenceLookups": 3,
   "domesticFixtureSource": {
     "source": "Football-Data.co.uk/fixtures.csv",
     "status": "disponibile",
-    "fixturesAdded": 1,
-    "fixturesWithQuotedMarkets": 1,
+    "fixturesAdded": 0,
+    "fixturesWithQuotedMarkets": 0,
     "oddsType": "quote raccolte in CSV, non live"
   },
-  "historyCount": 33283,
+  "historyCount": 33334,
   "historyCoverage": {
-    "matchesTotal": 23,
-    "matchesHistoryEligible": 6,
-    "matchesHistoryInsufficient": 17,
+    "matchesTotal": 13,
+    "matchesHistoryEligible": 3,
+    "matchesHistoryInsufficient": 10,
     "rejectedTeamReasons": {
-      "storico_insufficiente": 30
+      "storico_insufficiente": 18
     },
     "byLeague": {
-      "Spain / Segunda División": {
-        "fixtures": 2,
-        "eligible": 2
-      },
-      "Spain / Segunda Division": {
-        "fixtures": 1,
-        "eligible": 1
-      },
       "World / UEFA Champions League Women": {
         "fixtures": 5,
         "eligible": 3
-      },
-      "Norway / Eliteserien": {
-        "fixtures": 1,
-        "eligible": 0
       },
       "Argentina / Reserve League": {
         "fixtures": 6,
         "eligible": 0
       },
-      "England / Premier League 2 Division One": {
-        "fixtures": 1,
-        "eligible": 0
-      },
-      "Denmark / 1. Division": {
-        "fixtures": 1,
-        "eligible": 0
-      },
-      "Germany / Frauen Bundesliga": {
-        "fixtures": 1,
-        "eligible": 0
-      },
-      "Spain / Primera División Femenina": {
-        "fixtures": 2,
-        "eligible": 0
-      },
       "England / Premier League Cup": {
-        "fixtures": 2,
+        "fixtures": 1,
         "eligible": 0
       },
       "Denmark / Kvindeliga": {
@@ -437,10 +409,10 @@
     },
     "policy": "Nessuna riduzione delle soglie minime: i match senza dati restano non consigliati"
   },
-  "matchesAnalyzed": 23,
+  "matchesAnalyzed": 13,
   "matchesWithCandidates": 0,
-  "matchesHistoryRecent": 6,
-  "matchesHistoryUnreliable": 17,
+  "matchesHistoryRecent": 3,
+  "matchesHistoryUnreliable": 10,
   "selectionPolicy": {
     "model": "poisson_historical_transparent_market_veto",
     "winStreakExcludeAt": 6,
@@ -463,7 +435,7 @@
     "minRecentGamesPerTeam": 5,
     "maxDaysFromLastMatch": 30
   },
-  "marketCandidates": 201,
+  "marketCandidates": 105,
   "candidatesWithOdds": 0,
   "exactScoresWithOdds": 0,
   "injuriesApiStatus": "non_disponibile_piano",
@@ -471,855 +443,6 @@
   "injuriesFixturesQueried": 0,
   "injuriesFixturesWithReports": 0,
   "analysis": [
-    {
-      "fixtureId": 1570011,
-      "date": "2026-11-09",
-      "timestamp": 1794252600,
-      "country": "Spain",
-      "league": "Segunda División",
-      "priority": 4,
-      "home": {
-        "name": "Las Palmas",
-        "form": {
-          "played": 12,
-          "wins": 5,
-          "draws": 2,
-          "losses": 5,
-          "gf": 17,
-          "ga": 21,
-          "ppg": 1.417,
-          "avgGF": 1.417,
-          "avgGA": 1.75
-        }
-      },
-      "away": {
-        "name": "Eldense",
-        "form": {
-          "played": 12,
-          "wins": 5,
-          "draws": 2,
-          "losses": 5,
-          "gf": 14,
-          "ga": 14,
-          "ppg": 1.417,
-          "avgGF": 1.167,
-          "avgGA": 1.167
-        }
-      },
-      "historyScore": 24,
-      "historyEligible": true,
-      "historyQuality": {
-        "home": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 12,
-          "lastRecorded": "2026-11-02",
-          "lastAgeDays": 7,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 12,
-          "lastRecorded": "2026-11-01",
-          "lastAgeDays": 8,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:19.307845+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 6,
-          "wins": 2,
-          "draws": 2,
-          "losses": 2,
-          "avgGF": 0.83,
-          "avgGA": 1.17
-        },
-        "awayVenueForm": {
-          "played": 6,
-          "wins": 3,
-          "draws": 0,
-          "losses": 3,
-          "avgGF": 0.83,
-          "avgGA": 1.0
-        },
-        "homeRestDays": 6,
-        "awayRestDays": 7,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-11-02",
-        "awayLastRecorded": "2026-11-01",
-        "homeHistoryAgeDays": 7,
-        "awayHistoryAgeDays": 8,
-        "historyEligible": true,
-        "historyQuality": {
-          "home": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 12,
-            "lastRecorded": "2026-11-02",
-            "lastAgeDays": 7,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 12,
-            "lastRecorded": "2026-11-01",
-            "lastAgeDays": 8,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Gran Canaria",
-          "city": "Las Palmas de Gran Canaria"
-        },
-        "homeTeamId": 534,
-        "awayTeamId": 9692,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 10,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.46109,
-            "X": 0.26893,
-            "2": 0.26998
-          },
-          "dispersion": 0.0416,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 12,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.48,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 12,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.645,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 0.0,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 4,
-        "awayWinStreak": 0,
-        "drawOdd": 3.5,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "campione_idoneo",
-        "note": "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata.",
-        "homeGames": 12,
-        "awayGames": 12,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": true,
-        "expectedGoals": {
-          "home": 1.379,
-          "away": 1.149
-        },
-        "probabilities": {
-          "1": 0.42132,
-          "X": 0.26616,
-          "2": 0.31252,
-          "1X": 0.68748,
-          "X2": 0.57868,
-          "12": 0.73384,
-          "GOAL": 0.51098,
-          "NO GOAL": 0.48902,
-          "OVER 1.5": 0.71834,
-          "UNDER 1.5": 0.28166,
-          "OVER 2.5": 0.46327,
-          "UNDER 2.5": 0.53673,
-          "OVER 3.5": 0.24836,
-          "UNDER 3.5": 0.75164,
-          "PARI": 0.50319,
-          "DISPARI": 0.49681
-        },
-        "topScores": [
-          {
-            "score": "1-1",
-            "probability": 0.12648
-          },
-          {
-            "score": "1-0",
-            "probability": 0.11009
-          },
-          {
-            "score": "0-1",
-            "probability": 0.09173
-          }
-        ],
-        "topScoreDominant": false,
-        "topScoreLead": 0.01639,
-        "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
-      },
-      "analyzedMarketOptions": [
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.75164,
-          "odd": 1.41,
-          "bookmaker": "Marathonbet",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.73384,
-          "odd": 1.28,
-          "bookmaker": "Bet365",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.71834,
-          "odd": 1.21,
-          "bookmaker": "1xBet",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.68748,
-          "odd": 1.28,
-          "bookmaker": "Marathonbet",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.57868,
-          "odd": 1.73,
-          "bookmaker": "Bet365",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 2.5",
-          "modelProbability": 0.53673,
-          "odd": 2.05,
-          "bookmaker": "Bet365",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.51098,
-          "odd": 1.57,
-          "bookmaker": "Betano",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.50319,
-          "odd": 1.82,
-          "bookmaker": "Bet365",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1570013,
-      "date": "2026-11-09",
-      "timestamp": 1794252600,
-      "country": "Spain",
-      "league": "Segunda División",
-      "priority": 4,
-      "home": {
-        "name": "Sabadell",
-        "form": {
-          "played": 12,
-          "wins": 5,
-          "draws": 4,
-          "losses": 3,
-          "gf": 14,
-          "ga": 12,
-          "ppg": 1.583,
-          "avgGF": 1.167,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Real Sociedad II",
-        "form": {
-          "played": 12,
-          "wins": 2,
-          "draws": 1,
-          "losses": 9,
-          "gf": 14,
-          "ga": 24,
-          "ppg": 0.583,
-          "avgGF": 1.167,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 24,
-      "historyEligible": true,
-      "historyQuality": {
-        "home": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 12,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 5,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:22.028611+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 5,
-          "wins": 3,
-          "draws": 2,
-          "losses": 0,
-          "avgGF": 1.6,
-          "avgGA": 0.8
-        },
-        "awayVenueForm": {
-          "played": 7,
-          "wins": 0,
-          "draws": 0,
-          "losses": 7,
-          "avgGF": 0.71,
-          "avgGA": 2.29
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 8,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-10-31",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 9,
-        "historyEligible": true,
-        "historyQuality": {
-          "home": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 12,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 5,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Nova Creu Alta",
-          "city": "Sabadell"
-        },
-        "homeTeamId": 9593,
-        "awayTeamId": 9585,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 10,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.54272,
-            "X": 0.25985,
-            "2": 0.19743
-          },
-          "dispersion": 0.0418,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 12,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.388,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 9,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.739,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 1.0,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 1,
-        "drawOdd": 3.65,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "campione_idoneo",
-        "note": "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata.",
-        "homeGames": 12,
-        "awayGames": 12,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": true,
-        "expectedGoals": {
-          "home": 1.666,
-          "away": 0.949
-        },
-        "probabilities": {
-          "1": 0.54213,
-          "X": 0.24349,
-          "2": 0.21438,
-          "1X": 0.78562,
-          "X2": 0.45787,
-          "12": 0.75651,
-          "GOAL": 0.49699,
-          "NO GOAL": 0.50301,
-          "OVER 1.5": 0.73542,
-          "UNDER 1.5": 0.26458,
-          "OVER 2.5": 0.48523,
-          "UNDER 2.5": 0.51477,
-          "OVER 3.5": 0.26718,
-          "UNDER 3.5": 0.73282,
-          "PARI": 0.50268,
-          "DISPARI": 0.49732
-        },
-        "topScores": [
-          {
-            "score": "1-0",
-            "probability": 0.12192
-          },
-          {
-            "score": "1-1",
-            "probability": 0.1157
-          },
-          {
-            "score": "2-0",
-            "probability": 0.10153
-          }
-        ],
-        "topScoreDominant": false,
-        "topScoreLead": 0.00622,
-        "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
-      },
-      "analyzedMarketOptions": [
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.78562,
-          "odd": 1.18,
-          "bookmaker": "William Hill",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.75651,
-          "odd": 1.25,
-          "bookmaker": "Betfair",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.73542,
-          "odd": 1.3,
-          "bookmaker": "BetVictor",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.73282,
-          "odd": 1.29,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "1X2",
-          "selection": "1",
-          "modelProbability": 0.54213,
-          "odd": 1.7,
-          "bookmaker": "SBO",
-          "oddsSources": 10,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 2.5",
-          "modelProbability": 0.51477,
-          "odd": 1.75,
-          "bookmaker": "Bet365",
-          "oddsSources": 8,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "NO GOAL",
-          "modelProbability": 0.50301,
-          "odd": 1.86,
-          "bookmaker": "Marathonbet",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.50268,
-          "odd": 1.85,
-          "bookmaker": "William Hill",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 938375531099919,
-      "date": "2026-11-09",
-      "timestamp": 1794252600,
-      "country": "Spain",
-      "league": "Segunda Division",
-      "priority": 4,
-      "home": {
-        "name": "Sabadell",
-        "form": {
-          "played": 12,
-          "wins": 5,
-          "draws": 4,
-          "losses": 3,
-          "gf": 14,
-          "ga": 12,
-          "ppg": 1.583,
-          "avgGF": 1.167,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Sociedad B",
-        "form": {
-          "played": 12,
-          "wins": 3,
-          "draws": 2,
-          "losses": 7,
-          "gf": 15,
-          "ga": 22,
-          "ppg": 0.917,
-          "avgGF": 1.25,
-          "avgGA": 1.833
-        }
-      },
-      "historyScore": 24,
-      "historyEligible": true,
-      "historyQuality": {
-        "home": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 12,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 12,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "Football-Data.co.uk: calendario e quote di piu bookmaker",
-        "generatedAt": "2026-11-09T14:57:22.170906+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Identificativi delle squadre incoerenti: assenze non verificabili",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 5,
-          "wins": 3,
-          "draws": 2,
-          "losses": 0,
-          "avgGF": 1.6,
-          "avgGA": 0.8
-        },
-        "awayVenueForm": {
-          "played": 6,
-          "wins": 2,
-          "draws": 1,
-          "losses": 3,
-          "avgGF": 1.5,
-          "avgGA": 2.0
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 8,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-10-31",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 9,
-        "historyEligible": true,
-        "historyQuality": {
-          "home": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 12,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 12,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "",
-          "city": ""
-        },
-        "homeTeamId": null,
-        "awayTeamId": null,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 3,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.55093,
-            "X": 0.2571,
-            "2": 0.19196
-          },
-          "dispersion": 0.0225,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 12,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.388,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 12,
-            "gamesExamined": 12,
-            "opponentsAvgPPG": 1.514,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 0.666,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 1,
-        "drawOdd": 3.6,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "campione_idoneo",
-        "note": "Storico sufficiente per calcolare la distribuzione. Le percentuali non sono calibrate e non implicano un consiglio di giocata.",
-        "homeGames": 12,
-        "awayGames": 12,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": true,
-        "expectedGoals": {
-          "home": 1.678,
-          "away": 1.04
-        },
-        "probabilities": {
-          "1": 0.52302,
-          "X": 0.24233,
-          "2": 0.23465,
-          "1X": 0.76535,
-          "X2": 0.47698,
-          "12": 0.75767,
-          "GOAL": 0.5258,
-          "NO GOAL": 0.4742,
-          "OVER 1.5": 0.7546,
-          "UNDER 1.5": 0.2454,
-          "OVER 2.5": 0.51079,
-          "UNDER 2.5": 0.48921,
-          "OVER 3.5": 0.28989,
-          "UNDER 3.5": 0.71011,
-          "PARI": 0.50218,
-          "DISPARI": 0.49782
-        },
-        "topScores": [
-          {
-            "score": "1-1",
-            "probability": 0.11518
-          },
-          {
-            "score": "1-0",
-            "probability": 0.11076
-          },
-          {
-            "score": "2-1",
-            "probability": 0.09665
-          }
-        ],
-        "topScoreDominant": false,
-        "topScoreLead": 0.00442,
-        "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
-      },
-      "analyzedMarketOptions": [
-        {
-          "market": "1X2",
-          "selection": "1",
-          "modelProbability": 0.52302,
-          "odd": 1.68,
-          "bookmaker": "Bet365",
-          "oddsSources": 3,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.51079,
-          "odd": 2.05,
-          "bookmaker": "Bet365",
-          "oddsSources": 1,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 2.5",
-          "modelProbability": 0.48921,
-          "odd": 1.75,
-          "bookmaker": "Bet365",
-          "oddsSources": 1,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "1X2",
-          "selection": "X",
-          "modelProbability": 0.24233,
-          "odd": 3.6,
-          "bookmaker": "Bet365",
-          "oddsSources": 3,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "1X2",
-          "selection": "2",
-          "modelProbability": 0.23465,
-          "odd": 4.75,
-          "bookmaker": "Bwin",
-          "oddsSources": 3,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
     {
       "fixtureId": 1638304,
       "date": "2026-11-10",
@@ -1381,7 +504,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:24.116629+01:00",
+        "generatedAt": "2026-11-09T22:26:40.524109+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1449,11 +572,11 @@
           "sourceCount": 9,
           "status": "verificato",
           "probabilities": {
-            "1": 0.07028,
-            "X": 0.12956,
-            "2": 0.80016
+            "1": 0.08921,
+            "X": 0.14872,
+            "2": 0.76208
           },
-          "dispersion": 0.0484,
+          "dispersion": 0.0381,
           "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
@@ -1476,7 +599,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
-        "drawOdd": 7.0,
+        "drawOdd": 6.1,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -1532,8 +655,8 @@
           "market": "Totale Gol",
           "selection": "OVER 1.5",
           "modelProbability": 0.85644,
-          "odd": 1.08,
-          "bookmaker": "BetVictor",
+          "odd": 1.1,
+          "bookmaker": "Betfair",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
         },
@@ -1541,7 +664,7 @@
           "market": "Doppia Chance",
           "selection": "12",
           "modelProbability": 0.77468,
-          "odd": 1.06,
+          "odd": 1.07,
           "bookmaker": "Betfair",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
@@ -1550,8 +673,8 @@
           "market": "Goal/No Goal",
           "selection": "GOAL",
           "modelProbability": 0.67229,
-          "odd": 2.0,
-          "bookmaker": "BetVictor",
+          "odd": 1.91,
+          "bookmaker": "William Hill",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
         },
@@ -1559,8 +682,8 @@
           "market": "Totale Gol",
           "selection": "OVER 2.5",
           "modelProbability": 0.66586,
-          "odd": 1.4,
-          "bookmaker": "Betfair",
+          "odd": 1.44,
+          "bookmaker": "Bet365",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -1568,7 +691,7 @@
           "market": "Doppia Chance",
           "selection": "1X",
           "modelProbability": 0.61972,
-          "odd": 4.7,
+          "odd": 3.96,
           "bookmaker": "1xBet",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
@@ -1577,16 +700,16 @@
           "market": "Doppia Chance",
           "selection": "X2",
           "modelProbability": 0.6056,
-          "odd": 1.03,
-          "bookmaker": "Betfair",
-          "oddsSources": 5,
+          "odd": 1.04,
+          "bookmaker": "William Hill",
+          "oddsSources": 4,
           "status": "solo_analisi_non_approvato"
         },
         {
           "market": "Totale Gol",
           "selection": "UNDER 3.5",
           "modelProbability": 0.55198,
-          "odd": 1.73,
+          "odd": 1.67,
           "bookmaker": "Bet365",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
@@ -1673,7 +796,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:26.105285+01:00",
+        "generatedAt": "2026-11-09T22:26:43.083297+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1741,11 +864,11 @@
           "sourceCount": 9,
           "status": "verificato",
           "probabilities": {
-            "1": 0.1406,
-            "X": 0.18204,
-            "2": 0.67736
+            "1": 0.1367,
+            "X": 0.17786,
+            "2": 0.68544
           },
-          "dispersion": 0.0538,
+          "dispersion": 0.0461,
           "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
@@ -1763,9 +886,7 @@
           }
         },
         "relativeFormPPG": -0.166,
-        "blockedSelections": [
-          "Doppia Chance 1X: modello 60.2% vs mercato 32.3%"
-        ],
+        "blockedSelections": [],
         "newsStatus": "non_verificato_nessun_feed_notizie",
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 2,
@@ -1835,7 +956,7 @@
           "market": "Doppia Chance",
           "selection": "12",
           "modelProbability": 0.75725,
-          "odd": 1.11,
+          "odd": 1.1,
           "bookmaker": "Betfair",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
@@ -1844,7 +965,7 @@
           "market": "Totale Gol",
           "selection": "UNDER 3.5",
           "modelProbability": 0.64727,
-          "odd": 1.65,
+          "odd": 1.66,
           "bookmaker": "Pinnacle",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
@@ -1854,7 +975,7 @@
           "selection": "X2",
           "modelProbability": 0.64088,
           "odd": 1.08,
-          "bookmaker": "Betfair",
+          "bookmaker": "William Hill",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -1862,8 +983,8 @@
           "market": "Goal/No Goal",
           "selection": "GOAL",
           "modelProbability": 0.60306,
-          "odd": 1.66,
-          "bookmaker": "Marathonbet",
+          "odd": 1.67,
+          "bookmaker": "Bet365",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
         },
@@ -1871,7 +992,7 @@
           "market": "Doppia Chance",
           "selection": "1X",
           "modelProbability": 0.60187,
-          "odd": 3.0,
+          "odd": 3.1,
           "bookmaker": "William Hill",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
@@ -1880,8 +1001,8 @@
           "market": "Totale Gol",
           "selection": "OVER 2.5",
           "modelProbability": 0.57678,
-          "odd": 1.44,
-          "bookmaker": "Betfair",
+          "odd": 1.43,
+          "bookmaker": "Pinnacle",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -1967,7 +1088,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:27.795647+01:00",
+        "generatedAt": "2026-11-09T22:26:45.271220+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2035,11 +1156,11 @@
           "sourceCount": 9,
           "status": "verificato",
           "probabilities": {
-            "1": 0.23682,
-            "X": 0.24135,
-            "2": 0.52183
+            "1": 0.23488,
+            "X": 0.23659,
+            "2": 0.52853
           },
-          "dispersion": 0.0301,
+          "dispersion": 0.0363,
           "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
@@ -2050,21 +1171,21 @@
             "status": "stimabile"
           },
           "away": {
-            "coverage": 3,
+            "coverage": 4,
             "gamesExamined": 6,
-            "opponentsAvgPPG": 1.455,
+            "opponentsAvgPPG": 1.391,
             "status": "stimabile"
           }
         },
         "relativeFormPPG": -0.834,
         "blockedSelections": [
-          "Doppia Chance 1X: modello 61.2% vs mercato 47.8%"
+          "Doppia Chance 1X: modello 61.2% vs mercato 47.1%"
         ],
         "newsStatus": "non_verificato_nessun_feed_notizie",
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 2,
-        "drawOdd": 3.8,
+        "drawOdd": 3.85,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -2120,8 +1241,8 @@
           "market": "Totale Gol",
           "selection": "OVER 1.5",
           "modelProbability": 0.78027,
-          "odd": 1.14,
-          "bookmaker": "1xBet",
+          "odd": 1.13,
+          "bookmaker": "BetVictor",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
         },
@@ -2138,8 +1259,8 @@
           "market": "Totale Gol",
           "selection": "UNDER 3.5",
           "modelProbability": 0.67675,
-          "odd": 1.54,
-          "bookmaker": "BetVictor",
+          "odd": 1.57,
+          "bookmaker": "Bet365",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -2157,7 +1278,7 @@
           "selection": "1X",
           "modelProbability": 0.6124,
           "odd": 1.91,
-          "bookmaker": "Betfair",
+          "bookmaker": "1xBet",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -2165,8 +1286,8 @@
           "market": "Goal/No Goal",
           "selection": "GOAL",
           "modelProbability": 0.57995,
-          "odd": 1.52,
-          "bookmaker": "Marathonbet",
+          "odd": 1.5,
+          "bookmaker": "William Hill",
           "oddsSources": 6,
           "status": "solo_analisi_non_approvato"
         },
@@ -2174,8 +1295,8 @@
           "market": "Totale Gol",
           "selection": "OVER 2.5",
           "modelProbability": 0.54662,
-          "odd": 1.53,
-          "bookmaker": "Pinnacle",
+          "odd": 1.5,
+          "bookmaker": "Betfair",
           "oddsSources": 7,
           "status": "solo_analisi_non_approvato"
         },
@@ -2261,7 +1382,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:28.986885+01:00",
+        "generatedAt": "2026-11-09T22:26:46.639039+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2329,11 +1450,11 @@
           "sourceCount": 9,
           "status": "verificato",
           "probabilities": {
-            "1": 0.78115,
-            "X": 0.13722,
-            "2": 0.08163
+            "1": 0.75803,
+            "X": 0.14678,
+            "2": 0.09518
           },
-          "dispersion": 0.0285,
+          "dispersion": 0.0394,
           "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
@@ -2356,7 +1477,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 2,
         "awayWinStreak": 1,
-        "drawOdd": 6.76,
+        "drawOdd": 6.33,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -2388,205 +1509,6 @@
           "UNDER 3.5": 0.50081,
           "PARI": 0.50033,
           "DISPARI": 0.49967
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1494798,
-      "date": "2026-11-09",
-      "timestamp": 1794247200,
-      "country": "Norway",
-      "league": "Eliteserien",
-      "priority": 2,
-      "home": {
-        "name": "Kristiansund BK",
-        "form": {
-          "played": 6,
-          "wins": 1,
-          "draws": 1,
-          "losses": 4,
-          "gf": 8,
-          "ga": 16,
-          "ppg": 0.667,
-          "avgGF": 1.333,
-          "avgGA": 2.667
-        }
-      },
-      "away": {
-        "name": "Valerenga",
-        "form": {
-          "played": 5,
-          "wins": 3,
-          "draws": 0,
-          "losses": 2,
-          "gf": 11,
-          "ga": 6,
-          "ppg": 1.8,
-          "avgGF": 2.2,
-          "avgGA": 1.2
-        }
-      },
-      "historyScore": 11,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 6,
-          "lastRecorded": "2026-11-01",
-          "lastAgeDays": 8,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 5,
-          "lastRecorded": "2026-11-01",
-          "lastAgeDays": 8,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:29.936029+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 3,
-          "wins": 0,
-          "draws": 1,
-          "losses": 2,
-          "avgGF": 1.0,
-          "avgGA": 2.67
-        },
-        "awayVenueForm": {
-          "played": 3,
-          "wins": 1,
-          "draws": 0,
-          "losses": 2,
-          "avgGF": 1.33,
-          "avgGA": 1.67
-        },
-        "homeRestDays": 7,
-        "awayRestDays": 7,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-11-01",
-        "awayLastRecorded": "2026-11-01",
-        "homeHistoryAgeDays": 8,
-        "awayHistoryAgeDays": 8,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 6,
-            "lastRecorded": "2026-11-01",
-            "lastAgeDays": 8,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 5,
-            "lastRecorded": "2026-11-01",
-            "lastAgeDays": 8,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Kristiansund Stadion",
-          "city": "Kristiansand"
-        },
-        "homeTeamId": 320,
-        "awayTeamId": 326,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": false,
-          "sourceCount": 0,
-          "status": "meno_di_tre_bookmaker"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 6,
-            "gamesExamined": 6,
-            "opponentsAvgPPG": 1.45,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 5,
-            "gamesExamined": 5,
-            "opponentsAvgPPG": 1.418,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": -1.133,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 1,
-        "awayWinStreak": 1,
-        "drawOdd": null,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 6,
-        "awayGames": 5,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 1.438,
-          "away": 1.718
-        },
-        "probabilities": {
-          "1": 0.32304,
-          "X": 0.23369,
-          "2": 0.44328,
-          "1X": 0.55672,
-          "X2": 0.67696,
-          "12": 0.76631,
-          "GOAL": 0.62581,
-          "NO GOAL": 0.37419,
-          "OVER 1.5": 0.82302,
-          "UNDER 1.5": 0.17698,
-          "OVER 2.5": 0.61091,
-          "UNDER 2.5": 0.38909,
-          "OVER 3.5": 0.38775,
-          "UNDER 3.5": 0.61225,
-          "PARI": 0.50091,
-          "DISPARI": 0.49909
         },
         "topScores": [],
         "topScoreDominant": false,
@@ -2666,7 +1588,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:30.481627+01:00",
+        "generatedAt": "2026-11-09T22:26:47.350588+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2865,7 +1787,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:31.303596+01:00",
+        "generatedAt": "2026-11-09T22:26:48.419480+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3064,7 +1986,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:31.607511+01:00",
+        "generatedAt": "2026-11-09T22:26:48.778926+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3263,7 +2185,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:31.745257+01:00",
+        "generatedAt": "2026-11-09T22:26:48.958286+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3462,7 +2384,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:32.293277+01:00",
+        "generatedAt": "2026-11-09T22:26:49.666721+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3661,7 +2583,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:32.293775+01:00",
+        "generatedAt": "2026-11-09T22:26:49.667270+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3800,212 +2722,6 @@
       "candidates": []
     },
     {
-      "fixtureId": 1621088,
-      "date": "2026-11-09",
-      "timestamp": 1794250800,
-      "country": "England",
-      "league": "Premier League 2 Division One",
-      "priority": 5,
-      "home": {
-        "name": "Middlesbrough U21",
-        "form": {
-          "played": 4,
-          "wins": 1,
-          "draws": 0,
-          "losses": 3,
-          "gf": 6,
-          "ga": 13,
-          "ppg": 0.75,
-          "avgGF": 1.5,
-          "avgGA": 3.25
-        }
-      },
-      "away": {
-        "name": "Derby County U21",
-        "form": {
-          "played": 6,
-          "wins": 1,
-          "draws": 2,
-          "losses": 3,
-          "gf": 13,
-          "ga": 13,
-          "ppg": 0.833,
-          "avgGF": 2.167,
-          "avgGA": 2.167
-        }
-      },
-      "historyScore": 10,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-11-03",
-          "lastAgeDays": 6,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": true,
-          "reason": "ok",
-          "recentGames": 6,
-          "lastRecorded": "2026-11-03",
-          "lastAgeDays": 6,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:34.131776+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 2,
-          "wins": 1,
-          "draws": 0,
-          "losses": 1,
-          "avgGF": 2.0,
-          "avgGA": 2.0
-        },
-        "awayVenueForm": {
-          "played": 5,
-          "wins": 1,
-          "draws": 2,
-          "losses": 2,
-          "avgGF": 2.0,
-          "avgGA": 1.8
-        },
-        "homeRestDays": 5,
-        "awayRestDays": 5,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-11-03",
-        "awayLastRecorded": "2026-11-03",
-        "homeHistoryAgeDays": 6,
-        "awayHistoryAgeDays": 6,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-11-03",
-            "lastAgeDays": 6,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": true,
-            "reason": "ok",
-            "recentGames": 6,
-            "lastRecorded": "2026-11-03",
-            "lastAgeDays": 6,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Heritage Park",
-          "city": "Bishop Auckland"
-        },
-        "homeTeamId": 11910,
-        "awayTeamId": 19745,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 9,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.48631,
-            "X": 0.22429,
-            "2": 0.2894
-          },
-          "dispersion": 0.0378,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 2,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": null,
-            "status": "non_verificabile"
-          },
-          "away": {
-            "coverage": 5,
-            "gamesExamined": 6,
-            "opponentsAvgPPG": 1.028,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": -0.083,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 1,
-        "awayWinStreak": 0,
-        "drawOdd": 4.0,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 4,
-        "awayGames": 6,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 1.711,
-          "away": 1.763
-        },
-        "probabilities": {
-          "1": 0.37734,
-          "X": 0.22365,
-          "2": 0.39901,
-          "1X": 0.60099,
-          "X2": 0.62266,
-          "12": 0.77635,
-          "GOAL": 0.67878,
-          "NO GOAL": 0.32122,
-          "OVER 1.5": 0.86134,
-          "UNDER 1.5": 0.13866,
-          "OVER 2.5": 0.67432,
-          "UNDER 2.5": 0.32568,
-          "OVER 3.5": 0.45775,
-          "UNDER 3.5": 0.54225,
-          "PARI": 0.50048,
-          "DISPARI": 0.49952
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
       "fixtureId": 1638332,
       "date": "2026-11-10",
       "timestamp": 1794332700,
@@ -4066,7 +2782,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:35.192320+01:00",
+        "generatedAt": "2026-11-09T22:26:50.849826+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4134,11 +2850,11 @@
           "sourceCount": 9,
           "status": "verificato",
           "probabilities": {
-            "1": 0.66807,
-            "X": 0.18804,
-            "2": 0.14389
+            "1": 0.65524,
+            "X": 0.19558,
+            "2": 0.14918
           },
-          "dispersion": 0.0324,
+          "dispersion": 0.0336,
           "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
@@ -4161,7 +2877,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 1,
-        "drawOdd": 4.8,
+        "drawOdd": 4.75,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -4193,816 +2909,6 @@
           "UNDER 3.5": 0.64213,
           "PARI": 0.50118,
           "DISPARI": 0.49882
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1551374,
-      "date": "2026-11-09",
-      "timestamp": 1794247200,
-      "country": "Denmark",
-      "league": "1. Division",
-      "priority": 2,
-      "home": {
-        "name": "Hvidovre",
-        "form": {
-          "played": 4,
-          "wins": 2,
-          "draws": 2,
-          "losses": 0,
-          "gf": 6,
-          "ga": 4,
-          "ppg": 2.0,
-          "avgGF": 1.5,
-          "avgGA": 1.0
-        }
-      },
-      "away": {
-        "name": "Aarhus Fremad",
-        "form": {
-          "played": 5,
-          "wins": 1,
-          "draws": 2,
-          "losses": 2,
-          "gf": 2,
-          "ga": 5,
-          "ppg": 1.0,
-          "avgGF": 0.4,
-          "avgGA": 1.0
-        }
-      },
-      "historyScore": 9,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 5,
-          "lastRecorded": "2026-11-01",
-          "lastAgeDays": 8,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:36.022147+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 2,
-          "wins": 1,
-          "draws": 1,
-          "losses": 0,
-          "avgGF": 1.5,
-          "avgGA": 1.0
-        },
-        "awayVenueForm": {
-          "played": 2,
-          "wins": 0,
-          "draws": 1,
-          "losses": 1,
-          "avgGF": 0.0,
-          "avgGA": 1.0
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 7,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-11-01",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 8,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 5,
-            "lastRecorded": "2026-11-01",
-            "lastAgeDays": 8,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Hvidovre Stadium",
-          "city": "Hvidovre"
-        },
-        "homeTeamId": 2072,
-        "awayTeamId": 6004,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": false,
-          "sourceCount": 0,
-          "status": "meno_di_tre_bookmaker"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 4,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": 1.325,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 5,
-            "gamesExamined": 5,
-            "opponentsAvgPPG": 1.62,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 1.0,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 1,
-        "drawOdd": null,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 4,
-        "awayGames": 5,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 1.302,
-          "away": 0.97
-        },
-        "probabilities": {
-          "1": 0.44166,
-          "X": 0.28068,
-          "2": 0.27766,
-          "1X": 0.72234,
-          "X2": 0.55834,
-          "12": 0.71932,
-          "GOAL": 0.45206,
-          "NO GOAL": 0.54794,
-          "OVER 1.5": 0.66266,
-          "UNDER 1.5": 0.33734,
-          "OVER 2.5": 0.39655,
-          "UNDER 2.5": 0.60345,
-          "OVER 3.5": 0.195,
-          "UNDER 3.5": 0.805,
-          "PARI": 0.50531,
-          "DISPARI": 0.49469
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1593167,
-      "date": "2026-11-09",
-      "timestamp": 1794243600,
-      "country": "Germany",
-      "league": "Frauen Bundesliga",
-      "priority": 5,
-      "home": {
-        "name": "FC Koln W",
-        "form": {
-          "played": 4,
-          "wins": 2,
-          "draws": 0,
-          "losses": 2,
-          "gf": 4,
-          "ga": 5,
-          "ppg": 1.5,
-          "avgGF": 1.0,
-          "avgGA": 1.25
-        }
-      },
-      "away": {
-        "name": "RB Leipzig W",
-        "form": {
-          "played": 4,
-          "wins": 2,
-          "draws": 0,
-          "losses": 2,
-          "gf": 9,
-          "ga": 6,
-          "ppg": 1.5,
-          "avgGF": 2.25,
-          "avgGA": 1.5
-        }
-      },
-      "historyScore": 8,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:36.928795+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 3,
-          "wins": 2,
-          "draws": 0,
-          "losses": 1,
-          "avgGF": 1.33,
-          "avgGA": 0.67
-        },
-        "awayVenueForm": {
-          "played": 2,
-          "wins": 1,
-          "draws": 0,
-          "losses": 1,
-          "avgGF": 1.5,
-          "avgGA": 0.5
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 8,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-10-31",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 9,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Südstadion",
-          "city": "Cologne"
-        },
-        "homeTeamId": 1871,
-        "awayTeamId": 20501,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 10,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.4914,
-            "X": 0.25076,
-            "2": 0.25784
-          },
-          "dispersion": 0.0345,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 3,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": 1.467,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 3,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": 1.289,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 0.0,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 1,
-        "awayWinStreak": 0,
-        "drawOdd": 3.62,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 4,
-        "awayGames": 4,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 1.465,
-          "away": 1.175
-        },
-        "probabilities": {
-          "1": 0.43824,
-          "X": 0.25834,
-          "2": 0.30342,
-          "1X": 0.69658,
-          "X2": 0.56176,
-          "12": 0.74166,
-          "GOAL": 0.53139,
-          "NO GOAL": 0.46861,
-          "OVER 1.5": 0.74019,
-          "UNDER 1.5": 0.25981,
-          "OVER 2.5": 0.4915,
-          "UNDER 2.5": 0.5085,
-          "OVER 3.5": 0.27267,
-          "UNDER 3.5": 0.72733,
-          "PARI": 0.50255,
-          "DISPARI": 0.49745
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1573633,
-      "date": "2026-11-09",
-      "timestamp": 1794247200,
-      "country": "Spain",
-      "league": "Primera División Femenina",
-      "priority": 5,
-      "home": {
-        "name": "Atletico Madrid W",
-        "form": {
-          "played": 4,
-          "wins": 3,
-          "draws": 1,
-          "losses": 0,
-          "gf": 11,
-          "ga": 2,
-          "ppg": 2.5,
-          "avgGF": 2.75,
-          "avgGA": 0.5
-        }
-      },
-      "away": {
-        "name": "FC Levante Badalona W",
-        "form": {
-          "played": 4,
-          "wins": 0,
-          "draws": 1,
-          "losses": 3,
-          "gf": 3,
-          "ga": 12,
-          "ppg": 0.25,
-          "avgGF": 0.75,
-          "avgGA": 3.0
-        }
-      },
-      "historyScore": 8,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-11-01",
-          "lastAgeDays": 8,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:37.813727+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 2,
-          "wins": 2,
-          "draws": 0,
-          "losses": 0,
-          "avgGF": 4.0,
-          "avgGA": 0.0
-        },
-        "awayVenueForm": {
-          "played": 2,
-          "wins": 0,
-          "draws": 1,
-          "losses": 1,
-          "avgGF": 1.5,
-          "avgGA": 2.0
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 7,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-11-01",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 8,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-11-01",
-            "lastAgeDays": 8,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Centro Deportivo Alcala de Henares",
-          "city": "Madrid"
-        },
-        "homeTeamId": 1910,
-        "awayTeamId": 19896,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": true,
-          "sourceCount": 9,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.69459,
-            "X": 0.18527,
-            "2": 0.12014
-          },
-          "dispersion": 0.0306,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 2,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": null,
-            "status": "non_verificabile"
-          },
-          "away": {
-            "coverage": 3,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": 1.367,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 2.25,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 0,
-        "drawOdd": 4.85,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 4,
-        "awayGames": 4,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 2.243,
-          "away": 0.733
-        },
-        "probabilities": {
-          "1": 0.71703,
-          "X": 0.17631,
-          "2": 0.10667,
-          "1X": 0.89333,
-          "X2": 0.28297,
-          "12": 0.82369,
-          "GOAL": 0.46435,
-          "NO GOAL": 0.53565,
-          "OVER 1.5": 0.7972,
-          "UNDER 1.5": 0.2028,
-          "OVER 2.5": 0.57135,
-          "UNDER 2.5": 0.42865,
-          "OVER 3.5": 0.34733,
-          "UNDER 3.5": 0.65267,
-          "PARI": 0.5013,
-          "DISPARI": 0.4987
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1573636,
-      "date": "2026-11-09",
-      "timestamp": 1794254400,
-      "country": "Spain",
-      "league": "Primera División Femenina",
-      "priority": 5,
-      "home": {
-        "name": "Deportivo de La Coruña W",
-        "form": {
-          "played": 4,
-          "wins": 2,
-          "draws": 0,
-          "losses": 2,
-          "gf": 7,
-          "ga": 7,
-          "ppg": 1.5,
-          "avgGF": 1.75,
-          "avgGA": 1.75
-        }
-      },
-      "away": {
-        "name": "Valencia W",
-        "form": {
-          "played": 4,
-          "wins": 1,
-          "draws": 0,
-          "losses": 3,
-          "gf": 2,
-          "ga": 7,
-          "ppg": 0.75,
-          "avgGF": 0.5,
-          "avgGA": 1.75
-        }
-      },
-      "historyScore": 8,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 4,
-          "lastRecorded": "2026-10-31",
-          "lastAgeDays": 9,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:38.396771+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 2,
-          "wins": 1,
-          "draws": 0,
-          "losses": 1,
-          "avgGF": 1.5,
-          "avgGA": 1.5
-        },
-        "awayVenueForm": {
-          "played": 2,
-          "wins": 0,
-          "draws": 0,
-          "losses": 2,
-          "avgGF": 0.0,
-          "avgGA": 2.5
-        },
-        "homeRestDays": 8,
-        "awayRestDays": 8,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "indicativo",
-        "homeLastRecorded": "2026-10-31",
-        "awayLastRecorded": "2026-10-31",
-        "homeHistoryAgeDays": 9,
-        "awayHistoryAgeDays": 9,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 4,
-            "lastRecorded": "2026-10-31",
-            "lastAgeDays": 9,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "Estadio Municipal de Riazor",
-          "city": ""
-        },
-        "homeTeamId": 6376,
-        "awayTeamId": 1909,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": false,
-          "sourceCount": 0,
-          "status": "meno_di_tre_bookmaker"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 2,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": null,
-            "status": "non_verificabile"
-          },
-          "away": {
-            "coverage": 3,
-            "gamesExamined": 4,
-            "opponentsAvgPPG": 1.311,
-            "status": "stimabile"
-          }
-        },
-        "relativeFormPPG": 0.75,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 1,
-        "drawOdd": null,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "esplorativa",
-        "note": "Campione ridotto o datato: valori matematici esplorativi, non validati e non utilizzabili come consigli di giocata.",
-        "homeGames": 4,
-        "awayGames": 4,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": 1.667,
-          "away": 1.15
-        },
-        "probabilities": {
-          "1": 0.49435,
-          "X": 0.24256,
-          "2": 0.26309,
-          "1X": 0.73691,
-          "X2": 0.50565,
-          "12": 0.75744,
-          "GOAL": 0.55431,
-          "NO GOAL": 0.44569,
-          "OVER 1.5": 0.77177,
-          "UNDER 1.5": 0.22823,
-          "OVER 2.5": 0.53454,
-          "UNDER 2.5": 0.46546,
-          "OVER 3.5": 0.3118,
-          "UNDER 3.5": 0.6882,
-          "PARI": 0.50179,
-          "DISPARI": 0.49821
         },
         "topScores": [],
         "topScoreDominant": false,
@@ -5082,7 +2988,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:39.566949+01:00",
+        "generatedAt": "2026-11-09T22:26:52.377951+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5146,9 +3052,16 @@
       },
       "riskSignals": {
         "market1X2": {
-          "available": false,
-          "sourceCount": 0,
-          "status": "meno_di_tre_bookmaker"
+          "available": true,
+          "sourceCount": 7,
+          "status": "verificato",
+          "probabilities": {
+            "1": 0.29258,
+            "X": 0.23928,
+            "2": 0.46813
+          },
+          "dispersion": 0.0335,
+          "method": "mediana_probabilita_quote_1x2_senza_margine"
         },
         "opponentStrength": {
           "home": {
@@ -5170,7 +3083,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 3,
         "awayWinStreak": 0,
-        "drawOdd": null,
+        "drawOdd": 3.74,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -5281,7 +3194,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:40.375134+01:00",
+        "generatedAt": "2026-11-09T22:26:53.439218+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5401,205 +3314,6 @@
           "UNDER 3.5": 0.81403,
           "PARI": 0.50582,
           "DISPARI": 0.49418
-        },
-        "topScores": [],
-        "topScoreDominant": false,
-        "topScoreLead": null,
-        "scoreNote": "Risultati esatti non mostrati: storico recente insufficiente"
-      },
-      "analyzedMarketOptions": [],
-      "prediction": {
-        "available": false,
-        "selection": null,
-        "market": null,
-        "confidence": null,
-        "oddAvailable": false,
-        "odd": null,
-        "bookmaker": null
-      },
-      "candidates": []
-    },
-    {
-      "fixtureId": 1627107,
-      "date": "2026-11-09",
-      "timestamp": 1794250800,
-      "country": "England",
-      "league": "Premier League Cup",
-      "priority": 5,
-      "home": {
-        "name": "West Bromwich Albion U21",
-        "form": {
-          "played": 5,
-          "wins": 0,
-          "draws": 1,
-          "losses": 4,
-          "gf": 7,
-          "ga": 12,
-          "ppg": 0.2,
-          "avgGF": 1.4,
-          "avgGA": 2.4
-        }
-      },
-      "away": {
-        "name": "Bromley U21",
-        "form": {
-          "played": 1,
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "gf": 1,
-          "ga": 2,
-          "ppg": 0.0,
-          "avgGF": 1.0,
-          "avgGA": 2.0
-        }
-      },
-      "historyScore": 6,
-      "historyEligible": false,
-      "historyQuality": {
-        "home": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 5,
-          "lastRecorded": "2026-11-03",
-          "lastAgeDays": 6,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        },
-        "away": {
-          "eligible": false,
-          "reason": "storico_insufficiente",
-          "recentGames": 1,
-          "lastRecorded": "2026-10-13",
-          "lastAgeDays": 27,
-          "windowDays": 90,
-          "requiredRecentGames": 5,
-          "maxLastAgeDays": 30
-        }
-      },
-      "context": {
-        "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-09T14:57:41.219235+01:00",
-        "injuriesStatus": "non_verificato",
-        "injuriesRequestStatus": "non_disponibile_piano",
-        "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
-        "homeInjuries": [],
-        "awayInjuries": [],
-        "homeVenueForm": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "avgGF": null,
-          "avgGA": null
-        },
-        "awayVenueForm": {
-          "played": 0,
-          "wins": 0,
-          "draws": 0,
-          "losses": 0,
-          "avgGF": null,
-          "avgGA": null
-        },
-        "homeRestDays": 5,
-        "awayRestDays": null,
-        "homeRestStatus": "indicativo",
-        "awayRestStatus": "storico_non_recente",
-        "homeLastRecorded": "2026-11-03",
-        "awayLastRecorded": "2026-10-13",
-        "homeHistoryAgeDays": 6,
-        "awayHistoryAgeDays": 27,
-        "historyEligible": false,
-        "historyQuality": {
-          "home": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 5,
-            "lastRecorded": "2026-11-03",
-            "lastAgeDays": 6,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          },
-          "away": {
-            "eligible": false,
-            "reason": "storico_insufficiente",
-            "recentGames": 1,
-            "lastRecorded": "2026-10-13",
-            "lastAgeDays": 27,
-            "windowDays": 90,
-            "requiredRecentGames": 5,
-            "maxLastAgeDays": 30
-          }
-        },
-        "venue": {
-          "name": "",
-          "city": ""
-        },
-        "homeTeamId": 11913,
-        "awayTeamId": 24846,
-        "lineupsStatus": "non_verificato",
-        "note": "Le assenze e il riposo non modificano ancora automaticamente i gol attesi. Una gara datata oltre 21 giorni non documenta il riposo effettivo."
-      },
-      "riskSignals": {
-        "market1X2": {
-          "available": false,
-          "sourceCount": 0,
-          "status": "meno_di_tre_bookmaker"
-        },
-        "opponentStrength": {
-          "home": {
-            "coverage": 4,
-            "gamesExamined": 5,
-            "opponentsAvgPPG": 1.762,
-            "status": "stimabile"
-          },
-          "away": {
-            "coverage": 1,
-            "gamesExamined": 1,
-            "opponentsAvgPPG": null,
-            "status": "non_verificabile"
-          }
-        },
-        "relativeFormPPG": 0.2,
-        "blockedSelections": [],
-        "newsStatus": "non_verificato_nessun_feed_notizie",
-        "officialStandingStatus": "non_verificata_nessun_feed_classifica",
-        "homeWinStreak": 0,
-        "awayWinStreak": 0,
-        "drawOdd": null,
-        "drawAttention": false,
-        "engineModel": "poisson_v10_uncalibrated"
-      },
-      "modelAnalysis": {
-        "status": "non_calcolabile",
-        "note": "Servono almeno 4 partite storiche per ciascuna squadra prima del calcio d'inizio; non presentiamo il prior come previsione.",
-        "homeGames": 5,
-        "awayGames": 1,
-        "source": "storico_squadre_poisson_indipendente",
-        "exactScoreEligible": false,
-        "expectedGoals": {
-          "home": null,
-          "away": null
-        },
-        "probabilities": {
-          "1": null,
-          "X": null,
-          "2": null,
-          "1X": null,
-          "X2": null,
-          "12": null,
-          "GOAL": null,
-          "NO GOAL": null,
-          "OVER 1.5": null,
-          "UNDER 1.5": null,
-          "OVER 2.5": null,
-          "UNDER 2.5": null,
-          "OVER 3.5": null,
-          "UNDER 3.5": null,
-          "PARI": null,
-          "DISPARI": null
         },
         "topScores": [],
         "topScoreDominant": false,
