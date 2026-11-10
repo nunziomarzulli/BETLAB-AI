@@ -1,97 +1,97 @@
 {
   "method": "walk_forward_by_date_no_same_day_or_future_results",
   "type": "retrospective_exploratory_not_out_of_sample_final_validation",
-  "historicalResultsTotal": 33350,
-  "fixturesDuringTestPeriod": 26680,
-  "historyEligibleDuringTestPeriod": 5530,
-  "forecastsEvaluated": 5530,
+  "historicalResultsTotal": 33355,
+  "fixturesDuringTestPeriod": 26685,
+  "historyEligibleDuringTestPeriod": 5531,
+  "forecastsEvaluated": 5531,
   "startOfTestWindow": "2026-02-13",
   "cutoffDateExclusive": "2026-11-10",
-  "accuracy1X2": 0.477,
-  "baselineAccuracy1X2": 0.4434,
+  "accuracy1X2": 0.4769,
+  "baselineAccuracy1X2": 0.4433,
   "brier1X2": 0.6248,
   "baselineBrier1X2": 0.6478,
-  "logLoss1X2": 1.0392,
-  "baselineLogLoss1X2": 1.071,
+  "logLoss1X2": 1.0393,
+  "baselineLogLoss1X2": 1.0711,
   "requiredMinimum": 100,
   "status": "measured_not_proven",
   "note": "Valutazione retrospettiva cronologica 1X2 e mercati binari: nessuna quota storica inclusa, nessuna prova di profitto.",
   "marketMetrics": {
     "GOAL": {
-      "n": 5530,
-      "accuracy": 0.5302,
-      "baselineAccuracy": 0.559,
+      "n": 5531,
+      "accuracy": 0.5301,
+      "baselineAccuracy": 0.5589,
       "brier": 0.2489,
       "baselineBrier": 0.246,
       "status": "exploratory"
     },
     "NO GOAL": {
-      "n": 5530,
-      "accuracy": 0.53,
-      "baselineAccuracy": 0.5582,
+      "n": 5531,
+      "accuracy": 0.5299,
+      "baselineAccuracy": 0.5581,
       "brier": 0.2489,
       "baselineBrier": 0.246,
       "status": "exploratory"
     },
     "OVER 1.5": {
-      "n": 5530,
-      "accuracy": 0.7765,
-      "baselineAccuracy": 0.7769,
-      "brier": 0.1762,
-      "baselineBrier": 0.1753,
+      "n": 5531,
+      "accuracy": 0.7764,
+      "baselineAccuracy": 0.7767,
+      "brier": 0.1763,
+      "baselineBrier": 0.1754,
       "status": "exploratory"
     },
     "UNDER 1.5": {
-      "n": 5530,
-      "accuracy": 0.7765,
-      "baselineAccuracy": 0.7769,
-      "brier": 0.1762,
-      "baselineBrier": 0.1753,
+      "n": 5531,
+      "accuracy": 0.7764,
+      "baselineAccuracy": 0.7767,
+      "brier": 0.1763,
+      "baselineBrier": 0.1754,
       "status": "exploratory"
     },
     "OVER 2.5": {
-      "n": 5530,
-      "accuracy": 0.536,
-      "baselineAccuracy": 0.5347,
+      "n": 5531,
+      "accuracy": 0.5359,
+      "baselineAccuracy": 0.5346,
       "brier": 0.2495,
       "baselineBrier": 0.2474,
       "status": "exploratory"
     },
     "UNDER 2.5": {
-      "n": 5530,
-      "accuracy": 0.536,
-      "baselineAccuracy": 0.5315,
+      "n": 5531,
+      "accuracy": 0.5359,
+      "baselineAccuracy": 0.5314,
       "brier": 0.2495,
       "baselineBrier": 0.2474,
       "status": "exploratory"
     },
     "OVER 3.5": {
-      "n": 5530,
-      "accuracy": 0.6882,
-      "baselineAccuracy": 0.6873,
+      "n": 5531,
+      "accuracy": 0.6883,
+      "baselineAccuracy": 0.6874,
       "brier": 0.2135,
-      "baselineBrier": 0.2132,
+      "baselineBrier": 0.2131,
       "status": "exploratory"
     },
     "UNDER 3.5": {
-      "n": 5530,
-      "accuracy": 0.6882,
-      "baselineAccuracy": 0.6873,
+      "n": 5531,
+      "accuracy": 0.6883,
+      "baselineAccuracy": 0.6874,
       "brier": 0.2135,
-      "baselineBrier": 0.2132,
+      "baselineBrier": 0.2131,
       "status": "exploratory"
     },
     "PARI": {
-      "n": 5530,
-      "accuracy": 0.5004,
-      "baselineAccuracy": 0.4861,
+      "n": 5531,
+      "accuracy": 0.5005,
+      "baselineAccuracy": 0.486,
       "brier": 0.25,
       "baselineBrier": 0.2513,
       "status": "exploratory"
     },
     "DISPARI": {
-      "n": 5530,
-      "accuracy": 0.5004,
+      "n": 5531,
+      "accuracy": 0.5005,
       "baselineAccuracy": 0.4844,
       "brier": 0.25,
       "baselineBrier": 0.2513,
@@ -99,9 +99,9 @@
     }
   },
   "exactScoreDiagnostic": {
-    "n": 5530,
+    "n": 5531,
     "topOneAccuracy": 0.1108,
-    "shareTopOneIs1to1": 0.7204,
+    "shareTopOneIs1to1": 0.7205,
     "shareTopOneDominant": 0.0096,
     "note": "Punteggio esatto: scenario piu probabile, non esito sicuro."
   },
@@ -173,10 +173,10 @@
       "baselineBrier": 0.6594
     },
     "Spain / Segunda Division": {
-      "n": 234,
-      "accuracy": 0.4786,
-      "brier": 0.6241,
-      "baselineBrier": 0.6362
+      "n": 235,
+      "accuracy": 0.4766,
+      "brier": 0.6252,
+      "baselineBrier": 0.6372
     },
     "Brazil / Serie A": {
       "n": 204,
@@ -323,5 +323,5 @@
       "baselineBrier": 0.6291
     }
   },
-  "generatedAt": "2026-11-10T01:15:31.069178+01:00"
+  "generatedAt": "2026-11-10T14:31:30.416811+01:00"
 }
