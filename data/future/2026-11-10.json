@@ -2192,8 +2192,8 @@
           "second": 1794337200
         },
         "venue": {
-          "id": null,
-          "name": "Stade des Costières",
+          "id": 19777,
+          "name": "Stade des Antonins",
           "city": "Nimes"
         },
         "status": {
@@ -2827,9 +2827,9 @@
           "city": null
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -2848,27 +2848,27 @@
           "id": 13120,
           "name": "América de Pedrinhas",
           "logo": "https://media.api-sports.io/football/teams/13120.png",
-          "winner": null
+          "winner": false
         },
         "away": {
           "id": 24810,
           "name": "Flamengo SE",
           "logo": "https://media.api-sports.io/football/teams/24810.png",
-          "winner": null
+          "winner": true
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 3
       },
       "score": {
         "halftime": {
-          "home": null,
-          "away": null
+          "home": 0,
+          "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 0,
+          "away": 3
         },
         "extratime": {
           "home": null,
@@ -2888,8 +2888,8 @@
         "date": "2026-11-10T18:00:00+00:00",
         "timestamp": 1794333600,
         "periods": {
-          "first": null,
-          "second": null
+          "first": 1794333600,
+          "second": 1794337200
         },
         "venue": {
           "id": null,
@@ -2897,9 +2897,9 @@
           "city": null
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -2918,18 +2918,18 @@
           "id": 24806,
           "name": "Caninde",
           "logo": "https://media.api-sports.io/football/teams/24806.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 24818,
           "name": "Socorrense",
           "logo": "https://media.api-sports.io/football/teams/24818.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "score": {
         "halftime": {
@@ -2937,8 +2937,8 @@
           "away": null
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 2,
+          "away": 1
         },
         "extratime": {
           "home": null,
@@ -3092,6 +3092,76 @@
     },
     {
       "fixture": {
+        "id": 1649437,
+        "referee": null,
+        "timezone": "UTC",
+        "date": "2026-11-10T18:00:00+00:00",
+        "timestamp": 1794333600,
+        "periods": {
+          "first": 1794333600,
+          "second": 1794337200
+        },
+        "venue": {
+          "id": null,
+          "name": null,
+          "city": null
+        },
+        "status": {
+          "long": "Match Finished",
+          "short": "PEN",
+          "elapsed": 120,
+          "extra": null
+        }
+      },
+      "league": {
+        "id": 622,
+        "name": "Pernambucano - 1",
+        "country": "Brazil",
+        "logo": "https://media.api-sports.io/football/leagues/622.png",
+        "flag": "https://media.api-sports.io/flags/br.svg",
+        "season": 2027,
+        "round": "Semi-finals",
+        "standings": true
+      },
+      "teams": {
+        "home": {
+          "id": 7853,
+          "name": "Atlético PE",
+          "logo": "https://media.api-sports.io/football/teams/7853.png",
+          "winner": false
+        },
+        "away": {
+          "id": 28687,
+          "name": "Guarany de Camaragibe",
+          "logo": "https://media.api-sports.io/football/teams/28687.png",
+          "winner": true
+        }
+      },
+      "goals": {
+        "home": 1,
+        "away": 1
+      },
+      "score": {
+        "halftime": {
+          "home": 0,
+          "away": 0
+        },
+        "fulltime": {
+          "home": 1,
+          "away": 1
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": 2,
+          "away": 4
+        }
+      }
+    },
+    {
+      "fixture": {
         "id": 1649438,
         "referee": null,
         "timezone": "UTC",
@@ -3149,6 +3219,76 @@
         "fulltime": {
           "home": 3,
           "away": 1
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": 1649439,
+        "referee": null,
+        "timezone": "UTC",
+        "date": "2026-11-10T18:00:00+00:00",
+        "timestamp": 1794333600,
+        "periods": {
+          "first": 1794333600,
+          "second": 1794337200
+        },
+        "venue": {
+          "id": null,
+          "name": null,
+          "city": null
+        },
+        "status": {
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
+          "extra": null
+        }
+      },
+      "league": {
+        "id": 622,
+        "name": "Pernambucano - 1",
+        "country": "Brazil",
+        "logo": "https://media.api-sports.io/football/leagues/622.png",
+        "flag": "https://media.api-sports.io/flags/br.svg",
+        "season": 2027,
+        "round": "Semi-finals",
+        "standings": true
+      },
+      "teams": {
+        "home": {
+          "id": 22821,
+          "name": "Jaguaré",
+          "logo": "https://media.api-sports.io/football/teams/22821.png",
+          "winner": false
+        },
+        "away": {
+          "id": 24121,
+          "name": "Ipojuca",
+          "logo": "https://media.api-sports.io/football/teams/24121.png",
+          "winner": true
+        }
+      },
+      "goals": {
+        "home": 1,
+        "away": 2
+      },
+      "score": {
+        "halftime": {
+          "home": 0,
+          "away": 1
+        },
+        "fulltime": {
+          "home": 1,
+          "away": 2
         },
         "extratime": {
           "home": null,
@@ -4363,8 +4503,8 @@
         },
         "venue": {
           "id": 12288,
-          "name": "Instalaciones de Lezama",
-          "city": "Lezama"
+          "name": "Campo Municipal de Urritxe",
+          "city": "Amorebieta-Etxano"
         },
         "status": {
           "long": "Match Finished",
@@ -4503,8 +4643,8 @@
         },
         "venue": {
           "id": 6807,
-          "name": "Campo de Futbol La Canaleja",
-          "city": "Alcorcon"
+          "name": "Estadio Municipal de Butarque",
+          "city": "Leganes"
         },
         "status": {
           "long": "Match Finished",
@@ -4549,146 +4689,6 @@
         "fulltime": {
           "home": 0,
           "away": 1
-        },
-        "extratime": {
-          "home": null,
-          "away": null
-        },
-        "penalty": {
-          "home": null,
-          "away": null
-        }
-      }
-    },
-    {
-      "fixture": {
-        "id": 1649437,
-        "referee": null,
-        "timezone": "UTC",
-        "date": "2026-11-10T19:00:00+00:00",
-        "timestamp": 1794337200,
-        "periods": {
-          "first": null,
-          "second": null
-        },
-        "venue": {
-          "id": null,
-          "name": null,
-          "city": null
-        },
-        "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
-          "extra": null
-        }
-      },
-      "league": {
-        "id": 622,
-        "name": "Pernambucano - 1",
-        "country": "Brazil",
-        "logo": "https://media.api-sports.io/football/leagues/622.png",
-        "flag": "https://media.api-sports.io/flags/br.svg",
-        "season": 2027,
-        "round": "Semi-finals",
-        "standings": true
-      },
-      "teams": {
-        "home": {
-          "id": 7853,
-          "name": "Atlético PE",
-          "logo": "https://media.api-sports.io/football/teams/7853.png",
-          "winner": null
-        },
-        "away": {
-          "id": 28687,
-          "name": "Guarany de Camaragibe",
-          "logo": "https://media.api-sports.io/football/teams/28687.png",
-          "winner": null
-        }
-      },
-      "goals": {
-        "home": null,
-        "away": null
-      },
-      "score": {
-        "halftime": {
-          "home": null,
-          "away": null
-        },
-        "fulltime": {
-          "home": null,
-          "away": null
-        },
-        "extratime": {
-          "home": null,
-          "away": null
-        },
-        "penalty": {
-          "home": null,
-          "away": null
-        }
-      }
-    },
-    {
-      "fixture": {
-        "id": 1649439,
-        "referee": null,
-        "timezone": "UTC",
-        "date": "2026-11-10T19:00:00+00:00",
-        "timestamp": 1794337200,
-        "periods": {
-          "first": null,
-          "second": null
-        },
-        "venue": {
-          "id": null,
-          "name": null,
-          "city": null
-        },
-        "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
-          "extra": null
-        }
-      },
-      "league": {
-        "id": 622,
-        "name": "Pernambucano - 1",
-        "country": "Brazil",
-        "logo": "https://media.api-sports.io/football/leagues/622.png",
-        "flag": "https://media.api-sports.io/flags/br.svg",
-        "season": 2027,
-        "round": "Semi-finals",
-        "standings": true
-      },
-      "teams": {
-        "home": {
-          "id": 22821,
-          "name": "Jaguaré",
-          "logo": "https://media.api-sports.io/football/teams/22821.png",
-          "winner": null
-        },
-        "away": {
-          "id": 24121,
-          "name": "Ipojuca",
-          "logo": "https://media.api-sports.io/football/teams/24121.png",
-          "winner": null
-        }
-      },
-      "goals": {
-        "home": null,
-        "away": null
-      },
-      "score": {
-        "halftime": {
-          "home": null,
-          "away": null
-        },
-        "fulltime": {
-          "home": null,
-          "away": null
         },
         "extratime": {
           "home": null,
@@ -5488,8 +5488,8 @@
         },
         "status": {
           "long": "Match Finished",
-          "short": "FT",
-          "elapsed": 90,
+          "short": "PEN",
+          "elapsed": 120,
           "extra": null
         }
       },
@@ -5508,13 +5508,13 @@
           "id": 1361,
           "name": "Colchester",
           "logo": "https://media.api-sports.io/football/teams/1361.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 20094,
           "name": "Ipswich Town U21",
           "logo": "https://media.api-sports.io/football/teams/20094.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
@@ -5531,12 +5531,12 @@
           "away": 0
         },
         "extratime": {
-          "home": null,
-          "away": null
+          "home": 0,
+          "away": 0
         },
         "penalty": {
-          "home": null,
-          "away": null
+          "home": 4,
+          "away": 3
         }
       }
     },
@@ -7027,8 +7027,8 @@
           "city": "Chertsey"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
+          "long": "Match Finished",
+          "short": "FT",
           "elapsed": 90,
           "extra": 9
         }
@@ -7067,8 +7067,8 @@
           "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 2,
+          "away": 1
         },
         "extratime": {
           "home": null,
@@ -7377,9 +7377,9 @@
           "city": "Rome"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
-          "elapsed": 89,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -7417,8 +7417,8 @@
           "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 2,
+          "away": 1
         },
         "extratime": {
           "home": null,
@@ -7447,10 +7447,10 @@
           "city": "Varese"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
+          "long": "Match Finished",
+          "short": "FT",
           "elapsed": 90,
-          "extra": 1
+          "extra": null
         }
       },
       "league": {
@@ -7487,8 +7487,8 @@
           "away": 2
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 4
         },
         "extratime": {
           "home": null,
@@ -7517,9 +7517,9 @@
           "city": "Paris"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
-          "elapsed": 87,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -7557,8 +7557,8 @@
           "away": 2
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 2
         },
         "extratime": {
           "home": null,
@@ -7657,10 +7657,10 @@
           "city": "Envigado"
         },
         "status": {
-          "long": "Second Half",
-          "short": "2H",
-          "elapsed": 60,
-          "extra": null
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
+          "extra": 1
         }
       },
       "league": {
@@ -7688,7 +7688,7 @@
         }
       },
       "goals": {
-        "home": 1,
+        "home": 2,
         "away": 0
       },
       "score": {
@@ -7697,8 +7697,8 @@
           "away": 0
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 2,
+          "away": 0
         },
         "extratime": {
           "home": null,
@@ -7719,7 +7719,7 @@
         "timestamp": 1794346200,
         "periods": {
           "first": 1794346200,
-          "second": null
+          "second": 1794349800
         },
         "venue": {
           "id": null,
@@ -7727,10 +7727,10 @@
           "city": "San Miguel"
         },
         "status": {
-          "long": "First Half",
-          "short": "1H",
-          "elapsed": 14,
-          "extra": null
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
+          "extra": 4
         }
       },
       "league": {
@@ -7748,17 +7748,17 @@
           "id": 24530,
           "name": "Cacahuatique",
           "logo": "https://media.api-sports.io/football/teams/24530.png",
-          "winner": false
+          "winner": null
         },
         "away": {
           "id": 4303,
           "name": "Firpo",
           "logo": "https://media.api-sports.io/football/teams/4303.png",
-          "winner": true
+          "winner": null
         }
       },
       "goals": {
-        "home": 0,
+        "home": 1,
         "away": 1
       },
       "score": {
@@ -7767,8 +7767,8 @@
           "away": 1
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 1
         },
         "extratime": {
           "home": null,
@@ -7788,8 +7788,8 @@
         "date": "2026-11-10T22:00:00+00:00",
         "timestamp": 1794348000,
         "periods": {
-          "first": null,
-          "second": null
+          "first": 1794348000,
+          "second": 1794351600
         },
         "venue": {
           "id": null,
@@ -7797,9 +7797,9 @@
           "city": "Juazeiro do Norte"
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -7818,27 +7818,27 @@
           "id": 1216,
           "name": "Guarani De Juazeiro",
           "logo": "https://media.api-sports.io/football/teams/1216.png",
-          "winner": null
+          "winner": true
         },
         "away": {
           "id": 24093,
           "name": "Quixada",
           "logo": "https://media.api-sports.io/football/teams/24093.png",
-          "winner": null
+          "winner": false
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 5,
+        "away": 1
       },
       "score": {
         "halftime": {
-          "home": null,
-          "away": null
+          "home": 3,
+          "away": 1
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 5,
+          "away": 1
         },
         "extratime": {
           "home": null,
@@ -7853,23 +7853,23 @@
     {
       "fixture": {
         "id": 1648690,
-        "referee": null,
+        "referee": "Jose Alexander Ortiz Novoa",
         "timezone": "UTC",
         "date": "2026-11-10T23:30:00+00:00",
         "timestamp": 1794353400,
         "periods": {
-          "first": null,
-          "second": null
+          "first": 1794353400,
+          "second": 1794357000
         },
         "venue": {
-          "id": null,
+          "id": 371,
           "name": "Estadio Metropolitano de Techo",
-          "city": null
+          "city": "Bogota"
         },
         "status": {
-          "long": "Not Started",
-          "short": "NS",
-          "elapsed": null,
+          "long": "Match Finished",
+          "short": "FT",
+          "elapsed": 90,
           "extra": null
         }
       },
@@ -7888,27 +7888,27 @@
           "id": 1134,
           "name": "Internacional de Bogota",
           "logo": "https://media.api-sports.io/football/teams/1134.png",
-          "winner": null
+          "winner": false
         },
         "away": {
           "id": 1138,
           "name": "America de Cali",
           "logo": "https://media.api-sports.io/football/teams/1138.png",
-          "winner": null
+          "winner": true
         }
       },
       "goals": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "score": {
         "halftime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 2
         },
         "fulltime": {
-          "home": null,
-          "away": null
+          "home": 1,
+          "away": 2
         },
         "extratime": {
           "home": null,
