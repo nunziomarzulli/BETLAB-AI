@@ -4,7 +4,7 @@
     "date": "2026-11-15"
   },
   "errors": [],
-  "results": 816,
+  "results": 817,
   "paging": {
     "current": 1,
     "total": 1
@@ -3775,6 +3775,76 @@
         "halftime": {
           "home": null,
           "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": 1581974,
+        "referee": null,
+        "timezone": "UTC",
+        "date": "2026-11-15T09:00:00+00:00",
+        "timestamp": 1794733200,
+        "periods": {
+          "first": 1794650400,
+          "second": 1794654000
+        },
+        "venue": {
+          "id": null,
+          "name": "Lokomotyv Stadium",
+          "city": "Poltava"
+        },
+        "status": {
+          "long": "Match Suspended",
+          "short": "SUSP",
+          "elapsed": null,
+          "extra": null
+        }
+      },
+      "league": {
+        "id": 334,
+        "name": "Persha Liga",
+        "country": "Ukraine",
+        "logo": "https://media.api-sports.io/football/leagues/334.png",
+        "flag": "https://media.api-sports.io/flags/ua.svg",
+        "season": 2026,
+        "round": "Regular Season - 16",
+        "standings": true
+      },
+      "teams": {
+        "home": {
+          "id": 17165,
+          "name": "SK Poltava",
+          "logo": "https://media.api-sports.io/football/teams/17165.png",
+          "winner": false
+        },
+        "away": {
+          "id": 3620,
+          "name": "Ahrobiznes Volochysk",
+          "logo": "https://media.api-sports.io/football/teams/3620.png",
+          "winner": true
+        }
+      },
+      "goals": {
+        "home": 1,
+        "away": 4
+      },
+      "score": {
+        "halftime": {
+          "home": 1,
+          "away": 2
         },
         "fulltime": {
           "home": null,
@@ -54202,9 +54272,9 @@
           "second": null
         },
         "venue": {
-          "id": 0,
-          "name": "Matmut Stadium",
-          "city": "Lyon"
+          "id": 638,
+          "name": "Matmut Atlantique",
+          "city": "Bordeaux"
         },
         "status": {
           "long": "Not Started",
