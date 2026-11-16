@@ -1,108 +1,108 @@
 {
   "method": "walk_forward_by_date_no_same_day_or_future_results",
   "type": "retrospective_exploratory_not_out_of_sample_final_validation",
-  "historicalResultsTotal": 34978,
-  "fixturesDuringTestPeriod": 28067,
-  "historyEligibleDuringTestPeriod": 5895,
-  "forecastsEvaluated": 5895,
-  "startOfTestWindow": "2026-02-18",
-  "cutoffDateExclusive": "2026-11-15",
-  "accuracy1X2": 0.4831,
-  "baselineAccuracy1X2": 0.4468,
-  "brier1X2": 0.6225,
-  "baselineBrier1X2": 0.6469,
-  "logLoss1X2": 1.036,
-  "baselineLogLoss1X2": 1.0699,
+  "historicalResultsTotal": 35792,
+  "fixturesDuringTestPeriod": 28875,
+  "historyEligibleDuringTestPeriod": 6329,
+  "forecastsEvaluated": 6329,
+  "startOfTestWindow": "2026-02-19",
+  "cutoffDateExclusive": "2026-11-16",
+  "accuracy1X2": 0.4846,
+  "baselineAccuracy1X2": 0.4473,
+  "brier1X2": 0.6219,
+  "baselineBrier1X2": 0.6468,
+  "logLoss1X2": 1.0351,
+  "baselineLogLoss1X2": 1.0697,
   "requiredMinimum": 100,
   "status": "measured_not_proven",
   "note": "Valutazione retrospettiva cronologica 1X2 e mercati binari: nessuna quota storica inclusa, nessuna prova di profitto.",
   "marketMetrics": {
     "GOAL": {
-      "n": 5895,
-      "accuracy": 0.5335,
-      "baselineAccuracy": 0.5635,
-      "brier": 0.2481,
-      "baselineBrier": 0.2458,
+      "n": 6329,
+      "accuracy": 0.5328,
+      "baselineAccuracy": 0.5606,
+      "brier": 0.2485,
+      "baselineBrier": 0.2462,
       "status": "exploratory"
     },
     "NO GOAL": {
-      "n": 5895,
-      "accuracy": 0.5333,
-      "baselineAccuracy": 0.562,
-      "brier": 0.2481,
-      "baselineBrier": 0.2458,
+      "n": 6329,
+      "accuracy": 0.5326,
+      "baselineAccuracy": 0.5587,
+      "brier": 0.2485,
+      "baselineBrier": 0.2462,
       "status": "exploratory"
     },
     "OVER 1.5": {
-      "n": 5895,
-      "accuracy": 0.7791,
-      "baselineAccuracy": 0.779,
-      "brier": 0.1738,
-      "baselineBrier": 0.175,
+      "n": 6329,
+      "accuracy": 0.7764,
+      "baselineAccuracy": 0.7764,
+      "brier": 0.1751,
+      "baselineBrier": 0.1767,
       "status": "exploratory"
     },
     "UNDER 1.5": {
-      "n": 5895,
-      "accuracy": 0.7791,
-      "baselineAccuracy": 0.779,
-      "brier": 0.1738,
-      "baselineBrier": 0.175,
+      "n": 6329,
+      "accuracy": 0.7764,
+      "baselineAccuracy": 0.7767,
+      "brier": 0.1751,
+      "baselineBrier": 0.1767,
       "status": "exploratory"
     },
     "OVER 2.5": {
-      "n": 5895,
-      "accuracy": 0.5408,
-      "baselineAccuracy": 0.5399,
-      "brier": 0.2485,
-      "baselineBrier": 0.2467,
+      "n": 6329,
+      "accuracy": 0.5412,
+      "baselineAccuracy": 0.5389,
+      "brier": 0.2486,
+      "baselineBrier": 0.247,
       "status": "exploratory"
     },
     "UNDER 2.5": {
-      "n": 5895,
-      "accuracy": 0.5408,
+      "n": 6329,
+      "accuracy": 0.5412,
       "baselineAccuracy": 0.5366,
-      "brier": 0.2485,
-      "baselineBrier": 0.2467,
+      "brier": 0.2486,
+      "baselineBrier": 0.247,
       "status": "exploratory"
     },
     "OVER 3.5": {
-      "n": 5895,
-      "accuracy": 0.6819,
-      "baselineAccuracy": 0.6804,
-      "brier": 0.2159,
-      "baselineBrier": 0.215,
+      "n": 6329,
+      "accuracy": 0.6838,
+      "baselineAccuracy": 0.6815,
+      "brier": 0.215,
+      "baselineBrier": 0.2152,
       "status": "exploratory"
     },
     "UNDER 3.5": {
-      "n": 5895,
-      "accuracy": 0.6819,
-      "baselineAccuracy": 0.6816,
-      "brier": 0.2159,
-      "baselineBrier": 0.215,
+      "n": 6329,
+      "accuracy": 0.6838,
+      "baselineAccuracy": 0.6832,
+      "brier": 0.215,
+      "baselineBrier": 0.2152,
       "status": "exploratory"
     },
     "PARI": {
-      "n": 5895,
-      "accuracy": 0.5009,
-      "baselineAccuracy": 0.4955,
+      "n": 6329,
+      "accuracy": 0.5037,
+      "baselineAccuracy": 0.4979,
       "brier": 0.25,
-      "baselineBrier": 0.2507,
+      "baselineBrier": 0.2508,
       "status": "exploratory"
     },
     "DISPARI": {
-      "n": 5895,
-      "accuracy": 0.5009,
-      "baselineAccuracy": 0.4936,
+      "n": 6329,
+      "accuracy": 0.5037,
+      "baselineAccuracy": 0.4957,
       "brier": 0.25,
-      "baselineBrier": 0.2507,
+      "baselineBrier": 0.2508,
       "status": "exploratory"
     }
   },
   "exactScoreDiagnostic": {
-    "n": 5895,
-    "topOneAccuracy": 0.1115,
-    "shareTopOneIs1to1": 0.7208,
-    "shareTopOneDominant": 0.0098,
+    "n": 6329,
+    "topOneAccuracy": 0.112,
+    "shareTopOneIs1to1": 0.7165,
+    "shareTopOneDominant": 0.0104,
     "note": "Punteggio esatto: scenario piu probabile, non esito sicuro."
   },
   "byLeague": {
@@ -113,22 +113,22 @@
       "baselineBrier": 0.6551
     },
     "Spain / La Liga": {
-      "n": 372,
-      "accuracy": 0.4892,
-      "brier": 0.6134,
-      "baselineBrier": 0.6305
+      "n": 370,
+      "accuracy": 0.4865,
+      "brier": 0.6136,
+      "baselineBrier": 0.6296
     },
     "England / League Two": {
-      "n": 288,
-      "accuracy": 0.4618,
-      "brier": 0.6314,
-      "baselineBrier": 0.6489
+      "n": 292,
+      "accuracy": 0.4658,
+      "brier": 0.6297,
+      "baselineBrier": 0.6484
     },
     "England / League One": {
-      "n": 286,
-      "accuracy": 0.4406,
-      "brier": 0.6292,
-      "baselineBrier": 0.6542
+      "n": 287,
+      "accuracy": 0.446,
+      "brier": 0.6268,
+      "baselineBrier": 0.6536
     },
     "Portugal / Primeira Liga": {
       "n": 279,
@@ -143,16 +143,16 @@
       "baselineBrier": 0.6479
     },
     "Italy / Serie A": {
-      "n": 263,
-      "accuracy": 0.5133,
-      "brier": 0.5926,
-      "baselineBrier": 0.6429
+      "n": 262,
+      "accuracy": 0.5153,
+      "brier": 0.5918,
+      "baselineBrier": 0.6424
     },
     "England / Premier League": {
-      "n": 256,
-      "accuracy": 0.4844,
-      "brier": 0.6387,
-      "baselineBrier": 0.6594
+      "n": 255,
+      "accuracy": 0.4863,
+      "brier": 0.6378,
+      "baselineBrier": 0.6588
     },
     "Germany / Bundesliga": {
       "n": 253,
@@ -173,10 +173,10 @@
       "baselineBrier": 0.6509
     },
     "Spain / Segunda Division": {
-      "n": 224,
-      "accuracy": 0.4732,
-      "brier": 0.627,
-      "baselineBrier": 0.6392
+      "n": 227,
+      "accuracy": 0.4758,
+      "brier": 0.6249,
+      "baselineBrier": 0.6386
     },
     "Brazil / Serie A": {
       "n": 204,
@@ -221,16 +221,16 @@
       "baselineBrier": 0.6523
     },
     "Scotland / Championship": {
-      "n": 109,
-      "accuracy": 0.4954,
-      "brier": 0.6136,
-      "baselineBrier": 0.6545
+      "n": 112,
+      "accuracy": 0.5,
+      "brier": 0.6105,
+      "baselineBrier": 0.6513
     },
     "Spain / Segunda División": {
-      "n": 44,
-      "accuracy": 0.3864,
-      "brier": 0.6472,
-      "baselineBrier": 0.6554
+      "n": 48,
+      "accuracy": 0.4167,
+      "brier": 0.6412,
+      "baselineBrier": 0.6475
     },
     "World / UEFA Champions League": {
       "n": 37,
@@ -243,6 +243,12 @@
       "accuracy": 0.5135,
       "brier": 0.6144,
       "baselineBrier": 0.5647
+    },
+    "Japan / J2 League": {
+      "n": 31,
+      "accuracy": 0.6774,
+      "brier": 0.568,
+      "baselineBrier": 0.6205
     },
     "Turkey / 2. Lig": {
       "n": 31,
@@ -274,17 +280,35 @@
       "brier": 0.6246,
       "baselineBrier": 0.7016
     },
+    "Japan / J3 League": {
+      "n": 28,
+      "accuracy": 0.5357,
+      "brier": 0.6058,
+      "baselineBrier": 0.6185
+    },
+    "Turkey / 3. Lig - Group 2": {
+      "n": 27,
+      "accuracy": 0.7037,
+      "brier": 0.5428,
+      "baselineBrier": 0.6429
+    },
+    "Turkey / 3. Lig - Group 1": {
+      "n": 27,
+      "accuracy": 0.4074,
+      "brier": 0.6576,
+      "baselineBrier": 0.6617
+    },
     "England / Non League Premier - Isthmian": {
       "n": 26,
       "accuracy": 0.4615,
       "brier": 0.6312,
       "baselineBrier": 0.6684
     },
-    "Japan / J2 League": {
-      "n": 26,
-      "accuracy": 0.7308,
-      "brier": 0.5395,
-      "baselineBrier": 0.6044
+    "World / Friendlies Clubs": {
+      "n": 25,
+      "accuracy": 0.48,
+      "brier": 0.6144,
+      "baselineBrier": 0.6018
     },
     "England / Non League Premier - Southern South": {
       "n": 25,
@@ -298,17 +322,11 @@
       "brier": 0.6329,
       "baselineBrier": 0.6574
     },
-    "World / Friendlies Clubs": {
-      "n": 23,
-      "accuracy": 0.4348,
-      "brier": 0.6255,
-      "baselineBrier": 0.6216
-    },
-    "Japan / J3 League": {
-      "n": 21,
-      "accuracy": 0.5714,
-      "brier": 0.6023,
-      "baselineBrier": 0.6165
+    "Kosovo / Liga E Pare": {
+      "n": 24,
+      "accuracy": 0.375,
+      "brier": 0.6719,
+      "baselineBrier": 0.6776
     },
     "World / UEFA Europa Conference League": {
       "n": 20,
@@ -316,29 +334,23 @@
       "brier": 0.5818,
       "baselineBrier": 0.5931
     },
+    "Turkey / 3. Lig - Group 3": {
+      "n": 20,
+      "accuracy": 0.65,
+      "brier": 0.5367,
+      "baselineBrier": 0.6033
+    },
     "Japan / J1 League": {
       "n": 18,
       "accuracy": 0.5556,
       "brier": 0.557,
       "baselineBrier": 0.6547
     },
-    "Turkey / 3. Lig - Group 2": {
-      "n": 18,
-      "accuracy": 0.6667,
-      "brier": 0.5603,
-      "baselineBrier": 0.6412
-    },
-    "Turkey / 3. Lig - Group 1": {
-      "n": 18,
-      "accuracy": 0.3333,
-      "brier": 0.6902,
-      "baselineBrier": 0.6625
-    },
-    "Kosovo / Liga E Pare": {
-      "n": 18,
-      "accuracy": 0.3889,
-      "brier": 0.6619,
-      "baselineBrier": 0.6515
+    "Guatemala / Liga Nacional": {
+      "n": 16,
+      "accuracy": 0.5,
+      "brier": 0.5999,
+      "baselineBrier": 0.5894
     },
     "Liberia / LFA First Division": {
       "n": 16,
@@ -364,17 +376,11 @@
       "brier": 0.4998,
       "baselineBrier": 0.6394
     },
-    "Guatemala / Liga Nacional": {
-      "n": 13,
-      "accuracy": 0.5385,
-      "brier": 0.5988,
-      "baselineBrier": 0.5589
-    },
-    "Turkey / 3. Lig - Group 3": {
-      "n": 13,
-      "accuracy": 0.5385,
-      "brier": 0.5889,
-      "baselineBrier": 0.6669
+    "El-Salvador / Primera Division": {
+      "n": 12,
+      "accuracy": 0.5,
+      "brier": 0.6478,
+      "baselineBrier": 0.6846
     },
     "Norway / 1. Division": {
       "n": 12,
@@ -387,7 +393,25 @@
       "accuracy": 0.5,
       "brier": 0.6012,
       "baselineBrier": 0.7615
+    },
+    "Spain / Tercera División RFEF - Group 12": {
+      "n": 12,
+      "accuracy": 0.5833,
+      "brier": 0.4964,
+      "baselineBrier": 0.5301
+    },
+    "Spain / Primera División RFEF - Group 1": {
+      "n": 12,
+      "accuracy": 0.3333,
+      "brier": 0.6818,
+      "baselineBrier": 0.7013
+    },
+    "Tunisia / Ligue 2": {
+      "n": 12,
+      "accuracy": 0.4167,
+      "brier": 0.6294,
+      "baselineBrier": 0.5534
     }
   },
-  "generatedAt": "2026-11-15T22:01:12.830122+01:00"
+  "generatedAt": "2026-11-16T14:42:39.192519+01:00"
 }

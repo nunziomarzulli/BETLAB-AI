@@ -31529,7 +31529,7 @@
     "away": "Pachuca W",
     "recordedAt": "2026-11-15T13:47:53.762090+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.46148,
       "X": 0.23037,
@@ -31537,7 +31537,14 @@
       "OVER 2.5": 0.62013,
       "UNDER 2.5": 0.37987
     },
-    "market": null
+    "market": null,
+    "outcome": "1",
+    "homeGoals": 3,
+    "awayGoals": 2,
+    "settledAt": "2026-11-16T14:42:35.836116+01:00",
+    "correct1X2": true,
+    "brier1X2": 0.438037,
+    "correctOver25": true
   },
   {
     "fixtureId": 1649470,
@@ -31547,7 +31554,7 @@
     "away": "América W",
     "recordedAt": "2026-11-15T13:47:53.762090+01:00",
     "source": "pre_kickoff_model_only",
-    "status": "IN_ATTESA",
+    "status": "VALUTATO",
     "probabilities": {
       "1": 0.17008,
       "X": 0.19963,
@@ -31555,7 +31562,14 @@
       "OVER 2.5": 0.61089,
       "UNDER 2.5": 0.38911
     },
-    "market": null
+    "market": null,
+    "outcome": "2",
+    "homeGoals": 0,
+    "awayGoals": 3,
+    "settledAt": "2026-11-16T14:42:35.836116+01:00",
+    "correct1X2": true,
+    "brier1X2": 0.205465,
+    "correctOver25": true
   },
   {
     "fixtureId": 1636987,
@@ -31572,6 +31586,150 @@
       "2": 0.25782,
       "OVER 2.5": 0.60859,
       "UNDER 2.5": 0.39141
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1578780,
+    "timestamp": 1794944700,
+    "date": "2026-11-17",
+    "home": "Bonnyrigg Rose Athletic",
+    "away": "Gala Fairydean Rovers",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.44655,
+      "X": 0.22443,
+      "2": 0.32902,
+      "OVER 2.5": 0.65906,
+      "UNDER 2.5": 0.34094
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612185,
+    "timestamp": 1794938400,
+    "date": "2026-11-17",
+    "home": "Defensa y Justicia Res.",
+    "away": "Huracán Res.",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.37495,
+      "X": 0.29281,
+      "2": 0.33224,
+      "OVER 2.5": 0.37111,
+      "UNDER 2.5": 0.62889
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612188,
+    "timestamp": 1794938400,
+    "date": "2026-11-17",
+    "home": "Gimnasia La Plata Res.",
+    "away": "Atlético Tucumán Res.",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.3243,
+      "X": 0.2688,
+      "2": 0.4069,
+      "OVER 2.5": 0.45619,
+      "UNDER 2.5": 0.54381
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612189,
+    "timestamp": 1794938400,
+    "date": "2026-11-17",
+    "home": "Independiente Riva. Res.",
+    "away": "Platense Res.",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.54201,
+      "X": 0.23433,
+      "2": 0.22366,
+      "OVER 2.5": 0.53302,
+      "UNDER 2.5": 0.46698
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612194,
+    "timestamp": 1794938400,
+    "date": "2026-11-17",
+    "home": "San Lorenzo Res.",
+    "away": "Tigre Res.",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.40662,
+      "X": 0.26805,
+      "2": 0.32533,
+      "OVER 2.5": 0.45942,
+      "UNDER 2.5": 0.54058
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612197,
+    "timestamp": 1794938400,
+    "date": "2026-11-17",
+    "home": "Unión Santa Fe Res.",
+    "away": "Instituto Res.",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.40729,
+      "X": 0.25473,
+      "2": 0.33798,
+      "OVER 2.5": 0.518,
+      "UNDER 2.5": 0.482
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1578781,
+    "timestamp": 1794944700,
+    "date": "2026-11-17",
+    "home": "Brechin",
+    "away": "Stirling University",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.61946,
+      "X": 0.20951,
+      "2": 0.17102,
+      "OVER 2.5": 0.56714,
+      "UNDER 2.5": 0.43286
+    },
+    "market": null
+  },
+  {
+    "fixtureId": 1612195,
+    "timestamp": 1794945600,
+    "date": "2026-11-17",
+    "home": "San Martín San Juan Res.",
+    "away": "Quilmes 2",
+    "recordedAt": "2026-11-16T14:42:35.836116+01:00",
+    "source": "pre_kickoff_model_only",
+    "status": "IN_ATTESA",
+    "probabilities": {
+      "1": 0.42306,
+      "X": 0.24471,
+      "2": 0.33223,
+      "OVER 2.5": 0.56179,
+      "UNDER 2.5": 0.43821
     },
     "market": null
   }
