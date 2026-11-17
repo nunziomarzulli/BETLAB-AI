@@ -4,7 +4,7 @@
   "modelCalibration": "non_validato",
   "predictionSource": "historical_poisson_with_market_sanity_checks",
   "engine": "BETLAB AI CORE - PREVISIONI + TEST CRONOLOGICO",
-  "generatedAt": "2026-11-17T01:14:15.057910+01:00",
+  "generatedAt": "2026-11-17T15:30:06.134734+01:00",
   "days": [
     "2026-11-16",
     "2026-11-17",
@@ -453,7 +453,7 @@
         "baselineBrier": 0.5534
       }
     },
-    "generatedAt": "2026-11-17T01:14:15.057119+01:00"
+    "generatedAt": "2026-11-17T15:30:06.133450+01:00"
   },
   "marketReferenceLookups": 1,
   "domesticFixtureSource": {
@@ -517,7 +517,7 @@
       "sourcesAvailable": 38,
       "sourcesUnavailable": 0,
       "resultsRead": 8840,
-      "resultsAdded": 1
+      "resultsAdded": 0
     },
     "apiTeamEnrichment": {
       "requests": 4,
@@ -620,7 +620,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:43.716594+01:00",
+        "generatedAt": "2026-11-17T15:29:12.479587+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -832,7 +832,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:44.177126+01:00",
+        "generatedAt": "2026-11-17T15:29:13.184810+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1044,7 +1044,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:45.931118+01:00",
+        "generatedAt": "2026-11-17T15:29:15.678428+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1108,16 +1108,9 @@
       },
       "riskSignals": {
         "market1X2": {
-          "available": true,
-          "sourceCount": 9,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.10476,
-            "X": 0.16579,
-            "2": 0.72945
-          },
-          "dispersion": 0.0377,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
         },
         "opponentStrength": {
           "home": {
@@ -1139,7 +1132,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 0,
-        "drawOdd": 5.5,
+        "drawOdd": null,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -1190,80 +1183,7 @@
         "topScoreLead": 0.01719,
         "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
       },
-      "analyzedMarketOptions": [
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.75212,
-          "odd": 1.13,
-          "bookmaker": "BetVictor",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.74715,
-          "odd": 1.1,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.71314,
-          "odd": 1.6,
-          "bookmaker": "BetVictor",
-          "oddsSources": 6,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.71115,
-          "odd": 3.5,
-          "bookmaker": "BetVictor",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.5417,
-          "odd": 1.05,
-          "bookmaker": "Betfair",
-          "oddsSources": 6,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.54067,
-          "odd": 1.81,
-          "bookmaker": "Marathonbet",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.50743,
-          "odd": 1.47,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.50224,
-          "odd": 1.83,
-          "bookmaker": "1xBet",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
+      "analyzedMarketOptions": [],
       "prediction": {
         "available": false,
         "selection": null,
@@ -1336,7 +1256,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:47.840080+01:00",
+        "generatedAt": "2026-11-17T15:29:18.316692+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1400,16 +1320,9 @@
       },
       "riskSignals": {
         "market1X2": {
-          "available": true,
-          "sourceCount": 9,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.73717,
-            "X": 0.16374,
-            "2": 0.09908
-          },
-          "dispersion": 0.0296,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
         },
         "opponentStrength": {
           "home": {
@@ -1431,7 +1344,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 0,
         "awayWinStreak": 0,
-        "drawOdd": 5.5,
+        "drawOdd": null,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -1482,80 +1395,7 @@
         "topScoreLead": 0.00682,
         "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
       },
-      "analyzedMarketOptions": [
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.87067,
-          "odd": 1.13,
-          "bookmaker": "BetVictor",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.7939,
-          "odd": 1.1,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.7534,
-          "odd": 1.04,
-          "bookmaker": "Betfair",
-          "oddsSources": 6,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 2.5",
-          "modelProbability": 0.69074,
-          "odd": 1.47,
-          "bookmaker": "Pinnacle",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "GOAL",
-          "modelProbability": 0.66746,
-          "odd": 1.85,
-          "bookmaker": "BetVictor",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "1X2",
-          "selection": "1",
-          "modelProbability": 0.5473,
-          "odd": 1.25,
-          "bookmaker": "William Hill",
-          "oddsSources": 9,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.52299,
-          "odd": 1.59,
-          "bookmaker": "1xBet",
-          "oddsSources": 6,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.5004,
-          "odd": 1.83,
-          "bookmaker": "1xBet",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
+      "analyzedMarketOptions": [],
       "prediction": {
         "available": false,
         "selection": null,
@@ -1628,7 +1468,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:49.250785+01:00",
+        "generatedAt": "2026-11-17T15:29:20.173343+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -1692,16 +1532,9 @@
       },
       "riskSignals": {
         "market1X2": {
-          "available": true,
-          "sourceCount": 9,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.7107,
-            "X": 0.17768,
-            "2": 0.11162
-          },
-          "dispersion": 0.034,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
         },
         "opponentStrength": {
           "home": {
@@ -1723,7 +1556,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 1,
         "awayWinStreak": 1,
-        "drawOdd": 5.15,
+        "drawOdd": null,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -1774,80 +1607,7 @@
         "topScoreLead": 0.00225,
         "scoreNote": "Nessun punteggio chiaramente dominante: mostrare i tre scenari, non un risultato sicuro"
       },
-      "analyzedMarketOptions": [
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 3.5",
-          "modelProbability": 0.76353,
-          "odd": 1.57,
-          "bookmaker": "1xBet",
-          "oddsSources": 6,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "12",
-          "modelProbability": 0.73602,
-          "odd": 1.11,
-          "bookmaker": "BetVictor",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "1X",
-          "modelProbability": 0.73537,
-          "odd": 1.05,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "OVER 1.5",
-          "modelProbability": 0.70692,
-          "odd": 1.13,
-          "bookmaker": "BetVictor",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Totale Gol",
-          "selection": "UNDER 2.5",
-          "modelProbability": 0.551,
-          "odd": 2.4,
-          "bookmaker": "Bet365",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Doppia Chance",
-          "selection": "X2",
-          "modelProbability": 0.5286,
-          "odd": 3.3,
-          "bookmaker": "Betfair",
-          "oddsSources": 7,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Goal/No Goal",
-          "selection": "NO GOAL",
-          "modelProbability": 0.51048,
-          "odd": 1.87,
-          "bookmaker": "Marathonbet",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        },
-        {
-          "market": "Pari/Dispari",
-          "selection": "PARI",
-          "modelProbability": 0.50356,
-          "odd": 1.83,
-          "bookmaker": "1xBet",
-          "oddsSources": 5,
-          "status": "solo_analisi_non_approvato"
-        }
-      ],
+      "analyzedMarketOptions": [],
       "prediction": {
         "available": false,
         "selection": null,
@@ -1920,7 +1680,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:49.472100+01:00",
+        "generatedAt": "2026-11-17T15:29:20.535655+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2132,7 +1892,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:49.815355+01:00",
+        "generatedAt": "2026-11-17T15:29:21.090475+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2344,7 +2104,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:50.035193+01:00",
+        "generatedAt": "2026-11-17T15:29:21.395777+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2556,7 +2316,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:50.266041+01:00",
+        "generatedAt": "2026-11-17T15:29:21.780494+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2768,7 +2528,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:50.623665+01:00",
+        "generatedAt": "2026-11-17T15:29:22.282708+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -2980,7 +2740,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:51.125776+01:00",
+        "generatedAt": "2026-11-17T15:29:23.264999+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3192,7 +2952,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:51.378646+01:00",
+        "generatedAt": "2026-11-17T15:29:23.767119+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3404,7 +3164,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:51.511352+01:00",
+        "generatedAt": "2026-11-17T15:29:24.077999+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3616,7 +3376,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:51.764111+01:00",
+        "generatedAt": "2026-11-17T15:29:24.646541+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -3828,7 +3588,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:51.896520+01:00",
+        "generatedAt": "2026-11-17T15:29:24.954894+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4040,7 +3800,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:52.031982+01:00",
+        "generatedAt": "2026-11-17T15:29:25.265313+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4252,7 +4012,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:52.294188+01:00",
+        "generatedAt": "2026-11-17T15:29:25.766603+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4464,7 +4224,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:52.551918+01:00",
+        "generatedAt": "2026-11-17T15:29:26.282826+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4676,7 +4436,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:53.524432+01:00",
+        "generatedAt": "2026-11-17T15:29:27.940517+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -4888,7 +4648,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:54.845072+01:00",
+        "generatedAt": "2026-11-17T15:29:30.230379+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5100,7 +4860,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:54.992482+01:00",
+        "generatedAt": "2026-11-17T15:29:30.604207+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5312,7 +5072,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:55.015560+01:00",
+        "generatedAt": "2026-11-17T15:29:30.719271+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5524,7 +5284,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:55.034967+01:00",
+        "generatedAt": "2026-11-17T15:29:30.934640+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5736,7 +5496,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:56.484522+01:00",
+        "generatedAt": "2026-11-17T15:29:33.386422+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -5948,7 +5708,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:57.088458+01:00",
+        "generatedAt": "2026-11-17T15:29:34.468510+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6160,7 +5920,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:58.284923+01:00",
+        "generatedAt": "2026-11-17T15:29:36.572107+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6372,7 +6132,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:13:59.585687+01:00",
+        "generatedAt": "2026-11-17T15:29:38.872197+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6584,7 +6344,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:00.521145+01:00",
+        "generatedAt": "2026-11-17T15:29:40.438516+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6783,7 +6543,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:01.007152+01:00",
+        "generatedAt": "2026-11-17T15:29:41.375802+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -6995,7 +6755,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:01.729547+01:00",
+        "generatedAt": "2026-11-17T15:29:42.649048+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7207,7 +6967,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:02.450720+01:00",
+        "generatedAt": "2026-11-17T15:29:43.936719+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7419,7 +7179,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:03.165581+01:00",
+        "generatedAt": "2026-11-17T15:29:45.290098+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7631,7 +7391,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:03.182397+01:00",
+        "generatedAt": "2026-11-17T15:29:45.457830+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -7843,7 +7603,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:03.785477+01:00",
+        "generatedAt": "2026-11-17T15:29:46.568402+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8055,7 +7815,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:03.805382+01:00",
+        "generatedAt": "2026-11-17T15:29:46.688007+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8267,7 +8027,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:04.524987+01:00",
+        "generatedAt": "2026-11-17T15:29:47.971062+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8479,7 +8239,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:04.785765+01:00",
+        "generatedAt": "2026-11-17T15:29:48.551489+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8691,7 +8451,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:04.798372+01:00",
+        "generatedAt": "2026-11-17T15:29:48.717680+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -8903,7 +8663,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:04.819019+01:00",
+        "generatedAt": "2026-11-17T15:29:48.836351+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -9115,7 +8875,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:05.886703+01:00",
+        "generatedAt": "2026-11-17T15:29:50.709336+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -9327,7 +9087,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:06.003939+01:00",
+        "generatedAt": "2026-11-17T15:29:50.906943+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -9526,7 +9286,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:06.004311+01:00",
+        "generatedAt": "2026-11-17T15:29:50.907528+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -9725,7 +9485,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:06.004630+01:00",
+        "generatedAt": "2026-11-17T15:29:50.908045+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -9924,7 +9684,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:06.933679+01:00",
+        "generatedAt": "2026-11-17T15:29:52.494495+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -10123,7 +9883,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:07.628971+01:00",
+        "generatedAt": "2026-11-17T15:29:53.670542+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -10322,7 +10082,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:07.745989+01:00",
+        "generatedAt": "2026-11-17T15:29:53.869021+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -10521,7 +10281,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:08.095529+01:00",
+        "generatedAt": "2026-11-17T15:29:54.457999+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -10720,7 +10480,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:08.789330+01:00",
+        "generatedAt": "2026-11-17T15:29:55.640220+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -10919,7 +10679,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:09.138454+01:00",
+        "generatedAt": "2026-11-17T15:29:56.226239+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -11118,7 +10878,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:09.601977+01:00",
+        "generatedAt": "2026-11-17T15:29:57.001117+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -11317,7 +11077,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:10.177782+01:00",
+        "generatedAt": "2026-11-17T15:29:57.969242+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -11516,7 +11276,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:10.410959+01:00",
+        "generatedAt": "2026-11-17T15:29:58.356813+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -11715,7 +11475,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:10.872351+01:00",
+        "generatedAt": "2026-11-17T15:29:59.130812+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -11914,7 +11674,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:11.218930+01:00",
+        "generatedAt": "2026-11-17T15:29:59.715413+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -12113,7 +11873,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:11.450064+01:00",
+        "generatedAt": "2026-11-17T15:30:00.103484+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -12312,7 +12072,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:12.265632+01:00",
+        "generatedAt": "2026-11-17T15:30:01.463127+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
@@ -12376,16 +12136,9 @@
       },
       "riskSignals": {
         "market1X2": {
-          "available": true,
-          "sourceCount": 6,
-          "status": "verificato",
-          "probabilities": {
-            "1": 0.74632,
-            "X": 0.14485,
-            "2": 0.10884
-          },
-          "dispersion": 0.0476,
-          "method": "mediana_probabilita_quote_1x2_senza_margine"
+          "available": false,
+          "sourceCount": 0,
+          "status": "meno_di_tre_bookmaker"
         },
         "opponentStrength": {
           "home": {
@@ -12407,7 +12160,7 @@
         "officialStandingStatus": "non_verificata_nessun_feed_classifica",
         "homeWinStreak": 3,
         "awayWinStreak": 0,
-        "drawOdd": 6.25,
+        "drawOdd": null,
         "drawAttention": false,
         "engineModel": "poisson_v10_uncalibrated"
       },
@@ -12518,7 +12271,7 @@
       },
       "context": {
         "source": "API-Football + storico BETLAB",
-        "generatedAt": "2026-11-17T01:14:12.381775+01:00",
+        "generatedAt": "2026-11-17T15:30:01.659635+01:00",
         "injuriesStatus": "non_verificato",
         "injuriesRequestStatus": "non_disponibile_piano",
         "injuriesNote": "Indisponibilita' non verificabili con il piano API attuale: endpoint /injuries con parametro ids non autorizzato. Controllare fonti ufficiali prima della partita.",
