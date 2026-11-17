@@ -1,108 +1,108 @@
 {
   "method": "walk_forward_by_date_no_same_day_or_future_results",
   "type": "retrospective_exploratory_not_out_of_sample_final_validation",
-  "historicalResultsTotal": 35792,
-  "fixturesDuringTestPeriod": 28875,
-  "historyEligibleDuringTestPeriod": 6329,
-  "forecastsEvaluated": 6329,
-  "startOfTestWindow": "2026-02-19",
-  "cutoffDateExclusive": "2026-11-16",
-  "accuracy1X2": 0.4846,
-  "baselineAccuracy1X2": 0.4473,
-  "brier1X2": 0.6219,
-  "baselineBrier1X2": 0.6468,
-  "logLoss1X2": 1.0351,
-  "baselineLogLoss1X2": 1.0697,
+  "historicalResultsTotal": 35868,
+  "fixturesDuringTestPeriod": 28950,
+  "historyEligibleDuringTestPeriod": 6353,
+  "forecastsEvaluated": 6353,
+  "startOfTestWindow": "2026-02-20",
+  "cutoffDateExclusive": "2026-11-17",
+  "accuracy1X2": 0.485,
+  "baselineAccuracy1X2": 0.4477,
+  "brier1X2": 0.6216,
+  "baselineBrier1X2": 0.6467,
+  "logLoss1X2": 1.0348,
+  "baselineLogLoss1X2": 1.0695,
   "requiredMinimum": 100,
   "status": "measured_not_proven",
   "note": "Valutazione retrospettiva cronologica 1X2 e mercati binari: nessuna quota storica inclusa, nessuna prova di profitto.",
   "marketMetrics": {
     "GOAL": {
-      "n": 6329,
-      "accuracy": 0.5328,
-      "baselineAccuracy": 0.5606,
+      "n": 6353,
+      "accuracy": 0.5327,
+      "baselineAccuracy": 0.5602,
       "brier": 0.2485,
       "baselineBrier": 0.2462,
       "status": "exploratory"
     },
     "NO GOAL": {
-      "n": 6329,
-      "accuracy": 0.5326,
-      "baselineAccuracy": 0.5587,
+      "n": 6353,
+      "accuracy": 0.5325,
+      "baselineAccuracy": 0.5586,
       "brier": 0.2485,
       "baselineBrier": 0.2462,
       "status": "exploratory"
     },
     "OVER 1.5": {
-      "n": 6329,
-      "accuracy": 0.7764,
-      "baselineAccuracy": 0.7764,
-      "brier": 0.1751,
-      "baselineBrier": 0.1767,
+      "n": 6353,
+      "accuracy": 0.7755,
+      "baselineAccuracy": 0.7755,
+      "brier": 0.1755,
+      "baselineBrier": 0.1769,
       "status": "exploratory"
     },
     "UNDER 1.5": {
-      "n": 6329,
-      "accuracy": 0.7764,
-      "baselineAccuracy": 0.7767,
-      "brier": 0.1751,
-      "baselineBrier": 0.1767,
+      "n": 6353,
+      "accuracy": 0.7755,
+      "baselineAccuracy": 0.7759,
+      "brier": 0.1755,
+      "baselineBrier": 0.1769,
       "status": "exploratory"
     },
     "OVER 2.5": {
-      "n": 6329,
+      "n": 6353,
       "accuracy": 0.5412,
-      "baselineAccuracy": 0.5389,
+      "baselineAccuracy": 0.5393,
       "brier": 0.2486,
-      "baselineBrier": 0.247,
+      "baselineBrier": 0.2469,
       "status": "exploratory"
     },
     "UNDER 2.5": {
-      "n": 6329,
+      "n": 6353,
       "accuracy": 0.5412,
-      "baselineAccuracy": 0.5366,
+      "baselineAccuracy": 0.5369,
       "brier": 0.2486,
-      "baselineBrier": 0.247,
+      "baselineBrier": 0.2469,
       "status": "exploratory"
     },
     "OVER 3.5": {
-      "n": 6329,
-      "accuracy": 0.6838,
-      "baselineAccuracy": 0.6815,
-      "brier": 0.215,
-      "baselineBrier": 0.2152,
+      "n": 6353,
+      "accuracy": 0.6842,
+      "baselineAccuracy": 0.6819,
+      "brier": 0.2149,
+      "baselineBrier": 0.2151,
       "status": "exploratory"
     },
     "UNDER 3.5": {
-      "n": 6329,
-      "accuracy": 0.6838,
-      "baselineAccuracy": 0.6832,
-      "brier": 0.215,
-      "baselineBrier": 0.2152,
+      "n": 6353,
+      "accuracy": 0.6842,
+      "baselineAccuracy": 0.6836,
+      "brier": 0.2149,
+      "baselineBrier": 0.2151,
       "status": "exploratory"
     },
     "PARI": {
-      "n": 6329,
-      "accuracy": 0.5037,
-      "baselineAccuracy": 0.4979,
+      "n": 6353,
+      "accuracy": 0.5032,
+      "baselineAccuracy": 0.4987,
       "brier": 0.25,
-      "baselineBrier": 0.2508,
+      "baselineBrier": 0.2507,
       "status": "exploratory"
     },
     "DISPARI": {
-      "n": 6329,
-      "accuracy": 0.5037,
-      "baselineAccuracy": 0.4957,
+      "n": 6353,
+      "accuracy": 0.5032,
+      "baselineAccuracy": 0.4965,
       "brier": 0.25,
-      "baselineBrier": 0.2508,
+      "baselineBrier": 0.2507,
       "status": "exploratory"
     }
   },
   "exactScoreDiagnostic": {
-    "n": 6329,
-    "topOneAccuracy": 0.112,
-    "shareTopOneIs1to1": 0.7165,
-    "shareTopOneDominant": 0.0104,
+    "n": 6353,
+    "topOneAccuracy": 0.1122,
+    "shareTopOneIs1to1": 0.7156,
+    "shareTopOneDominant": 0.0105,
     "note": "Punteggio esatto: scenario piu probabile, non esito sicuro."
   },
   "byLeague": {
@@ -173,10 +173,10 @@
       "baselineBrier": 0.6509
     },
     "Spain / Segunda Division": {
-      "n": 227,
-      "accuracy": 0.4758,
-      "brier": 0.6249,
-      "baselineBrier": 0.6386
+      "n": 228,
+      "accuracy": 0.4781,
+      "brier": 0.6235,
+      "baselineBrier": 0.6378
     },
     "Brazil / Serie A": {
       "n": 204,
@@ -227,10 +227,10 @@
       "baselineBrier": 0.6513
     },
     "Spain / Segunda División": {
-      "n": 48,
-      "accuracy": 0.4167,
-      "brier": 0.6412,
-      "baselineBrier": 0.6475
+      "n": 49,
+      "accuracy": 0.4286,
+      "brier": 0.6345,
+      "baselineBrier": 0.6439
     },
     "World / UEFA Champions League": {
       "n": 37,
@@ -316,17 +316,17 @@
       "brier": 0.623,
       "baselineBrier": 0.6061
     },
+    "Kosovo / Liga E Pare": {
+      "n": 25,
+      "accuracy": 0.4,
+      "brier": 0.6685,
+      "baselineBrier": 0.6692
+    },
     "World / UEFA Europa League": {
       "n": 24,
       "accuracy": 0.5,
       "brier": 0.6329,
       "baselineBrier": 0.6574
-    },
-    "Kosovo / Liga E Pare": {
-      "n": 24,
-      "accuracy": 0.375,
-      "brier": 0.6719,
-      "baselineBrier": 0.6776
     },
     "World / UEFA Europa Conference League": {
       "n": 20,
@@ -406,6 +406,12 @@
       "brier": 0.6818,
       "baselineBrier": 0.7013
     },
+    "Serbia / Prva Liga": {
+      "n": 12,
+      "accuracy": 0.3333,
+      "brier": 0.7155,
+      "baselineBrier": 0.7402
+    },
     "Tunisia / Ligue 2": {
       "n": 12,
       "accuracy": 0.4167,
@@ -413,5 +419,5 @@
       "baselineBrier": 0.5534
     }
   },
-  "generatedAt": "2026-11-16T22:01:40.581340+01:00"
+  "generatedAt": "2026-11-17T01:14:15.057119+01:00"
 }
